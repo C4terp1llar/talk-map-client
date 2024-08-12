@@ -8,6 +8,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
+
 import { createVuetify } from 'vuetify';
 import 'vuetify/styles';
 import { aliases, mdi } from 'vuetify/iconsets/mdi';

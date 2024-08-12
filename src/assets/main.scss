@@ -43,3 +43,21 @@ html, body, #app{
   min-width: 100%;
   min-height: 100%;
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+/* Для Firefox */
+input[type="date"] {
+  -moz-appearance: textfield;
+}
+
+/* Для IE и Edge */
+input[type="date"]::-ms-clear {
+  display: none;
+}
+input[type="date"]::-ms-expand {
+  display: none;
+}

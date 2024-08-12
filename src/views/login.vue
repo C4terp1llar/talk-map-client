@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import {ref} from "vue";
+import {rules} from "@/helpers/baseTextValidator";
 
 const router = useRouter()
 const isPasswordVisible = ref<boolean>(false);
+
+const password = ref<string>('');
+const email = ref<string>('');
 
 const handleSubmit = () => {
   console.log('kjuby')
@@ -14,17 +18,23 @@ const handleSubmit = () => {
 <template>
   <div class="wrapper">
 
-    <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-2">
+    <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
 
       <v-text-field
+          v-model="email"
+          :rules="[rules.required, rules.email]"
           class="w-100"
           variant="outlined"
           type="email"
           label="Email"
           maxlength="50"
+          hide-details="auto"
+
       />
 
       <v-text-field
+          v-model="password"
+          :rules="[rules.required]"
           class="w-100"
           variant="outlined"
           label="Пароль"
@@ -32,6 +42,8 @@ const handleSubmit = () => {
           :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
           :type="isPasswordVisible ? 'text' : 'password'"
           @click:append-inner="isPasswordVisible = !isPasswordVisible"
+          hide-details="auto"
+
       />
 
       <v-btn
