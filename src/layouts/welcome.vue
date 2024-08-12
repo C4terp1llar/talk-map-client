@@ -1,0 +1,29 @@
+<script setup lang="ts">
+
+import WelcomeHeader from "@/components/common/welcomeHeader.vue";
+import WelcomeFooter from "@/components/common/welcomeFooter.vue";
+</script>
+
+<template>
+  <div class="wrapper">
+    <header>
+      <welcome-header/>
+    </header>
+    <main class="d-flex w-100 align-items-center flex-wrap justify-content-center">
+      <router-view/>
+    </main>
+    <footer>
+      <welcome-footer/>
+    </footer>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.wrapper {
+  width: 100%;
+  height: 100% ;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 100px 1fr 100px;
+}
+</style>
