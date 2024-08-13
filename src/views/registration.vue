@@ -1,76 +1,48 @@
 <script setup lang="ts">
-import {useRouter} from "vue-router";
-import {ref} from "vue";
-import {rules} from "@/helpers/baseTextValidator";
+import {useRegistrationStore} from "@/stores/regSteps";
+import EmailStep from "@/components/registerSteps/EmailStep.vue";
+import CodeStep from "@/components/registerSteps/CodeStep.vue";
+import PassStep from "@/components/registerSteps/PassStep.vue";
+import {computed} from "vue";
+import PersonalStep from "@/components/registerSteps/PersonalStep.vue";
+import AddressStep from "@/components/registerSteps/AddressStep.vue";
 
-const date = ref<string>('');
-const password = ref<string>('');
-const email = ref<string>('');
+const regStore = useRegistrationStore();
 
-
-const router = useRouter()
-
-const isPasswordVisible = ref<boolean>(false);
-
-const handleSubmit = () => {
-  console.log('рег')
+const steps = {
+  1: EmailStep,
+  2: CodeStep,
+  3: PassStep,
+  4: PersonalStep,
+  5: AddressStep
 }
+
+const currentComponent = computed(() => steps[regStore.currentStep]);
+
+const currentProgress = computed(() =>  (regStore.currentStep / Object.keys(steps).length) * 100);
+
 </script>
 
 <template>
   <div class="wrapper">
 
-    <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
+<!--    <v-progress-linear-->
+<!--        v-model="currentProgress"-->
+<!--        height="5"-->
+<!--        color="primary"-->
+<!--    />-->
 
-      <v-text-field
-          v-model="email"
-          :rules="[rules.required, rules.email]"
-          class="w-100"
-          variant="outlined"
-          type="email"
-          label="Email"
-          maxlength="50"
-          hide-details="auto"
-      />
+    <component :is="currentComponent"/>
 
-      <v-text-field
-          v-model="password"
-          :rules="[rules.required, rules.lengthPass(password), rules.onlyDigitOrLetterPass(password)]"
-          variant="outlined"
-          label="Пароль"
-          maxlength="50"
-          :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
-          :type="isPasswordVisible ? 'text' : 'password'"
-          @click:append-inner="isPasswordVisible = !isPasswordVisible"
-          hide-details="auto"
-      />
-
-      <v-text-field
-          v-model="date"
-          :rules="[rules.required, rules.minAge]"
-          variant="outlined"
-          type="date"
-          hide-details="auto"
-      ></v-text-field>
-
-      <v-btn
-          class="text-none w-100"
-          type="submit"
-          variant="outlined"
-      >
-        Зарегистрироваться
-      </v-btn>
-
-      <router-link class="align-self-center" to="login">Уже есть аккаунт?</router-link>
-
-    </v-form>
+    <router-link class="align-self-center mt-4" to="login">Уже есть аккаунт?</router-link>
 
   </div>
 </template>
 
 <style scoped>
 .wrapper {
-  width: 350px;
+  max-width: 500px;
+  min-width: 300px;
   height: auto;
   padding: 50px;
   border-radius: 15px;
