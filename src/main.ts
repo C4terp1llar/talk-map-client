@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@mdi/font/css/materialdesignicons.css'
-import './assets/main.scss'
+import './assets/main.scss';
+import './assets/map.scss'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

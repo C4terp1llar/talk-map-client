@@ -50,5 +50,14 @@ const currentProgress = computed(() =>  (regStore.currentStep / Object.keys(step
   display: flex;
   flex-direction: column;
   align-items: center;
+  @media screen and (max-width: 525px) {
+    padding: 15px;
+    max-width: 400px;
+  }
+  @media screen and (max-width: 425px) {
+  padding: 15px 5px;
+    max-width: 350px;
+    width: 100%;
+  }
 }
 </style>
