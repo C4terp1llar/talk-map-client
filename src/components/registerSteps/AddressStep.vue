@@ -12,9 +12,9 @@ const foundAddresses = ref<{ name: string, lat: number, lon: number }[]>([])
 const map = ref<L.Map | null | any>(null);
 const markers = ref<L.Marker[]>([]); // Массив маркеров
 
-
 const isMenuOpen = ref(false);
-const canEditAddress = ref(true);
+const addressNotFound = ref(false);
+const pending = ref(false);
 
 const initMap = () => {
   map.value = L.map('map').setView([55.7558, 37.6176], 10); // если нет доступа к геолокации то ставим москву
@@ -65,7 +65,9 @@ const addMarker = (lat: number, lon: number, name: string) => {
   markers.value.push(newMarker);
 };
 
-const handleMarkerClick = (marker: L.Marker, name: string, lat: number, lon: number) => {
+const handleMarkerClick = (marker: any, name: string, lat: number, lon: number) => {
+  map.value?.setView([lat, lon], 15); // центрируем карту на выбранный маркер
+
   // ставим в модель маркера данные с кликнутого маркера
   selectedAddress.value = {
     name: name,
@@ -85,7 +87,10 @@ const handleMarkerClick = (marker: L.Marker, name: string, lat: number, lon: num
 }
 
 const findAddress = async () => {
-  isMenuOpen.value = false
+  if  (pending.value) return
+
+  pending.value = true
+  addressNotFound.value = false;
   foundAddresses.value = []
 
   await regStore.getAddresses(address.value);
@@ -100,10 +105,23 @@ const findAddress = async () => {
     bounds.extend([lat, lon]);
   }
 
-  // Если найдено хотя бы одно место масштабируем карту
   if (regStore.guessCities.length > 0) {
     isMenuOpen.value = true
     map.value?.fitBounds(bounds);
+  }else{
+    addressNotFound.value = true;
+  }
+  pending.value = false
+};
+
+const handleListClick = (item: { name: string, lat: number, lon: number }) => {
+  console.log(item)
+  // маркер который соответствует координатам выбранного элемента списка
+  const marker = markers.value.find(m => m.getLatLng().lat === item.lat && m.getLatLng().lng === item.lon);
+
+  if (marker) {
+    handleMarkerClick(marker, item.name, item.lat, item.lon);  // Вызываем обработку клика по маркеру
+    isMenuOpen.value = false
   }
 };
 
@@ -130,23 +148,44 @@ onMounted(() => {
         :append-inner-icon="'mdi-magnify'"
         @click:append-inner="findAddress"
         @keydown.enter="findAddress"
-        @focus="foundAddresses.length ? isMenuOpen = true : isMenuOpen = false"
-        @blur="isMenuOpen ? isMenuOpen = false : false"
+        @focus="isMenuOpen = true"
+        @blur="isMenuOpen && (addressNotFound || !foundAddresses.length) ? isMenuOpen = false : false "
     />
+
     <v-fade-transition>
       <v-list
           class="address-menu-selector"
           v-if="isMenuOpen"
       >
-        <v-list-item-action>
-          <v-btn color="green" class="w-100 text-none">Выбрать на карте</v-btn>
-        </v-list-item-action>
-        <v-list-item
-            v-for="(item, index) in foundAddresses"
-            :key="index"
-        >
-          <v-list-item-title>{{ item.name }}</v-list-item-title>
-        </v-list-item>
+        <template v-if="pending">
+          <v-progress-circular
+              class="align-self-center"
+              color="green"
+              indeterminate
+          ></v-progress-circular>
+        </template>
+        <template v-if="addressNotFound">
+          <v-list-item>
+            <v-list-item-title class="text-center">Адрес не найден</v-list-item-title>
+          </v-list-item>
+        </template>
+        <template v-if="!addressNotFound && !pending && foundAddresses.length">
+          <v-list-item-action class="w-100">
+            <v-btn color="green" class="w-100 text-none" @click="isMenuOpen = false">Выбрать на карте</v-btn>
+          </v-list-item-action>
+          <v-list-item
+              v-for="(item, index) in foundAddresses"
+              :key="index"
+              @click="handleListClick(item)"
+          >
+            <v-list-item-title>{{ item.name }}</v-list-item-title>
+          </v-list-item>
+        </template>
+        <template v-if="!addressNotFound && !pending && !foundAddresses.length">
+          <v-list-item>
+            <v-list-item-title class="text-center">Найдите свой адрес</v-list-item-title>
+          </v-list-item>
+        </template>
       </v-list>
     </v-fade-transition>
 
@@ -162,6 +201,7 @@ onMounted(() => {
       </div>
     </div>
   </v-fade-transition>
+
   <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
 
     <div class="d-flex gap-3 mt-5">
@@ -181,11 +221,14 @@ onMounted(() => {
       </v-btn>
     </div>
   </v-form>
+
 </template>
 
 <style scoped>
 #map {
   border-radius: 15px;
+  border: 1px solid black;
+
 }
 
 .address-menu-selector {
@@ -194,13 +237,41 @@ onMounted(() => {
   top: 106px;
   right: 0;
   z-index: 9999;
-  border: 1px solid black;
+  border: 2px solid black;
   max-height: 300px;
+  border-radius: 15px;
+  padding: 15px;
+  gap: 5px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .address-text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+
+
+
+
+/* скролбар джля списка */
+.address-menu-selector::-webkit-scrollbar {
+  width: 8px; /* Ширина скроллбара */
+  margin-right: 5px;
+}
+
+.address-menu-selector::-webkit-scrollbar-thumb {
+  background-color: #c4c4c4; /* Цвет ползунка */
+  border-radius: 15px; /* Скругление ползунка */
+
+}
+
+.address-menu-selector::-webkit-scrollbar-track {
+  margin: 10px;
+  background-color: #f0f0f0; /* Цвет фона для дорожки скроллбара */
+  border-radius: 15px; /* Скругление дорожки */
 }
 </style>

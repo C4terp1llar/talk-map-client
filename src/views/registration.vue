@@ -32,7 +32,10 @@ const currentProgress = computed(() =>  (regStore.currentStep / Object.keys(step
 <!--        color="primary"-->
 <!--    />-->
 
-    <component :is="currentComponent"/>
+
+      <component :is="currentComponent"/>
+
+
 
     <router-link class="align-self-center mt-4" to="login">Уже есть аккаунт?</router-link>
 
