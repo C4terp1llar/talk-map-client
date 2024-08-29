@@ -126,7 +126,7 @@ const handleListClick = (item: { name: string, lat: number, lon: number }) => {
 };
 
 const handleSubmit = () => {
-  regStore.resetSteps();
+  regStore.nextStep();
 };
 
 onMounted(() => {
@@ -237,7 +237,7 @@ onMounted(() => {
   top: 106px;
   right: 0;
   z-index: 9999;
-  border: 2px solid black;
+  border: 1px solid black;
   max-height: 300px;
   border-radius: 15px;
   padding: 15px;

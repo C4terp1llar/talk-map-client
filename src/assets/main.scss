@@ -31,6 +31,17 @@ a:hover{
   text-decoration: underline;
 }
 
+.nav-link{
+  text-decoration: none;
+  color: green;
+  cursor:pointer;
+}
+
+.nav-link:hover{
+  color: greenyellow;
+}
+
+
 *{
   margin: 0;
   padding: 0;
@@ -85,4 +96,3 @@ input[type="date"]::-ms-expand {
 .marker-popup-txt-def{
   color: green;
 }
-

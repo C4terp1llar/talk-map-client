@@ -6,6 +6,7 @@ import PassStep from "@/components/registerSteps/PassStep.vue";
 import {computed} from "vue";
 import PersonalStep from "@/components/registerSteps/PersonalStep.vue";
 import AddressStep from "@/components/registerSteps/AddressStep.vue";
+import AvatarStep from "@/components/registerSteps/avatarStep.vue";
 
 const regStore = useRegistrationStore();
 
@@ -14,7 +15,8 @@ const steps = {
   2: CodeStep,
   3: PassStep,
   4: PersonalStep,
-  5: AddressStep
+  5: AddressStep,
+  6: AvatarStep
 }
 
 const currentComponent = computed(() => steps[regStore.currentStep]);
