@@ -3,13 +3,33 @@
 import {rules} from "@/helpers/baseTextValidator";
 import {ref} from "vue";
 import {useRegistrationStore} from "@/stores/regSteps";
+import {useNotificationStore} from "@/stores/notifications";
 
+const notificationStore = useNotificationStore()
 const regStore = useRegistrationStore();
 
 const email = ref<string>('');
 
-const handleSubmit = () => {
-  regStore.nextStep()
+const handleSubmit = async () => {
+  if (rules.email(email.value) !== true) return
+
+  await regStore.isEmailBusy(email.value)
+
+  if(!regStore.error){
+    await sendCode()
+  }else {
+    notificationStore.addNotification('error', regStore.error, 3000)
+  }
+}
+
+const sendCode = async () => {
+  await regStore.sendConfirmEmailCode(email.value)
+
+  if(!regStore.error){
+    regStore.nextStep();
+  }else {
+    notificationStore.addNotification('error', regStore.error, 3000)
+  }
 }
 </script>
 
@@ -37,7 +57,18 @@ const handleSubmit = () => {
           type="submit"
           variant="outlined"
       >
-        Далее
+        <template v-if="regStore.pending">
+          <v-progress-circular
+              class="align-self-center"
+              color="green"
+              indeterminate
+              size="small"
+              :disabled="regStore.pending"
+          ></v-progress-circular>
+        </template>
+        <template v-else>
+          Далее
+        </template>
       </v-btn>
 
 

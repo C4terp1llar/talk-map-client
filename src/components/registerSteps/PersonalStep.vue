@@ -7,7 +7,7 @@ const regStore = useRegistrationStore();
 
 const name = ref<string>('');
 const date = ref<string>('');
-const gender = ref<string>(''); // Пол
+const gender = ref<string>('');
 
 const handleSubmit = () => {
   console.log(name.value, date.value, gender.value);

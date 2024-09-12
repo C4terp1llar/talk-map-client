@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import axios from 'axios';
+import api from "@/utils/api";
 
 export const useRegistrationStore = defineStore('registration', () => {
     const pending = ref<boolean>(false);
@@ -17,6 +18,67 @@ export const useRegistrationStore = defineStore('registration', () => {
     const resetSteps = () => {
         currentStep.value = 1;
     };
+
+
+    const newUserEmail = ref<string>()
+
+    const isEmailBusy = async (clientMail: string) => {
+        pending.value = true;
+        error.value = null;
+
+        try{
+            const response = await api.post('checkEmail', {
+                email: clientMail
+            })
+
+            if (response.data.isTaken){
+                error.value = "Данный email уже используется"
+            }else{
+                newUserEmail.value = clientMail;
+            }
+        }catch (e) {
+            error.value = "Произошла ошибка, попробуйте позже";
+            console.error(e);
+        }finally {
+            pending.value = false;
+        }
+    }
+
+    const sendConfirmEmailCode = async (clientEmail: string) => {
+        pending.value = true;
+        error.value = null;
+
+        try {
+            await api.post(`sendCheckCode`, {
+                email: clientEmail,
+            }, { withCredentials: true });
+        }catch (e) {
+            error.value = "Произошла ошибка, попробуйте позже";
+            console.error(e);
+        }finally {
+            pending.value = false;
+        }
+    }
+
+    const checkConfirmEmailCode = async (clientCode: string) => {
+        pending.value = true;
+        error.value = null;
+
+        try {
+            const response = await api.post(`verifyCheckCode`, {
+                code: clientCode,
+            }, { withCredentials: true });
+
+            if (response.data.message === "Неверный код"){
+                error.value = "Неверный код"
+            }
+        }catch (e) {
+            error.value = "Произошла ошибка, попробуйте позже";
+            console.error(e);
+        }finally {
+            pending.value = false;
+        }
+    }
 
     const guessCities = ref<{ name: string; lat: number; lon: number }[]>([]);
 
@@ -55,6 +117,10 @@ export const useRegistrationStore = defineStore('registration', () => {
         currentStep,
         nextStep,
         prevStep,
+        isEmailBusy,
+        newUserEmail,
+        sendConfirmEmailCode,
+        checkConfirmEmailCode,
         resetSteps,
         guessCities,
         getAddresses

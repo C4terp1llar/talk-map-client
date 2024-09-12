@@ -3,7 +3,9 @@ import {ref, onMounted} from 'vue';
 import L from 'leaflet';
 import {rules} from "@/helpers/baseTextValidator";
 import {useRegistrationStore} from "@/stores/regSteps";
+import {useNotificationStore} from "@/stores/notifications";
 
+const notificationStore = useNotificationStore();
 const regStore = useRegistrationStore();
 
 const address = ref<string>('');
@@ -92,6 +94,8 @@ const findAddress = async () => {
   pending.value = true
   addressNotFound.value = false;
   foundAddresses.value = []
+
+  notificationStore.addNotification('error', 'что-то пошло не так', 5000)
 
   await regStore.getAddresses(address.value);
 
