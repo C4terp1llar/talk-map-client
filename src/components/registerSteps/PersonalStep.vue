@@ -2,15 +2,19 @@
 import {rules} from "@/helpers/baseTextValidator";
 import {useRegistrationStore} from "@/stores/regSteps";
 import {ref} from "vue";
+import {replaceSymbols} from "@/helpers/replaceSymbols";
 
 const regStore = useRegistrationStore();
 
-const name = ref<string>('');
+const nickname = ref<string>('');
 const date = ref<string>('');
 const gender = ref<string>('');
 
 const handleSubmit = () => {
-  console.log(name.value, date.value, gender.value);
+  if (!gender.value.length || rules.minAge(date.value) !== true || rules.lengthNickname(nickname.value) !== true || rules.fieldSymbols(nickname.value) !== true) return
+
+  regStore.setNewUserPersonal(nickname.value, date.value, gender.value);
+
   regStore.nextStep()
 }
 </script>
@@ -19,14 +23,15 @@ const handleSubmit = () => {
   <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
 
     <div class="field">
-      <label class="inp-default-label">Имя:</label>
+      <label class="inp-default-label">Никнейм:</label>
       <v-text-field
-          v-model="name"
-          :rules="[rules.required]"
+          v-model="nickname"
+          :rules="[rules.fieldSymbols(nickname), rules.required, rules.lengthNickname(nickname)]"
           class="w-100"
           variant="outlined"
           maxlength="25"
           hide-details="auto"
+          @input="nickname = replaceSymbols(nickname)"
       />
     </div>
 

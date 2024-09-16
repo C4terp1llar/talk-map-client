@@ -10,13 +10,12 @@ const regStore = useRegistrationStore();
 
 const address = ref<string>('');
 const selectedAddress = ref<{ name: string, lat: number, lon: number } | null>(null)
-const foundAddresses = ref<{ name: string, lat: number, lon: number }[]>([])
 const map = ref<L.Map | null | any>(null);
 const markers = ref<L.Marker[]>([]); // Массив маркеров
 
 const isMenuOpen = ref(false);
 const addressNotFound = ref(false);
-const pending = ref(false);
+
 
 const initMap = () => {
   map.value = L.map('map').setView([55.7558, 37.6176], 10); // если нет доступа к геолокации то ставим москву
@@ -87,35 +86,31 @@ const handleMarkerClick = (marker: any, name: string, lat: number, lon: number) 
   const markerElement = marker.getElement();
   markerElement?.classList.add('selected-marker');
 }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const findAddress = async () => {
-  if  (pending.value) return
+  if  (regStore.pending || !address.value.length) return
 
-  pending.value = true
   addressNotFound.value = false;
-  foundAddresses.value = []
-
-  notificationStore.addNotification('error', 'что-то пошло не так', 5000)
 
   await regStore.getAddresses(address.value);
+
+  if (regStore.error ){
+    notificationStore.addNotification('error', regStore.error, 3000);
+    addressNotFound.value = true;
+    return
+  }
 
   clearMarkers(); // Очистка всех маркеров перед добавлением новых
   const bounds = L.latLngBounds([]);
 
   for (let city of regStore.guessCities) {
     const {lat, lon, name} = city;
-    foundAddresses.value.push({name: name, lat: lat, lon: lon});
     addMarker(lat, lon, name);
     bounds.extend([lat, lon]);
   }
 
-  if (regStore.guessCities.length > 0) {
-    isMenuOpen.value = true
-    map.value?.fitBounds(bounds);
-  }else{
-    addressNotFound.value = true;
-  }
-  pending.value = false
+  isMenuOpen.value = true
+  map.value?.fitBounds(bounds);
 };
 
 const handleListClick = (item: { name: string, lat: number, lon: number }) => {
@@ -130,6 +125,10 @@ const handleListClick = (item: { name: string, lat: number, lon: number }) => {
 };
 
 const handleSubmit = () => {
+  if (!selectedAddress.value) return
+
+  regStore.setNewUserAddress(selectedAddress.value)
+
   regStore.nextStep();
 };
 
@@ -153,7 +152,7 @@ onMounted(() => {
         @click:append-inner="findAddress"
         @keydown.enter="findAddress"
         @focus="isMenuOpen = true"
-        @blur="isMenuOpen && (addressNotFound || !foundAddresses.length) ? isMenuOpen = false : false "
+        @blur="isMenuOpen && (addressNotFound || !regStore.guessCities.length) ? isMenuOpen = false : false "
     />
 
     <v-fade-transition>
@@ -161,7 +160,7 @@ onMounted(() => {
           class="address-menu-selector"
           v-if="isMenuOpen"
       >
-        <template v-if="pending">
+        <template v-if="regStore.pending">
           <v-progress-circular
               class="align-self-center"
               color="green"
@@ -173,19 +172,19 @@ onMounted(() => {
             <v-list-item-title class="text-center">Адрес не найден</v-list-item-title>
           </v-list-item>
         </template>
-        <template v-if="!addressNotFound && !pending && foundAddresses.length">
+        <template v-if="!addressNotFound && !regStore.pending && regStore.guessCities.length">
           <v-list-item-action class="w-100">
             <v-btn color="green" class="w-100 text-none" @click="isMenuOpen = false">Выбрать на карте</v-btn>
           </v-list-item-action>
           <v-list-item
-              v-for="(item, index) in foundAddresses"
+              v-for="(item, index) in regStore.guessCities"
               :key="index"
               @click="handleListClick(item)"
           >
             <v-list-item-title>{{ item.name }}</v-list-item-title>
           </v-list-item>
         </template>
-        <template v-if="!addressNotFound && !pending && !foundAddresses.length">
+        <template v-if="!addressNotFound && !regStore.pending && !regStore.guessCities.length">
           <v-list-item>
             <v-list-item-title class="text-center">Найдите свой адрес</v-list-item-title>
           </v-list-item>

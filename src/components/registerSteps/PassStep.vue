@@ -4,6 +4,7 @@ import {rules} from "@/helpers/baseTextValidator";
 import {computed, ref} from "vue";
 import {checkPasswordStrength} from "@/helpers/passStrength";
 import {useRegistrationStore} from "@/stores/regSteps";
+import {replaceSymbols} from "@/helpers/replaceSymbols";
 
 const regStore = useRegistrationStore();
 
@@ -16,7 +17,10 @@ const password = ref<string>('');
 const confirmPassword = ref<string>('');
 
 const handleSubmit = () => {
-  console.log(password.value);
+  if (strength.value < 2 || password.value !== confirmPassword.value || rules.fieldSymbols(password.value) !== true) return;
+
+  regStore.setNewUserPassword(password.value)
+
   regStore.nextStep()
 }
 </script>
@@ -28,14 +32,13 @@ const handleSubmit = () => {
         <label class="inp-default-label">Пароль:</label>
         <v-text-field
             v-model="password"
-            :rules="[rules.required, rules.lengthPass(password), rules.onlyDigitOrLetterPass(password)]"
+            :rules="[rules.fieldSymbols(password), rules.required, rules.lengthPass(password), rules.onlyDigitOrLetterPass(password)]"
             variant="outlined"
             :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
             :type="isPasswordVisible ? 'text' : 'password'"
             @click:append-inner="isPasswordVisible = !isPasswordVisible"
-            @input="checkPasswordStrength"
+            @input="checkPasswordStrength, password = replaceSymbols(password)"
             hide-details="auto"
-
         />
       </div>
 
@@ -51,12 +54,13 @@ const handleSubmit = () => {
       <label class="inp-default-label">Подтверждение пароля:</label>
       <v-text-field
           v-model="confirmPassword"
-          :rules="[rules.required, rules.mismatchPasswords(password, confirmPassword)]"
+          :rules="[rules.fieldSymbols(confirmPassword), rules.required, rules.mismatchPasswords(password, confirmPassword)]"
           variant="outlined"
           :append-inner-icon="isPasswordConfirmVisible ? 'mdi-eye-off' : 'mdi-eye'"
           :type="isPasswordConfirmVisible ? 'text' : 'password'"
           @click:append-inner="isPasswordConfirmVisible = !isPasswordConfirmVisible"
           hide-details="auto"
+          @input="confirmPassword = replaceSymbols(confirmPassword)"
       />
     </div>
 

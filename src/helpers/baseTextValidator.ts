@@ -25,6 +25,12 @@ export const rules = {
         return tag.length >= 6 || 'Минимальная длина 6 символов'
     },
     onlyDigitOrLetterPass: (password: string) => {
-        return /[A-z,a-z]/.test(password) && /\d/.test(password) || 'Добавьте буквы и цифры'
+        return /[A-z,a-z]/.test(password) && /\d/.test(password) || 'Добавьте и буквы и цифры'
+    },
+    fieldSymbols: (value: string) => {
+        return /^[a-zA-Z0-9!@#$%^&*()_+\-={}\[\]|:;'",.<>/?]*$/.test(value) || 'Поле может содержать только латинские буквы, цифры и спец символы';
+    },
+    onlyNumbers: (value: string) => {
+        return /^[0-9]*$/.test(value) || 'Поле может содержать только цифры';
     }
 }

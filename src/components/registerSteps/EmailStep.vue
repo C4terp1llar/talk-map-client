@@ -4,6 +4,7 @@ import {rules} from "@/helpers/baseTextValidator";
 import {ref} from "vue";
 import {useRegistrationStore} from "@/stores/regSteps";
 import {useNotificationStore} from "@/stores/notifications";
+import {replaceSymbols} from "@/helpers/replaceSymbols";
 
 const notificationStore = useNotificationStore()
 const regStore = useRegistrationStore();
@@ -47,6 +48,7 @@ const sendCode = async () => {
           type="email"
           maxlength="50"
           hide-details="auto"
+          @input="email = replaceSymbols(email)"
       />
     </div>
 

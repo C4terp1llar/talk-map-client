@@ -4,6 +4,7 @@ import {rules} from "@/helpers/baseTextValidator";
 import {ref} from "vue";
 import {useRegistrationStore} from "@/stores/regSteps";
 import {useNotificationStore} from "@/stores/notifications";
+import {replaceSymbols} from "@/helpers/replaceSymbols";
 
 const notificationStore = useNotificationStore()
 const regStore = useRegistrationStore();
@@ -11,6 +12,9 @@ const regStore = useRegistrationStore();
 const code = ref<string>('');
 
 const handleSubmit = async () => {
+
+  if (rules.required(code.value) !== true || rules.onlyNumbers(code.value) !== true) return;
+
   await regStore.checkConfirmEmailCode(code.value)
 
   if(!regStore.error){
@@ -28,11 +32,12 @@ const handleSubmit = async () => {
       <label class="inp-default-label" >Код подтверждения:</label>
       <v-text-field
           v-model="code"
-          :rules="[rules.required]"
+          :rules="[rules.required, rules.onlyNumbers(code)]"
           class="w-100"
           variant="outlined"
           maxlength="4"
           hide-details="auto"
+          @input="code = replaceSymbols(code)"
       />
     </div>
 

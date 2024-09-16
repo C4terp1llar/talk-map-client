@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import {useAvatarSliderStore} from "@/stores/regAvatarSlider";
 import {onMounted} from "vue";
+import {useNotificationStore} from "@/stores/notifications";
 
 const regAvatarSliderStore = useAvatarSliderStore();
+const notificationStore = useNotificationStore()
 
-onMounted(() => {
-  regAvatarSliderStore.handleGetCommonAvatars();
+onMounted(async () => {
+  await regAvatarSliderStore.handleGetCommonAvatars();
+
+  if (regAvatarSliderStore.error){
+    notificationStore.addNotification('error', regAvatarSliderStore.error, 3000)
+  }
 });
 </script>
 
@@ -13,6 +19,7 @@ onMounted(() => {
   <div class="slider-wrapper">
     <v-avatar v-bind="$attrs" size="200" class="avatar">
       <v-carousel
+          v-if="!regAvatarSliderStore.pending"
           v-model="regAvatarSliderStore.currentSlide"
           :show-arrows="false"
           height="200"
@@ -25,6 +32,14 @@ onMounted(() => {
           <v-img :src="item" height="200px"></v-img>
         </v-carousel-item>
       </v-carousel>
+      <template v-else>
+        <v-progress-circular
+            class="align-self-center"
+            color="green"
+            indeterminate
+            size="large"
+        ></v-progress-circular>
+      </template>
     </v-avatar>
     <div class="controls">
       <v-btn

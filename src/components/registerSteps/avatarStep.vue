@@ -4,8 +4,10 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {useRegistrationStore} from "@/stores/regSteps";
 import AvatarSlider from "@/components/registerSteps/common/AvatarSlider.vue";
+import {useAvatarSliderStore} from "@/stores/regAvatarSlider";
 
 const regStore = useRegistrationStore();
+const regAvatarSliderStore = useAvatarSliderStore();
 
 const imageUrl = ref<string | ArrayBuffer | null>(null);
 const showModal = ref(false);
@@ -59,9 +61,12 @@ const handleCancel = () => {
 };
 
 const handleSubmit = () => {
-  if (cropper.value && !chooseCommonImg.value) {
+
+  if (chooseCommonImg.value){
+    regStore.setNewUserAvatar(regAvatarSliderStore.avatars[regAvatarSliderStore.currentSlide])
+  }else if(cropper.value && !chooseCommonImg.value){
     const croppedImage = cropper.value.getCroppedCanvas().toDataURL();
-    console.log(croppedImage)
+    regStore.setNewUserAvatar(croppedImage)
     regStore.resetSteps();
   }
 
