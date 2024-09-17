@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import {rules} from "@/helpers/baseTextValidator";
 import {useRegistrationStore} from "@/stores/regSteps";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {replaceSymbols} from "@/helpers/replaceSymbols";
+
+onMounted(() => {
+  nickname.value = regStore.newUserNickname;
+  date.value = regStore.newUserDateB;
+  gender.value = regStore.newUserGender;
+})
 
 const regStore = useRegistrationStore();
 
@@ -59,20 +65,22 @@ const handleSubmit = () => {
       />
     </div>
 
-    <div class="d-flex gap-3">
-      <v-btn
-          class="text-none flex-1-0"
-          variant="outlined"
-          @click="regStore.prevStep()"
-      >
-        Назад
-      </v-btn>
+    <div class="d-flex flex-column gap-1">
+
       <v-btn
           class="text-none flex-1-0"
           type="submit"
           variant="outlined"
       >
         Далее
+      </v-btn>
+      <v-btn
+          class="text-none flex-1-0"
+          @click="regStore.prevStep()"
+          variant="plain"
+          color="green"
+      >
+        Вернуться назад
       </v-btn>
     </div>
   </v-form>

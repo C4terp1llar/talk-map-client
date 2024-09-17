@@ -19,7 +19,7 @@ export const useRegistrationStore = defineStore('registration', () => {
     };
 
 
-    const newUserEmail = ref<string>()
+    const newUserEmail = ref<string>('')
 
     const isEmailBusy = async (clientMail: string) => {
         pending.value = true;
@@ -79,15 +79,15 @@ export const useRegistrationStore = defineStore('registration', () => {
         }
     }
 
-    const newUserPassword = ref<string>()
+    const newUserPassword = ref<string>('')
 
     const setNewUserPassword = (clientPassword: string) => {
         newUserPassword.value = clientPassword
     }
 
-    const newUserNickname = ref<string>()
-    const newUserDateB = ref<string>()
-    const newUserGender = ref<string>()
+    const newUserNickname = ref<string>('')
+    const newUserDateB = ref<string>('')
+    const newUserGender = ref<string>('')
 
     const setNewUserPersonal = (clientUserNickname: string, clientUserDateB: string, clientUserGender: string) => {
         newUserNickname.value = clientUserNickname
@@ -96,14 +96,13 @@ export const useRegistrationStore = defineStore('registration', () => {
     }
 
 
-
-
     const guessCities = ref<{ name: string; lat: number; lon: number }[]>([]);
 
-    const newUserAddress = ref<{ name: string; lat: number; lon: number }>()
+    const newUserAddress = ref<{ name: string; lat: number; lon: number } | null>(null)
 
     const setNewUserAddress = (clientAddress: { name: string; lat: number; lon: number }) => {
-        newUserAddress.value = clientAddress
+        newUserAddress.value = clientAddress;
+        guessCities.value = []
     }
 
     const getAddresses = async (clientAddress: string) => {
@@ -131,13 +130,55 @@ export const useRegistrationStore = defineStore('registration', () => {
         }
     };
 
-    const newUserAvatar = ref<string>()
+    const newUserAvatar = ref<string>('')
 
     const setNewUserAvatar = (clientAvatar: string) => {
         newUserAvatar.value = clientAvatar
     }
 
+
+
     //todo финальный для рега по всем данным
+
+    const getDeviceInfo = () => {
+        return `${navigator.userAgent}&${navigator.language}`
+    }
+
+    const regNewUser = async () => {
+        //!email || !password || !nickname || !date_b || !gender || !avatar || !address || !device_info
+
+        pending.value = true;
+        error.value = null;
+
+        try{
+            await api.post('registerUser', {
+                email: newUserEmail.value,
+                password: newUserPassword.value,
+                nickname: newUserNickname.value,
+                date_b: newUserDateB.value,
+                gender: newUserGender.value,
+                avatar: newUserAvatar.value,
+                address: newUserAddress.value,
+                device_info: getDeviceInfo()
+            }, {withCredentials: true});
+        }catch (e) {
+            error.value = "Произошла ошибка, попробуйте позже";
+            console.error(e);
+        }finally {
+            pending.value = false;
+        }
+
+    }
+
+    const clearAllData = () => {
+        newUserEmail.value = ''
+        newUserPassword.value = ''
+        newUserNickname.value = ''
+        newUserDateB.value = ''
+        newUserGender.value = ''
+        newUserAvatar.value = ''
+        newUserAddress.value = null
+    }
 
     return {
         pending,
@@ -169,5 +210,9 @@ export const useRegistrationStore = defineStore('registration', () => {
 
         newUserAvatar,
         setNewUserAvatar,
+
+        regNewUser,
+
+        clearAllData
     };
 });

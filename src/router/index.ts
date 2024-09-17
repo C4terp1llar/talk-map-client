@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Welcome from '@/layouts/welcome.vue'
+import Main from "@/layouts/main.vue";
 
 
 const router = createRouter({
@@ -34,7 +35,23 @@ const router = createRouter({
         }
       ]
     },
-
+    {
+      path: '/app',
+      name: 'app',
+      component: Main,
+      children: [
+        {
+          path: '',
+          name: 'default-app',
+          redirect: '/home'
+        },
+        {
+          path: '/home',
+          name: 'home',
+          component: () => import('../views/home.vue')
+        }
+      ]
+    }
   ]
 })
 

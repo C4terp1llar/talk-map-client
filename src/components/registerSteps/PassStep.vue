@@ -1,10 +1,15 @@
 <script setup lang="ts">
 
 import {rules} from "@/helpers/baseTextValidator";
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {checkPasswordStrength} from "@/helpers/passStrength";
 import {useRegistrationStore} from "@/stores/regSteps";
 import {replaceSymbols} from "@/helpers/replaceSymbols";
+
+onMounted(() => {
+  password.value = regStore.newUserPassword;
+  confirmPassword.value = regStore.newUserPassword;
+})
 
 const regStore = useRegistrationStore();
 
@@ -64,20 +69,22 @@ const handleSubmit = () => {
       />
     </div>
 
-    <div class="d-flex gap-3">
-      <v-btn
-          class="text-none flex-1-0"
-          variant="outlined"
-          @click="regStore.resetSteps()"
-      >
-        Назад
-      </v-btn>
+    <div class="d-flex flex-column gap-1">
+
       <v-btn
           class="text-none flex-1-0"
           type="submit"
           variant="outlined"
       >
         Далее
+      </v-btn>
+      <v-btn
+          class="text-none flex-1-0"
+          @click="regStore.resetSteps()"
+          variant="plain"
+          color="green"
+      >
+        Вернуться назад
       </v-btn>
     </div>
 

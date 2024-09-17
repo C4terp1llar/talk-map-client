@@ -16,12 +16,13 @@
 
 <style scoped lang="scss">
 .header {
-  width: 100%;
-  height: 100%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 15px;
+  margin: 5px !important;
+  border-radius: 15px;
+  box-shadow: 0 1px 20px currentColor;
 }
 </style>

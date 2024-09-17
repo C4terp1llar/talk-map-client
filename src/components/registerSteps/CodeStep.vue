@@ -41,16 +41,7 @@ const handleSubmit = async () => {
       />
     </div>
 
-    <div class="d-flex gap-3">
-      <v-btn
-          class="text-none flex-1-0"
-          variant="outlined"
-          @click="regStore.prevStep()"
-          :disabled="regStore.pending"
-      >
-        Назад
-      </v-btn>
-
+    <div class="d-flex flex-column gap-1">
       <v-btn
           class="text-none flex-1-0"
           type="submit"
@@ -68,6 +59,16 @@ const handleSubmit = async () => {
         <template v-else>
           Далее
         </template>
+      </v-btn>
+
+      <v-btn
+          class="text-none flex-1-0"
+          variant="plain"
+          @click="regStore.prevStep()"
+          :disabled="regStore.pending"
+          color="green"
+      >
+        Вернуться назад
       </v-btn>
     </div>
 

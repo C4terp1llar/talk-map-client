@@ -1,10 +1,17 @@
 <script setup lang="ts">
 
 import {rules} from "@/helpers/baseTextValidator";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {useRegistrationStore} from "@/stores/regSteps";
 import {useNotificationStore} from "@/stores/notifications";
 import {replaceSymbols} from "@/helpers/replaceSymbols";
+import {useRouter} from "vue-router";
+
+onMounted(() => {
+  email.value = regStore.newUserEmail
+})
+
+const router = useRouter()
 
 const notificationStore = useNotificationStore()
 const regStore = useRegistrationStore();
@@ -16,9 +23,9 @@ const handleSubmit = async () => {
 
   await regStore.isEmailBusy(email.value)
 
-  if(!regStore.error){
+  if (!regStore.error) {
     await sendCode()
-  }else {
+  } else {
     notificationStore.addNotification('error', regStore.error, 3000)
   }
 }
@@ -26,9 +33,9 @@ const handleSubmit = async () => {
 const sendCode = async () => {
   await regStore.sendConfirmEmailCode(email.value)
 
-  if(!regStore.error){
+  if (!regStore.error) {
     regStore.nextStep();
-  }else {
+  } else {
     notificationStore.addNotification('error', regStore.error, 3000)
   }
 }
@@ -39,10 +46,10 @@ const sendCode = async () => {
 
 
     <div class="field">
-      <label class="inp-default-label" >Email:</label>
+      <label class="inp-default-label">Email:</label>
       <v-text-field
           v-model="email"
-          :rules="[rules.required, rules.email]"
+          :rules="[rules.required,rules.fieldSymbols(email), rules.email]"
           class="w-100"
           variant="outlined"
           type="email"
@@ -52,8 +59,7 @@ const sendCode = async () => {
       />
     </div>
 
-
-
+    <div class="d-flex flex-column gap-1">
       <v-btn
           class="text-none flex-1-0"
           type="submit"
@@ -73,6 +79,16 @@ const sendCode = async () => {
         </template>
       </v-btn>
 
+      <v-btn
+          class="text-none flex-1-0"
+          variant="plain"
+          @click="router.push('/')"
+          :disabled="regStore.pending"
+          color="green"
+      >
+        Вернуться к авторизации
+      </v-btn>
+    </div>
 
   </v-form>
 </template>

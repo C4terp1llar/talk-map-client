@@ -5,9 +5,14 @@ import 'cropperjs/dist/cropper.css';
 import {useRegistrationStore} from "@/stores/regSteps";
 import AvatarSlider from "@/components/registerSteps/common/AvatarSlider.vue";
 import {useAvatarSliderStore} from "@/stores/regAvatarSlider";
+import {useNotificationStore} from "@/stores/notifications";
+import {useRouter} from "vue-router";
+
+const router = useRouter()
 
 const regStore = useRegistrationStore();
 const regAvatarSliderStore = useAvatarSliderStore();
+const notificationStore = useNotificationStore();
 
 const imageUrl = ref<string | ArrayBuffer | null>(null);
 const showModal = ref(false);
@@ -60,14 +65,17 @@ const handleCancel = () => {
   cropper.value = null;
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
 
   if (chooseCommonImg.value){
     regStore.setNewUserAvatar(regAvatarSliderStore.avatars[regAvatarSliderStore.currentSlide])
+
+    await handleRegistration();
   }else if(cropper.value && !chooseCommonImg.value){
-    const croppedImage = cropper.value.getCroppedCanvas().toDataURL();
-    regStore.setNewUserAvatar(croppedImage)
-    regStore.resetSteps();
+    const avatar = imageUrl.value = cropper.value.getCroppedCanvas().toDataURL();
+    regStore.setNewUserAvatar(avatar)
+
+    await handleRegistration();
   }
 
   // если флаг на готовый аватары false или нет загруженной картинки просто ретернимся
@@ -75,7 +83,16 @@ const handleSubmit = () => {
 };
 
 const handleRegistration = async () => {
+  await regStore.regNewUser()
 
+  if(!regStore.error){
+    await router.push('/app');
+    notificationStore.addNotification('success', `Добро пожаловать, ${regStore.newUserNickname}!`, 3000)
+    regStore.resetSteps();
+    regStore.clearAllData();
+  }else{
+    notificationStore.addNotification('error', regStore.error, 3000)
+  }
 }
 
 onMounted(() => {
@@ -114,7 +131,7 @@ onUnmounted(() => {
   <v-btn
       v-if="!showModal"
       variant="plain"
-      class="text-none align-self-center mt-1"
+      class="text-none w-100 align-self-center mt-1"
       @click="chooseCommonImg = !chooseCommonImg"
   >
     {{ chooseCommonImg ? 'Загрузить свой аватар' : 'Выбрать из готовых' }}
@@ -122,20 +139,34 @@ onUnmounted(() => {
 
   <v-form v-if="!showModal" @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
 
-    <div class="d-flex gap-3 mt-4">
-      <v-btn
-          class="text-none flex-1-0"
-          variant="outlined"
-          @click="regStore.prevStep()"
-      >
-        Назад
-      </v-btn>
+    <div class="d-flex flex-column gap-1 mt-4">
+
       <v-btn
           class="text-none flex-1-0"
           type="submit"
           variant="outlined"
+          :disabled="regStore.pending"
       >
-        Далее
+        <template v-if="regStore.pending">
+          <v-progress-circular
+              class="align-self-center"
+              color="green"
+              indeterminate
+              size="small"
+          ></v-progress-circular>
+        </template>
+        <template v-else>
+          Завершить регистрацию
+        </template>
+      </v-btn>
+      <v-btn
+          class="text-none flex-1-0"
+          @click="regStore.prevStep()"
+          :disabled="regStore.pending"
+          variant="plain"
+          color="green"
+      >
+        Вернуться назад
       </v-btn>
     </div>
   </v-form>
@@ -145,21 +176,23 @@ onUnmounted(() => {
       <img ref="imageElement" :src="typeof imageUrl === 'string' ? imageUrl : ''" alt="Preview"
            @load="initializeCropper"/>
     </div>
-    <div class="d-flex gap-3 mt-5">
-      <v-btn
-          @click="handleCancel"
-          variant="outlined"
-          class="text-none flex-1-0"
-          type="submit"
-      >
-        Отмена
-      </v-btn>
+    <div class="d-flex flex-column gap-1 mt-5">
+
       <v-btn
           @click="handleCrop"
           class="text-none flex-1-0"
           variant="outlined"
       >
         Подтвердить
+      </v-btn>
+      <v-btn
+          @click="handleCancel"
+          class="text-none flex-1-0"
+          type="submit"
+          variant="plain"
+          color="green"
+      >
+        Отмена
       </v-btn>
     </div>
   </div>

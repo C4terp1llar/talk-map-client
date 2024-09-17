@@ -181,7 +181,7 @@ onMounted(() => {
               :key="index"
               @click="handleListClick(item)"
           >
-            <v-list-item-title>{{ item.name }}</v-list-item-title>
+            <v-list-item-title class="address-text">{{ item.name }}</v-list-item-title>
           </v-list-item>
         </template>
         <template v-if="!addressNotFound && !regStore.pending && !regStore.guessCities.length">
@@ -200,27 +200,31 @@ onMounted(() => {
     <div v-if="selectedAddress" class="selected-address-block d-flex w-100 flex-column ga-1 pt-2">
       <h5 class="align-self-center">Выбранный адрес:</h5>
       <div class="d-flex align-items-center justify-content-center">
-        <p class="address-text ma-0">{{ selectedAddress.name }}</p>
+        <p class="address-text text-center ma-0">{{ selectedAddress.name }}</p>
       </div>
     </div>
   </v-fade-transition>
 
   <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
 
-    <div class="d-flex gap-3 mt-5">
-      <v-btn
-          class="text-none flex-1-0"
-          variant="outlined"
-          @click="regStore.prevStep()"
-      >
-        Назад
-      </v-btn>
+    <div class="d-flex flex-column gap-1 mt-5">
+
       <v-btn
           class="text-none flex-1-0"
           type="submit"
           variant="outlined"
+          :disabled="regStore.pending"
       >
         Далее
+      </v-btn>
+      <v-btn
+          class="text-none flex-1-0"
+          @click="regStore.prevStep()"
+          :disabled="regStore.pending"
+          variant="plain"
+          color="green"
+      >
+        Вернуться назад
       </v-btn>
     </div>
   </v-form>
@@ -251,9 +255,12 @@ onMounted(() => {
 }
 
 .address-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box; /* Используется для реализации многострочного обрезания текста */
+  -webkit-line-clamp: 2; /* Ограничение на 2 строки */
+  -webkit-box-orient: vertical; /* Указывает, что нужно обрезать текст по вертикали */
+  overflow: hidden; /* Обрезка текста, который не помещается */
+  text-overflow: ellipsis; /* Добавляет многоточие в конце строки, если текст слишком длинный */
+  white-space: normal; /* Обеспечивает нормальный перенос строк */
 }
 
 

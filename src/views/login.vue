@@ -2,6 +2,7 @@
 import {useRouter} from "vue-router";
 import {ref} from "vue";
 import {rules} from "@/helpers/baseTextValidator";
+import {replaceSymbols} from "@/helpers/replaceSymbols";
 
 const router = useRouter()
 const isPasswordVisible = ref<boolean>(false);
@@ -16,35 +17,39 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <div class="wrapper">
+  <div class="wrapper-page-main-content">
 
     <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
 
-      <v-text-field
-          v-model="email"
-          :rules="[rules.required, rules.email]"
-          class="w-100"
-          variant="outlined"
-          type="email"
-          label="Email"
-          maxlength="50"
-          hide-details="auto"
 
-      />
+      <div class="field">
+        <label class="inp-default-label">Email:</label>
+        <v-text-field
+            v-model="email"
+            :rules="[rules.required,rules.fieldSymbols(email), rules.email]"
+            class="w-100"
+            variant="outlined"
+            type="email"
+            maxlength="50"
+            hide-details="auto"
+            @input="email = replaceSymbols(email)"
+        />
+      </div>
 
-      <v-text-field
-          v-model="password"
-          :rules="[rules.required]"
-          class="w-100"
-          variant="outlined"
-          label="Пароль"
-          maxlength="50"
-          :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
-          :type="isPasswordVisible ? 'text' : 'password'"
-          @click:append-inner="isPasswordVisible = !isPasswordVisible"
-          hide-details="auto"
 
-      />
+      <div class="field">
+        <label class="inp-default-label">Пароль:</label>
+        <v-text-field
+            v-model="password"
+            :rules="[rules.fieldSymbols(password), rules.required]"
+            variant="outlined"
+            :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
+            :type="isPasswordVisible ? 'text' : 'password'"
+            @click:append-inner="isPasswordVisible = !isPasswordVisible"
+            @input="password = replaceSymbols(password)"
+            hide-details="auto"
+        />
+      </div>
 
       <v-btn
           type="submit"
@@ -76,16 +81,6 @@ const handleSubmit = () => {
 </template>
 
 <style scoped lang="scss">
-.wrapper {
-  width: 350px;
-  height: auto;
-  padding: 50px;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
 .or-txt {
   color: grey;

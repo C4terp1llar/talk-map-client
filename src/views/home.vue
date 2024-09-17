@@ -3,8 +3,7 @@
 </script>
 
 <template>
-  <h1>Главный лейаут</h1>
-  <router-view/>
+<h1>Домашняя страница</h1>
 </template>
 
 <style scoped>
