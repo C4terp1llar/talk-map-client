@@ -36,7 +36,6 @@ const handleSubmit = () => {
         />
       </div>
 
-
       <div class="field">
         <label class="inp-default-label">Пароль:</label>
         <v-text-field

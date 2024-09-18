@@ -4,7 +4,7 @@
 
 <template>
   <div class="header">
-    <h3>TalkMap</h3>
+    <h3 class="ma-0">TalkMap</h3>
     <v-icon
         color="green-darken-2"
         icon="mdi-map-marker-account"
