@@ -1,0 +1,50 @@
+import axios, { type AxiosInstance } from 'axios';
+import {useRouter} from "vue-router";
+
+const apiAuth: AxiosInstance = axios.create({
+    // 'https://talkmapserver-production.up.railway.app/api/'
+    // 'http://localhost:5000/api/'
+    baseURL: 'https://talkmapserver-production.up.railway.app/api/'
+});
+
+const router = useRouter();
+
+
+const refreshToken = async () => {
+    try {
+        const { data: { accessToken } } = await apiAuth.post('auth/refresh', {}, { withCredentials: true });
+        localStorage.setItem('access_token', accessToken);
+        return accessToken;
+    } catch (e) {
+        console.error("Ошибка при обновлении токена", e);
+        await router.push('/login');
+        throw e;
+    }
+};
+
+
+apiAuth.interceptors.request.use((config => {
+    config.headers.Authorization = `Bearer ${localStorage.getItem('access_token')}`
+    return config;
+}))
+
+// Настраиваем перехватчики ответов
+apiAuth.interceptors.response.use(
+    response => response,
+    async error => {
+        const { config, response } = error;
+        if (response?.status === 401) {
+
+            try {
+                const newAccessToken = await refreshToken();
+                config.headers.Authorization = `Bearer ${newAccessToken}`;
+                return apiAuth(config);
+            } catch (e) {
+                return Promise.reject(e);
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
+export default apiAuth;

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Welcome from '@/layouts/welcome.vue'
 import Main from "@/layouts/main.vue";
+import {checkTokenValidity} from "@/utils/auth";
 
 
 const router = createRouter({
@@ -43,16 +44,30 @@ const router = createRouter({
         {
           path: '',
           name: 'default-app',
-          redirect: '/home'
+          redirect: '/app/home'
         },
         {
-          path: '/home',
+          path: '/app/home',
           name: 'home',
           component: () => import('../views/home.vue')
         }
       ]
     }
   ]
-})
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (to.path.startsWith('/app')) {
+    const isValid = await checkTokenValidity();
+    if (isValid) {
+      next();
+    } else {
+      to.path = '/login';
+      next('/login');
+    }
+  } else {
+    next();
+  }
+});
 
 export default router

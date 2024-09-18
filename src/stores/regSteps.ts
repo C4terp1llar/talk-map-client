@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import api from "@/utils/api";
+import {getDeviceInfo} from "@/helpers/deviceInfo";
 
 export const useRegistrationStore = defineStore('registration', () => {
     const pending = ref<boolean>(false);
@@ -26,7 +27,7 @@ export const useRegistrationStore = defineStore('registration', () => {
         error.value = null;
 
         try{
-            const response = await api.post('checkEmail', {
+            const response = await api.post('reg/checkEmail', {
                 email: clientMail
             })
 
@@ -48,7 +49,7 @@ export const useRegistrationStore = defineStore('registration', () => {
         error.value = null;
 
         try {
-            await api.post(`sendCheckCode`, {
+            await api.post(`reg/sendCheckCode`, {
                 email: clientEmail,
             }, { withCredentials: true });
         }catch (e) {
@@ -64,7 +65,7 @@ export const useRegistrationStore = defineStore('registration', () => {
         error.value = null;
 
         try {
-            const response = await api.post(`verifyCheckCode`, {
+            const response = await api.post(`reg/verifyCheckCode`, {
                 code: clientCode,
             }, { withCredentials: true });
 
@@ -110,7 +111,7 @@ export const useRegistrationStore = defineStore('registration', () => {
         error.value = null;
 
         try {
-            const response = await api.post('getCitiesByQ', {
+            const response = await api.post('reg/getCitiesByQ', {
                 query: clientAddress
             });
 
@@ -140,10 +141,6 @@ export const useRegistrationStore = defineStore('registration', () => {
 
     //todo финальный для рега по всем данным
 
-    const getDeviceInfo = () => {
-        return `${navigator.userAgent}&${navigator.language}`
-    }
-
     const regNewUser = async () => {
         //!email || !password || !nickname || !date_b || !gender || !avatar || !address || !device_info
 
@@ -151,7 +148,7 @@ export const useRegistrationStore = defineStore('registration', () => {
         error.value = null;
 
         try{
-            await api.post('registerUser', {
+            const response = await api.post('reg/registerUser', {
                 email: newUserEmail.value,
                 password: newUserPassword.value,
                 nickname: newUserNickname.value,
@@ -160,7 +157,12 @@ export const useRegistrationStore = defineStore('registration', () => {
                 avatar: newUserAvatar.value,
                 address: newUserAddress.value,
                 device_info: getDeviceInfo()
-            }, {withCredentials: true});
+            }, { withCredentials: true });
+
+            if (response.data && response.data.accessToken) {
+                localStorage.setItem('access_token', response.data.accessToken);
+            }
+
         }catch (e) {
             error.value = "Произошла ошибка, попробуйте позже";
             console.error(e);

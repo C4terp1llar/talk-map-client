@@ -3,6 +3,11 @@ import {useRouter} from "vue-router";
 import {ref} from "vue";
 import {rules} from "@/helpers/baseTextValidator";
 import {replaceSymbols} from "@/helpers/replaceSymbols";
+import {useAuthStore} from "@/stores/auth";
+import {useNotificationStore} from "@/stores/notifications";
+
+const authStore = useAuthStore();
+const notificationsStore = useNotificationStore();
 
 const router = useRouter()
 const isPasswordVisible = ref<boolean>(false);
@@ -10,8 +15,17 @@ const isPasswordVisible = ref<boolean>(false);
 const password = ref<string>('');
 const email = ref<string>('');
 
-const handleSubmit = () => {
-  console.log('kjuby')
+const handleSubmit = async () => {
+  if (rules.email(email.value) !== true || rules.required(password.value) !== true) return
+
+  const nickname = await authStore.login(email.value, password.value);
+
+  if (!authStore.error){
+    await router.push('/home');
+    notificationsStore.addNotification('success', `Рады снова вас видеть, ${nickname}!`, 3000)
+  }else{
+    notificationsStore.addNotification('error', authStore.error, 3000)
+  }
 }
 
 </script>
@@ -54,8 +68,19 @@ const handleSubmit = () => {
           type="submit"
           class="align-self-center text-none w-100"
           variant="outlined"
+          :disabled="authStore.pending"
       >
-        Войти
+        <template v-if="authStore.pending">
+          <v-progress-circular
+              class="align-self-center"
+              color="green"
+              indeterminate
+              size="small"
+          ></v-progress-circular>
+        </template>
+        <template v-else>
+          Войти
+        </template>
       </v-btn>
 
       <router-link class="align-self-center" to="recovery">Забыли аккаунт?</router-link>
@@ -70,6 +95,7 @@ const handleSubmit = () => {
           class="text-none w-100"
           @click="router.push('/registration')"
           variant="outlined"
+          :disabled="authStore.pending"
       >
         Зарегистрироваться
       </v-btn>
