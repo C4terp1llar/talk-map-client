@@ -21,7 +21,7 @@ const handleSubmit = async () => {
   const nickname = await authStore.login(email.value, password.value);
 
   if (!authStore.error){
-    await router.push('/home');
+    await router.push('/app');
     notificationsStore.addNotification('success', `Рады снова вас видеть, ${nickname}!`, 3000)
   }else{
     notificationsStore.addNotification('error', authStore.error, 3000)

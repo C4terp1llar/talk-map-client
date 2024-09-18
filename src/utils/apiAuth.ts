@@ -28,7 +28,7 @@ apiAuth.interceptors.request.use((config => {
     return config;
 }))
 
-// Настраиваем перехватчики ответов
+//  перехватчики ответов
 apiAuth.interceptors.response.use(
     response => response,
     async error => {
