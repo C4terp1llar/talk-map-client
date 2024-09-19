@@ -31,10 +31,8 @@ export const useRegistrationStore = defineStore('registration', () => {
                 email: clientMail
             })
 
-            if (response.data.isTaken){
-                error.value = "Данный email уже используется"
-            }else{
-                newUserEmail.value = clientMail;
+            if (response.data){
+                return response.data.isTaken
             }
         }catch (e) {
             error.value = "Произошла ошибка, попробуйте позже";
@@ -44,13 +42,14 @@ export const useRegistrationStore = defineStore('registration', () => {
         }
     }
 
-    const sendConfirmEmailCode = async (clientEmail: string) => {
+    const sendConfirmEmailCode = async (clientEmail: string, type: 'recovery' | 'registration') => {
         pending.value = true;
         error.value = null;
 
         try {
             await api.post(`reg/sendCheckCode`, {
                 email: clientEmail,
+                type: type
             }, { withCredentials: true });
         }catch (e) {
             error.value = "Произошла ошибка, попробуйте позже";

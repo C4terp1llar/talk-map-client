@@ -7,6 +7,28 @@ export const useAuthStore = defineStore('auth', () => {
     const pending = ref<boolean>(false);
     const error = ref<string | null>(null);
 
+    const changeUserPassword = async (clientEmail: string, newClientPassword: string) => {
+        pending.value = true;
+        error.value = null;
+
+        try {
+            const response = await api.post(`reg/changePassword`, {
+                email: clientEmail,
+                password: newClientPassword
+            });
+
+            if (response.data && response.data.passChangeNeed){
+                return response.data.passChangeNeed
+            }
+
+        } catch (e: any) {
+            error.value = "Произошла ошибка, попробуйте позже"
+            console.error(e);
+        } finally {
+            pending.value = false;
+        }
+    }
+
     const login = async (clientEmail: string, clientPassword: string) => {
         pending.value = true;
         error.value = null;
@@ -38,6 +60,7 @@ export const useAuthStore = defineStore('auth', () => {
     return {
         pending,
         error,
+        changeUserPassword,
         login
     };
 });

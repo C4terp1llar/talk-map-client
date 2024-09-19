@@ -6,15 +6,18 @@ import {useRegistrationStore} from "@/stores/regSteps";
 import {useNotificationStore} from "@/stores/notifications";
 import {replaceSymbols} from "@/helpers/replaceSymbols";
 import {useRouter} from "vue-router";
+import {useRecoveryStore} from "@/stores/recSteps";
 
 onMounted(() => {
-  email.value = regStore.newUserEmail
+  email.value = recStore.recoveryUserEmail
 })
 
 const router = useRouter()
 
 const notificationStore = useNotificationStore()
-const regStore = useRegistrationStore();
+
+const recStore = useRecoveryStore();
+const regStore = useRegistrationStore()
 
 const email = ref<string>('');
 
@@ -24,20 +27,20 @@ const handleSubmit = async () => {
   const isTaken = await regStore.isEmailBusy(email.value)
 
   if (!isTaken){
-    regStore.newUserEmail = email.value;
-    await sendCode()
+    notificationStore.addNotification('warning', 'Учетной записи с таким email не существует', 3000)
   }else if (isTaken){
-    notificationStore.addNotification('warning', 'Данный email уже используется', 3000)
+    recStore.recoveryUserEmail = email.value;
+    await sendCode()
   }else if (regStore.error){
     notificationStore.addNotification('error', regStore.error, 3000)
   }
 }
 
 const sendCode = async () => {
-  await regStore.sendConfirmEmailCode(email.value, 'registration')
+  await regStore.sendConfirmEmailCode(email.value, 'recovery')
 
   if (!regStore.error) {
-    regStore.nextStep();
+    recStore.nextStep();
   } else {
     notificationStore.addNotification('error', regStore.error, 3000)
   }

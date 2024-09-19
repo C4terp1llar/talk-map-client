@@ -1,44 +1,28 @@
 <script setup lang="ts">
 
 import {rules} from "@/helpers/baseTextValidator";
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import {useRegistrationStore} from "@/stores/regSteps";
 import {useNotificationStore} from "@/stores/notifications";
 import {replaceSymbols} from "@/helpers/replaceSymbols";
-import {useRouter} from "vue-router";
-
-onMounted(() => {
-  email.value = regStore.newUserEmail
-})
-
-const router = useRouter()
+import {useRecoveryStore} from "@/stores/recSteps";
 
 const notificationStore = useNotificationStore()
-const regStore = useRegistrationStore();
 
-const email = ref<string>('');
+const regStore = useRegistrationStore();
+const recStore = useRecoveryStore()
+
+const code = ref<string>('');
 
 const handleSubmit = async () => {
-  if (rules.email(email.value) !== true) return
 
-  const isTaken = await regStore.isEmailBusy(email.value)
+  if (rules.required(code.value) !== true || rules.onlyNumbers(code.value) !== true) return;
 
-  if (!isTaken){
-    regStore.newUserEmail = email.value;
-    await sendCode()
-  }else if (isTaken){
-    notificationStore.addNotification('warning', 'Данный email уже используется', 3000)
-  }else if (regStore.error){
-    notificationStore.addNotification('error', regStore.error, 3000)
-  }
-}
+  await regStore.checkConfirmEmailCode(code.value)
 
-const sendCode = async () => {
-  await regStore.sendConfirmEmailCode(email.value, 'registration')
-
-  if (!regStore.error) {
-    regStore.nextStep();
-  } else {
+  if(!regStore.error){
+    recStore.nextStep()
+  }else{
     notificationStore.addNotification('error', regStore.error, 3000)
   }
 }
@@ -47,18 +31,16 @@ const sendCode = async () => {
 <template>
   <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
 
-
     <div class="field">
-      <label class="inp-default-label">Email:</label>
+      <label class="inp-default-label" >Код подтверждения:</label>
       <v-text-field
-          v-model="email"
-          :rules="[rules.required,rules.fieldSymbols(email), rules.email]"
+          v-model="code"
+          :rules="[rules.required, rules.onlyNumbers(code)]"
           class="w-100"
           variant="outlined"
-          type="email"
-          maxlength="50"
+          maxlength="4"
           hide-details="auto"
-          @input="email = replaceSymbols(email)"
+          @input="code = replaceSymbols(code)"
       />
     </div>
 
@@ -67,6 +49,7 @@ const sendCode = async () => {
           class="text-none flex-1-0"
           type="submit"
           variant="outlined"
+          :disabled="regStore.pending"
       >
         <template v-if="regStore.pending">
           <v-progress-circular
@@ -74,7 +57,6 @@ const sendCode = async () => {
               color="green"
               indeterminate
               size="small"
-              :disabled="regStore.pending"
           ></v-progress-circular>
         </template>
         <template v-else>
@@ -85,13 +67,15 @@ const sendCode = async () => {
       <v-btn
           class="text-none flex-1-0"
           variant="plain"
-          @click="router.push('/')"
+          @click="recStore.prevStep()"
           :disabled="regStore.pending"
           color="green"
       >
-        Вернуться к авторизации
+        Вернуться назад
       </v-btn>
     </div>
+
+
 
   </v-form>
 </template>
