@@ -37,7 +37,7 @@ const isActive = (path: string) => computed(() => route.path === `/app/${path}`)
 
       </li>
 
-      <li :class="{ active: isActive('settings').value }">
+      <li :class="['mt-auto',{ active: isActive('settings').value}]">
         <RouterLink to="/app/settings"/>
         <v-icon>mdi-cog-outline</v-icon>
         <span>Настройки</span>
@@ -51,18 +51,23 @@ const isActive = (path: string) => computed(() => route.path === `/app/${path}`)
 <style scoped lang="scss">
 .navbar {
   border-radius: 15px;
-  padding: 15px;
+  padding: 20px;
   margin: 5px;
   box-shadow: 0 1px 20px currentColor;
   display: flex;
+  position: sticky;
+  top: 5px;
+  height: calc(100vh - 10px);
   justify-content: center;
 
   @media (max-width: 650px) {
+    height: auto;
+    padding: 20px 0;
     position: fixed;
     bottom: 0;
-    left: 0;
     right: 0;
-    margin-right: 5px;
+    left: 0;
+    top: unset;
     z-index: 10001;
     background: rgba(255, 255, 255, 0); /* Прозрачный фон */
     backdrop-filter: blur(50px); /* Эффект размытия */
@@ -73,19 +78,14 @@ const isActive = (path: string) => computed(() => route.path === `/app/${path}`)
   display: flex;
   flex-direction: column;
   list-style: none;
-  justify-content: center;
   gap: 5px;
-  padding: 15px;
-  margin: 5px;
-
-  @media (max-width: 1000px) {
-    padding: 0;
-    gap: 1rem;
-  }
+  margin: 0;
+  height: 100%;
+  padding: 0;
+  flex-wrap: wrap;
 
   @media (max-width: 650px) {
     flex-direction: unset;
-    justify-self: center;
   }
 
   li {
@@ -118,7 +118,7 @@ const isActive = (path: string) => computed(() => route.path === `/app/${path}`)
     }
 
     span {
-      @media (max-width: 1200px) {
+      @media (max-width: 1000px) {
         display: none;
       }
     }

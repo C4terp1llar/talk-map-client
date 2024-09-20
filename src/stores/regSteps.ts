@@ -85,6 +85,30 @@ export const useRegistrationStore = defineStore('registration', () => {
         newUserPassword.value = clientPassword
     }
 
+    const isNicknameTaken = ref<string>('');
+
+    const checkNicknameAvailable = async (clientNickname: string) => {
+        pending.value = true;
+        error.value = null;
+
+        try {
+            const response = await api.post(`reg/checkNickname`, {
+                nickname: clientNickname
+            });
+
+            if (response.data && response.status === 200){
+                isNicknameTaken.value = `${response.data.isTaken}`
+
+                return response.data.isTaken
+            }
+        }catch (e) {
+            error.value = "Произошла ошибка попробуйте позже";
+            console.error(e);
+        }finally {
+            pending.value = false;
+        }
+    };
+
     const newUserNickname = ref<string>('')
     const newUserDateB = ref<string>('')
     const newUserGender = ref<string>('')
@@ -114,7 +138,6 @@ export const useRegistrationStore = defineStore('registration', () => {
                 query: clientAddress
             });
 
-
             if (response.data.message){
                 error.value = response.data.message;
             }else{
@@ -135,8 +158,6 @@ export const useRegistrationStore = defineStore('registration', () => {
     const setNewUserAvatar = (clientAvatar: string) => {
         newUserAvatar.value = clientAvatar
     }
-
-
 
     //todo финальный для рега по всем данным
 
@@ -197,6 +218,9 @@ export const useRegistrationStore = defineStore('registration', () => {
 
         newUserPassword,
         setNewUserPassword,
+
+        isNicknameTaken,
+        checkNicknameAvailable,
 
         newUserNickname,
         newUserDateB,

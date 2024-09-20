@@ -5,7 +5,6 @@ import {checkTokenValidity} from "@/stores/sync";
 import Login from '@/views/login.vue';
 import Home from '@/views/home.vue';
 
-
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     linkActiveClass: "active-link",
@@ -79,18 +78,41 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-
     if (to.path.startsWith('/app')) {
 
-        next(); // сразу перехожу на страницу чтьобы не было подвисаний и проверка токена на фоне, если проблемы с рефрешем - просто выкинет на логин
+        if (from.path.startsWith('/app')) {
+            next();
 
-        const isValid = await checkTokenValidity();
+            const isValid = await checkTokenValidity();
 
-        if (!isValid) {
-            await router.replace('/login');
+            if (!isValid) {
+                await router.push('/login');
+            }
+
+        }else {
+            const isValid = await checkTokenValidity();
+
+            if (isValid) {
+                next();
+            } else {
+                next('/login')
+            }
         }
+
+
     } else {
-        next();
+        if (localStorage.getItem('access_token') !== null) {
+            const isValid = await checkTokenValidity();
+
+            if (isValid) {
+                next('/app');
+            } else {
+                localStorage.removeItem('access_token');
+                next()
+            }
+        } else {
+            next();
+        }
     }
 });
 

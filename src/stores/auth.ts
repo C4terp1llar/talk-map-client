@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import api from "@/utils/api";
 import {getDeviceInfo} from "@/helpers/deviceInfo";
+import apiAuth from "@/utils/apiAuth";
 
 export const useAuthStore = defineStore('auth', () => {
     const pending = ref<boolean>(false);
@@ -57,10 +58,26 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    const logout = async () => {
+        pending.value = true;
+        error.value = null;
+
+        try {
+            await apiAuth.post('auth/logout', {}, { withCredentials: true });
+            localStorage.removeItem('access_token');
+        } catch (e: any) {
+            error.value = "Произошла ошибка при разлогинивании";
+            console.error(e);
+        } finally {
+            pending.value = false;
+        }
+    }
+
     return {
         pending,
         error,
         changeUserPassword,
-        login
+        login,
+        logout
     };
 });

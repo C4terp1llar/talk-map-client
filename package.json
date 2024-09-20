@@ -17,6 +17,7 @@
     "cropperjs": "^1.6.2",
     "date-fns": "^3.6.0",
     "leaflet": "^1.9.4",
+    "perfect-debounce": "^1.0.0",
     "pinia": "^2.1.7",
     "scss": "^0.2.4",
     "vue": "^3.4.29",

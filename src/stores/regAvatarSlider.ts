@@ -16,7 +16,7 @@ export const useAvatarSliderStore = defineStore('avatar', () => {
         error.value = null;
 
         try {
-            const response = await api.get(`getCommonAvatars`)
+            const response = await api.get(`reg/getCommonAvatars`)
             avatars.value = response.data
         }catch (e) {
             error.value = "Произошла ошибка, попробуйте позже";

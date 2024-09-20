@@ -3,6 +3,9 @@ import {rules} from "@/helpers/baseTextValidator";
 import {useRegistrationStore} from "@/stores/regSteps";
 import {onMounted, ref} from "vue";
 import {replaceSymbols} from "@/helpers/replaceSymbols";
+import {debounce} from 'perfect-debounce'
+import NicknameIndicator from "@/components/nicknameIndicator.vue";
+
 
 onMounted(() => {
   nickname.value = regStore.newUserNickname;
@@ -16,8 +19,33 @@ const nickname = ref<string>('');
 const date = ref<string>('');
 const gender = ref<string>('');
 
+
+const errorMessages = ref<string[]>([]); // по сути только для ошибки если тег занят, но vuetify Надо передавать массив
+
+const handleInputNickname = () => {
+
+  nickname.value = replaceSymbols(nickname.value);
+
+  if (nickname.value.length <= 5 || rules.lengthNickname(nickname.value) !== true || rules.fieldSymbols(nickname.value) !== true) {
+    errorMessages.value = [];
+    return
+  }else{
+    errorMessages.value = [];
+    regStore.isNicknameTaken = '';
+    debouncedOperation();
+  }
+};
+
+const debouncedOperation = debounce(async () => {
+  const isTaken = await regStore.checkNicknameAvailable(nickname.value);
+
+  if (isTaken) {
+    errorMessages.value.push('Данный никнейм уже занят');
+  }
+}, 1000);
+
 const handleSubmit = () => {
-  if (!gender.value.length || rules.minAge(date.value) !== true || rules.lengthNickname(nickname.value) !== true || rules.fieldSymbols(nickname.value) !== true) return
+  if (regStore.isNicknameTaken !== 'false' || !gender.value.length || rules.minAge(date.value) !== true || rules.lengthNickname(nickname.value) !== true || rules.fieldSymbols(nickname.value) !== true) return
 
   regStore.setNewUserPersonal(nickname.value, date.value, gender.value);
 
@@ -30,15 +58,20 @@ const handleSubmit = () => {
 
     <div class="field">
       <label class="inp-default-label">Никнейм:</label>
-      <v-text-field
-          v-model="nickname"
-          :rules="[rules.fieldSymbols(nickname), rules.required, rules.lengthNickname(nickname)]"
-          class="w-100"
-          variant="outlined"
-          maxlength="25"
-          hide-details="auto"
-          @input="nickname = replaceSymbols(nickname)"
-      />
+      <div class="position-relative">
+        <v-text-field
+            v-model="nickname"
+            :rules="[rules.fieldSymbols(nickname), rules.required, rules.lengthNickname(nickname)]"
+            class="w-100"
+            variant="outlined"
+            maxlength="25"
+            hide-details="auto"
+            @input="handleInputNickname"
+            :error-messages="errorMessages"
+        />
+
+        <nickname-indicator v-if="nickname.length > 5"/>
+      </div>
     </div>
 
     <div class="field">

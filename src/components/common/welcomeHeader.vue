@@ -21,7 +21,7 @@
   align-items: center;
   justify-content: center;
   gap: 15px;
-  margin: 5px !important;
+  margin: 5px;
   border-radius: 15px;
   box-shadow: 0 1px 20px currentColor;
 }

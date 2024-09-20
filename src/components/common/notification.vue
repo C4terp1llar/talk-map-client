@@ -25,7 +25,13 @@ const store = useNotificationStore();
   bottom: 0;
   right: 0;
   padding: 1rem;
-  z-index: 9999;
+  z-index: 10002;
+
+  @media (max-width: 650px) {
+    bottom: unset;
+    top: 0;
+    width: 100%;
+  }
 }
 .notification {
   border: 1px solid currentColor;
@@ -35,6 +41,7 @@ const store = useNotificationStore();
   display: flex;
   gap: 5px;
   align-items: center;
+  justify-content: space-between;
 }
 .notification.success {
   border-color: #4caf50;
