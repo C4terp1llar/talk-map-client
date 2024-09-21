@@ -30,7 +30,7 @@ const isLoading = ref(true);
 .dot {
   width: 15px;
   height: 15px;
-  background-color: #4caf50; /* зелёный цвет для TalkMap */
+  background-color: #4caf50;
   border-radius: 50%;
   animation: bounce 0.6s infinite alternate;
 }
@@ -44,15 +44,15 @@ const isLoading = ref(true);
   animation-delay: 0.4s;
 }
 
-/* Анимация прыжков */
+
 @keyframes bounce {
   0% {
     transform: translateY(0);
     opacity: 1;
   }
   100% {
-    transform: translateY(-15px); /* Прыжок */
-    opacity: 0.6; /* Легкая прозрачность на пике */
+    transform: translateY(-15px);
+    opacity: 0.6;
   }
 }
 </style>

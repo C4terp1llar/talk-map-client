@@ -93,24 +93,29 @@ router.beforeEach(async (to, from, next) => {
         }else {
             setPendingStart()
             const isValid = await checkTokenValidity();
-            setPendingEnd()
+
             if (isValid) {
                 next();
+                setPendingEnd()
             } else {
                 next('/login')
+                setPendingEnd()
             }
         }
 
 
     } else {
         if (localStorage.getItem('access_token') !== null) {
+            setPendingStart()
             const isValid = await checkTokenValidity();
 
             if (isValid) {
                 next('/app');
+                setPendingEnd()
             } else {
                 localStorage.removeItem('access_token');
                 next()
+                setPendingEnd()
             }
         } else {
             next();

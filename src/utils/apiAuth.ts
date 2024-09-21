@@ -1,6 +1,5 @@
 import axios, { type AxiosInstance } from 'axios';
 import {refreshToken} from "@/stores/sync";
-import {setPendingEnd, setPendingStart} from "@/utils/refreshStore";
 
 
 const apiAuth: AxiosInstance = axios.create({
