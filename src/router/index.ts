@@ -4,6 +4,7 @@ import Main from "@/layouts/main.vue";
 import {checkTokenValidity} from "@/stores/sync";
 import Login from '@/views/login.vue';
 import Home from '@/views/home.vue';
+import {setPendingEnd, setPendingStart} from "@/utils/refreshStore";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -90,8 +91,9 @@ router.beforeEach(async (to, from, next) => {
             }
 
         }else {
+            setPendingStart()
             const isValid = await checkTokenValidity();
-
+            setPendingEnd()
             if (isValid) {
                 next();
             } else {

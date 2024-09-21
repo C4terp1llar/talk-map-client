@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance } from 'axios';
 import {refreshToken} from "@/stores/sync";
+import {setPendingEnd, setPendingStart} from "@/utils/refreshStore";
 
 
 const apiAuth: AxiosInstance = axios.create({
@@ -19,7 +20,6 @@ apiAuth.interceptors.response.use(
     async error => {
         const { config, response } = error;
         if (response?.status === 401) {
-
             try {
                 const newAccessToken = await refreshToken();
                 config.headers.Authorization = `Bearer ${newAccessToken}`;
