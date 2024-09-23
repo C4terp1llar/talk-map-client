@@ -1,5 +1,5 @@
 <template>
-  <div class="loader-container" v-if="isLoading">
+  <div class="loader-container">
     <div class="dot-loader">
       <div class="dot"></div>
       <div class="dot"></div>
@@ -9,9 +9,7 @@
 </template>
 
 <script setup>
-import {ref} from "vue";
 
-const isLoading = ref(true);
 </script>
 
 <style scoped>
@@ -19,7 +17,7 @@ const isLoading = ref(true);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100%;
 }
 
 .dot-loader {
