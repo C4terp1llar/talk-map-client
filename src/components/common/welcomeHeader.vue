@@ -5,12 +5,7 @@
 <template>
   <div class="header">
     <h3 class="ma-0">TalkMap</h3>
-    <v-icon
-        color="green-darken-2"
-        icon="mdi-map-marker-account"
-        size="large"
-    ></v-icon>
-
+    <v-icon color="green-darken-2" size="large">mdi-map-marker-radius-outline</v-icon>
   </div>
 </template>
 

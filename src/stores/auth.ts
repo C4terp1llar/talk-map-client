@@ -3,10 +3,13 @@ import { ref } from 'vue';
 import api from "@/utils/api";
 import {getDeviceInfo} from "@/helpers/deviceInfo";
 import apiAuth from "@/utils/apiAuth";
+import {useRouter} from "vue-router";
 
 export const useAuthStore = defineStore('auth', () => {
     const pending = ref<boolean>(false);
     const error = ref<string | null>(null);
+
+    const router = useRouter();
 
     const changeUserPassword = async (clientEmail: string, newClientPassword: string) => {
         pending.value = true;
@@ -65,6 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             await apiAuth.post('auth/logout', {}, { withCredentials: true });
             localStorage.removeItem('access_token');
+            await router.push('/login');
         } catch (e: any) {
             error.value = "Произошла ошибка при разлогинивании";
             console.error(e);

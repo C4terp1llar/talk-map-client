@@ -11,6 +11,7 @@ const isActive = (path: string) => computed(() => route.path === `/app/${path}`)
 
   <nav class="navbar">
     <ul class="nav-menu">
+
       <li :class="{ active: isActive('home').value }">
         <RouterLink to="/app/home"/>
         <v-icon>mdi-home-outline</v-icon>
@@ -53,7 +54,7 @@ const isActive = (path: string) => computed(() => route.path === `/app/${path}`)
   border-radius: 15px;
   padding: 20px;
   margin: 5px;
-  box-shadow: 0 1px 20px currentColor;
+  box-shadow: 0 1px 10px currentColor;
   display: flex;
   position: sticky;
   top: 5px;

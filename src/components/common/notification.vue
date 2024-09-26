@@ -59,7 +59,7 @@ const getIcon = (type: string) => {
 }
 
 .notification {
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(15px);
   box-shadow: 0 1px 10px currentColor;
   border: 2px solid currentColor;
   border-radius: 15px;
