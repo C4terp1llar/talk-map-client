@@ -31,6 +31,7 @@
     "@tsconfig/node20": "^20.1.4",
     "@types/leaflet": "^1.9.12",
     "@types/node": "^20.14.5",
+    "@types/vue-cropperjs": "^4.1.6",
     "@vitejs/plugin-vue": "^5.0.5",
     "@vue/tsconfig": "^0.5.1",
     "npm-run-all2": "^6.2.0",

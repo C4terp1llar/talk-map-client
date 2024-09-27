@@ -49,7 +49,9 @@ a:hover{
   box-sizing: border-box;
 }
 
-
+.header{
+  z-index: 10000;
+}
 
 .wrapper-page-main-content {
   max-width: 500px;
@@ -123,3 +125,4 @@ input[type="date"]::-ms-expand {
 .marker-popup-txt-def{
   color: green;
 }
+

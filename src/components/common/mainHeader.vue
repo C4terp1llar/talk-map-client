@@ -23,5 +23,6 @@ import AvatarMenu from "@/components/avatarMenu.vue";
   margin: 5px;
   border-radius: 15px;
   box-shadow: 0 1px 10px currentColor;
+  backdrop-filter: blur(10px);
 }
 </style>

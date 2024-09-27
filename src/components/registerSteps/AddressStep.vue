@@ -231,7 +231,7 @@ onMounted(() => {
 
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 #map {
   border-radius: 15px;
   border: 1px solid black;
@@ -281,7 +281,7 @@ onMounted(() => {
 
 .address-menu-selector::-webkit-scrollbar-track {
   margin: 10px;
-  background-color: #f0f0f0; /* Цвет фона для дорожки скроллбара */
-  border-radius: 15px; /* Скругление дорожки */
+  background-color: rgb(var(--v-theme-background));
+  border-radius: 15px;
 }
 </style>

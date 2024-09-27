@@ -146,6 +146,7 @@ onClickOutside(refAvatarMenu, e => clickOutside())
   flex-direction: column;
   gap: 5px;
 
+  z-index: 10000;
   .separator{
     width: 100%;
     border: 1px solid currentColor;
