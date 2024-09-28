@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import {ref} from 'vue';
 import {useNotificationStore} from "@/stores/notifications";
-import {vAutoAnimate} from '@formkit/auto-animate'
+import {useImageUploadStore} from "@/stores/imageUpload";
+import {onClickOutside} from "@vueuse/core";
+import {useUserStore} from "@/stores/user";
+
 const notificationStore = useNotificationStore()
+const imageUploadStore = useImageUploadStore();
+const userStore = useUserStore();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const isDragging = ref(false);
@@ -20,7 +25,13 @@ const handleFileUpload = (event: DragEvent | Event) => {
     files = (event.target as HTMLInputElement).files;
   }
 
-  if(files && files.length + imageUrls.value.length > 16){
+
+  if (imageUploadStore.uploadMode === 'single' && (files && (files.length > 1 || imageUrls.value.length >= 1))) {
+    notificationStore.addNotification('warning', 'Вы можете загрузить только 1 фотографию', 3000)
+    return
+  }
+
+  if (imageUploadStore.uploadMode === 'many' && files && files.length + imageUrls.value.length > 16) {
     notificationStore.addNotification('warning', 'Вы можете загрузить не более 16 фотографий за 1 раз', 3000)
     return
   }
@@ -42,8 +53,6 @@ const handleFileUpload = (event: DragEvent | Event) => {
   }
 };
 
-
-
 const deleteImg = (index: number) => {
   imageUrls.value.splice(index, 1);
 }
@@ -52,32 +61,59 @@ const openFileDialog = () => {
   fileInput.value?.click();
 };
 
+const refModalPopup = ref(null)
+onClickOutside(refModalPopup, e => imageUploadStore.closePopup())
+
+const handleSubmitUpload = async () => {
+  if (imageUrls.value.length <= 0 || imageUrls.value.length >= 17) return;
+
+  const sender = imageUploadStore.uploadSender
+  const data = imageUrls.value
+
+  imageUploadStore.closePopup()
+  imageUrls.value = []
+
+
+  if (sender === 'wallpaper'){
+    await setWallpaper(data)
+  }
+}
+
+const setWallpaper = async (data: (string | ArrayBuffer)[]) => {
+  await userStore.setUserWallpaper(data)
+
+  if (userStore.wallpaperError){
+    notificationStore.addNotification('error', userStore.wallpaperError, 3000)
+  }
+}
 </script>
 
 <template>
-  <div class="modal-img-upload-wrapper">
-    <div class="modal-block" @dragover.prevent @drop="handleFileUpload">
+  <div class="modal-img-upload-wrapper" v-if="imageUploadStore.isPopupVisible">
+
+    <div class="modal-block" @dragover.prevent @drop="handleFileUpload" ref="refModalPopup">
       <div class="file-drop-area" @click="openFileDialog">
-        <input ref="fileInput" type="file" @change="handleFileUpload" multiple class="file-input" />
-        <span class="file-drop-text">Перетащите файлы сюда или нажмите, чтобы выбрать</span>
+        <input ref="fileInput" type="file" @change="handleFileUpload" multiple class="file-input"/>
+        <span class="file-drop-text">Перетащите картинки сюда или нажмите, чтобы выбрать</span>
       </div>
 
 
-        <div class="images">
-          <div class="img-preview" v-for="(imageUrl, index) in imageUrls" :key="index">
-            <img :src="imageUrl" alt="Превью" class="image-preview" />
+      <div class="images">
+        <div class="img-preview" v-for="(imageUrl, index) in imageUrls" :key="index">
+          <img :src="imageUrl" alt="Превью" class="image-preview"/>
 
-            <button class="delete-img" @click="deleteImg(index)">
-              <v-icon size="15">mdi-close</v-icon>
-            </button>
-          </div>
+          <button class="delete-img" @click="deleteImg(index)">
+            <v-icon size="15">mdi-close</v-icon>
+          </button>
         </div>
+      </div>
 
 
       <div class="actions">
         <v-btn
-          class="text-none w-100"
-          variant="outlined"
+            class="text-none w-100"
+            variant="outlined"
+            @click="handleSubmitUpload"
         >
           Загрузить
         </v-btn>
@@ -85,11 +121,13 @@ const openFileDialog = () => {
             class="text-none w-100 mt-1"
             variant="plain"
             color="green"
+            @click="imageUploadStore.closePopup"
         >
           Отмена
         </v-btn>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -111,7 +149,7 @@ const openFileDialog = () => {
     margin: 5px;
 
     width: 700px;
-    max-height: 50vh;
+    max-height: 60vh;
 
     box-shadow: 0 1px 10px currentColor;
     background: rgb(var(--v-theme-background));
@@ -160,16 +198,15 @@ const openFileDialog = () => {
     .images {
       display: flex;
       gap: 10px;
-      margin: 15px 0;
+      margin: 15px 0 0 0;
       flex-wrap: wrap;
-
       justify-content: center;
     }
 
     .img-preview {
       position: relative;
 
-      .delete-img{
+      .delete-img {
         position: absolute;
         right: 5px;
         top: 5px;
@@ -181,7 +218,7 @@ const openFileDialog = () => {
         display: flex;
         align-items: center;
 
-        &:hover{
+        &:hover {
           opacity: 1;
         }
       }
@@ -197,18 +234,19 @@ const openFileDialog = () => {
     }
 
     @keyframes fade {
-      from{
+      from {
         opacity: 0;
       }
-      to{
+      to {
         opacity: 1;
       }
     }
 
-    .actions{
+    .actions {
       position: sticky;
       bottom: 0;
       background: rgb(var(--v-theme-background));
+      padding: 15px;
     }
   }
 }

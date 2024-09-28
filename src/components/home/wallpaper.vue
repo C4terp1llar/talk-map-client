@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import {useUserStore} from "@/stores/user";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
+import {useImageUploadStore} from "@/stores/imageUpload";
+import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 
+const imageUploadStore = useImageUploadStore();
 const userStore = useUserStore()
 
 </script>
@@ -9,12 +12,22 @@ const userStore = useUserStore()
 <template>
   <div class="wallpaper-block">
 
-    <button class="change-wallpaper" @click="console.log('asd')">
+    <button class="change-wallpaper" @click="imageUploadStore.openPopup('single', 'wallpaper')">
       <v-icon>mdi-pencil-outline</v-icon>
     </button>
 
-    <img class="wallpaper-img" src="../../assets/img/wallpaper_bg.jpeg" alt="wallpaper"/>
-    <!--    <skeleton-loader/>-->
+    <v-img
+        :src="userStore.userWallpaper || userStore.mainUserInfo?.wallpaper || 'https://i.ibb.co/3yMfWxN/wallpaper-bg.jpg'"
+        class="wallpaper-img"
+        cover
+        alt="wallpaper"
+    >
+      <template v-slot:placeholder>
+          <lazy-placeholder-loader/>
+      </template>
+    </v-img>
+
+    <skeleton-loader v-if="userStore.pending || userStore.wallpaperPending"/>
 
     <!--    это для аватарки -->
     <slot></slot>
@@ -37,12 +50,15 @@ const userStore = useUserStore()
   overflow: hidden;
 
   display: flex;
-
   box-shadow: 0 1px 10px currentColor;
 
   height: 300px;
 
-  .change-wallpaper{
+  @media screen and (max-width: 850px) {
+    justify-content: center;
+  }
+
+  .change-wallpaper {
     position: absolute;
     background: rgb(var(--v-theme-background));
     z-index: 10;
@@ -53,7 +69,7 @@ const userStore = useUserStore()
     opacity: .7;
     transition: 0.3s;
 
-    &:hover{
+    &:hover {
       opacity: 1;
     }
   }
@@ -63,7 +79,8 @@ const userStore = useUserStore()
     inset: 0;
     width: 100%;
     object-fit: cover;
-    min-height: 300px;
+    min-height: 70%;
+    max-height: 75%;
   }
 
   .wallpaper-loader {
@@ -83,13 +100,22 @@ const userStore = useUserStore()
 
     display: flex;
     align-items: center;
-    padding-left: 175px;
+    padding: 0 10px 0 175px;
 
+    @media screen and (max-width: 850px) {
+      padding: 30px 10px 10px 10px;
+    }
     .info {
+      width: 100%;
       padding: 10px;
       overflow: hidden;
       border-radius: 15px;
       position: relative;
+      display: flex;
+
+      @media screen and (max-width: 850px) {
+        justify-content: center;
+      }
     }
   }
 }

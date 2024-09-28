@@ -4,8 +4,7 @@ import {useAppThemeStore} from "@/stores/appTheme";
 import Notification from "@/components/common/notification.vue";
 import GlobalLoader from "@/components/globalLoader.vue";
 import {pending} from "@/utils/refreshStore";
-import CropperImg from "@/components/common/cropperImg.vue";
-
+import UploadImgPopup from "@/components/common/uploadImgPopup.vue";
 
 const appThemeStore = useAppThemeStore()
 </script>
@@ -14,8 +13,13 @@ const appThemeStore = useAppThemeStore()
   <v-app :theme="appThemeStore.currentTheme">
     <global-loader v-if="pending"/>
     <RouterView v-else/>
+
     <notification/>
-    <cropper-img/>
+
+    <v-fade-transition>
+      <upload-img-popup/>
+    </v-fade-transition>
+
   </v-app>
 </template>
 

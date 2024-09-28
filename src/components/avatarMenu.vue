@@ -4,6 +4,8 @@ import {onClickOutside} from "@vueuse/core";
 import ThemeSwitcher from "@/components/themeSwitcher.vue";
 import {useUserStore} from "@/stores/user";
 import {useAuthStore} from "@/stores/auth";
+import SkeletonLoader from "@/components/common/skeletonLoader.vue";
+import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 
 const userStore = useUserStore()
 const authStore = useAuthStore()
@@ -25,15 +27,17 @@ onClickOutside(refAvatarMenu, e => clickOutside())
 
     <div class="avatar-block" @click="isMenuVisible = !isMenuVisible">
       <v-avatar class="avatar">
-        <v-progress-circular
-            v-if="userStore.pending"
-            class="align-self-center"
-            color="green"
-            indeterminate
-            size="small"
-        ></v-progress-circular>
-
-        <v-img v-else class="user-avatar" :src="userStore.mainUserInfo?.avatar" alt="Avatar"/>
+        <skeleton-loader v-if="userStore.pending"/>
+        <v-img
+            v-else
+            class="user-avatar"
+            :src="userStore.mainUserInfo?.avatar"
+            alt="Avatar"
+        >
+          <template v-slot:placeholder>
+            <lazy-placeholder-loader/>
+          </template>
+        </v-img>
       </v-avatar>
 
       <v-icon>{{ isMenuVisible ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
@@ -44,27 +48,28 @@ onClickOutside(refAvatarMenu, e => clickOutside())
 
         <li class="avatar-prev">
           <v-avatar class="ready-avatar" size="80">
-            <v-progress-circular
-                v-if="userStore.pending"
-                class="align-self-center"
-                color="green"
-                indeterminate
-                size="small"
-            ></v-progress-circular>
-
-            <v-img v-else :src="userStore.mainUserInfo?.avatar" alt="Avatar"/>
+            <skeleton-loader v-if="userStore.pending"/>
+            <v-img
+                v-else
+                :src="userStore.mainUserInfo?.avatar"
+                alt="Avatar"
+            >
+              <template v-slot:placeholder>
+                <lazy-placeholder-loader/>
+              </template>
+            </v-img>
           </v-avatar>
 
-          <span class="text-span opacity-80">{{userStore.mainUserInfo?.email}}</span>
-          <span class="text-span opacity-80">{{userStore.mainUserInfo?.nickname}}</span>
+          <span class="text-span opacity-80">{{ userStore.mainUserInfo?.email }}</span>
+          <span class="text-span opacity-80">{{ userStore.mainUserInfo?.nickname }}</span>
         </li>
 
         <v-divider/>
 
         <li class="settings">
-            <router-link @click="clickOutside" to="/app/settings" />
-            <v-icon>mdi-cog-outline</v-icon>
-            <span class="text-span">Настройки</span>
+          <router-link @click="clickOutside" to="/app/settings"/>
+          <v-icon>mdi-cog-outline</v-icon>
+          <span class="text-span">Настройки</span>
         </li>
 
         <li class="theme-item">
@@ -122,6 +127,7 @@ onClickOutside(refAvatarMenu, e => clickOutside())
   color: green;
 
   .avatar {
+    position: relative;
     border: 2px solid green;
     transition: .3s;
   }
@@ -147,7 +153,8 @@ onClickOutside(refAvatarMenu, e => clickOutside())
   gap: 5px;
 
   z-index: 10000;
-  .separator{
+
+  .separator {
     width: 100%;
     border: 1px solid currentColor;
     opacity: .5;
@@ -155,7 +162,7 @@ onClickOutside(refAvatarMenu, e => clickOutside())
   }
 }
 
-.settings{
+.settings {
   position: relative;
   display: flex;
   gap: 5px;
@@ -168,29 +175,31 @@ onClickOutside(refAvatarMenu, e => clickOutside())
   }
 }
 
-.theme-item{
+.theme-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  .text{
+  .text {
     display: flex;
     align-items: center;
     gap: 5px;
   }
 }
 
-.avatar-prev{
+.avatar-prev {
   display: flex;
   flex-direction: column;
   gap: 5px;
   align-items: center;
-  .ready-avatar{
+
+  .ready-avatar {
+    position: relative;
     border: 2px solid green;
   }
 }
 
-.text-span{
+.text-span {
   word-wrap: break-word;
   white-space: normal;
   text-align: center;
