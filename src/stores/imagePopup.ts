@@ -17,26 +17,32 @@ const unlockScroll = () => {
     document.body.dataset.scrollY = ''; // Очищаем сохраненную прокрутку
 }
 
-export const useImageUploadStore = defineStore('image', () => {
+export const useImagePopupStore = defineStore('imagePopup', () => {
 
     const pending = ref<boolean>(false);
     const error = ref<string | null>(null);
 
     const isPopupVisible = ref<boolean>(false);
 
-    const uploadSender = ref<'wallpaper' | ''>('');
-    const uploadMode = ref<'single' | 'many' | ''>('')
+    const senderType = ref<'wallpaper' | 'avatar' | ''>('');
+    const modeType = ref<'single' | 'many' | ''>('')
+    const actionType = ref<'upload' | 'crop' | ''>('')
 
-    const openPopup = (mode: 'single' | 'many', sender: 'wallpaper' | '') => {
-        uploadMode.value = mode;
-        uploadSender.value = sender
+    const cropImageData = ref<(string | ArrayBuffer)[]>([])
+
+    const openPopup = (mode: 'single' | 'many', sender: 'wallpaper' | 'avatar', type: 'upload' | 'crop') => {
+        modeType.value = mode;
+        senderType.value = sender;
+        actionType.value = type
         isPopupVisible.value = true;
         lockScroll();
     }
 
     const closePopup = () => {
-        uploadMode.value = '';
-        uploadSender.value = '';
+        modeType.value = '';
+        senderType.value = '';
+        actionType.value = '';
+        cropImageData.value = []
         isPopupVisible.value = false;
         unlockScroll();
     }
@@ -45,8 +51,10 @@ export const useImageUploadStore = defineStore('image', () => {
         pending,
         error,
         isPopupVisible,
-        uploadSender,
-        uploadMode,
+        senderType,
+        modeType,
+        actionType,
+        cropImageData,
         openPopup,
         closePopup,
     }

@@ -4,7 +4,7 @@ import {useAppThemeStore} from "@/stores/appTheme";
 import Notification from "@/components/common/notification.vue";
 import GlobalLoader from "@/components/globalLoader.vue";
 import {pending} from "@/utils/refreshStore";
-import UploadImgPopup from "@/components/common/uploadImgPopup.vue";
+import ImgPopup from "@/components/imgPopup/imgPopup.vue";
 
 const appThemeStore = useAppThemeStore()
 </script>
@@ -16,9 +16,9 @@ const appThemeStore = useAppThemeStore()
 
     <notification/>
 
-    <v-fade-transition>
-      <upload-img-popup/>
-    </v-fade-transition>
+    <v-dialog-transition>
+      <img-popup/>
+    </v-dialog-transition>
 
   </v-app>
 </template>

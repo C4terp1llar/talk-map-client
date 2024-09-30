@@ -27,15 +27,15 @@ onClickOutside(refAvatarMenu, e => clickOutside())
 
     <div class="avatar-block" @click="isMenuVisible = !isMenuVisible">
       <v-avatar class="avatar">
-        <skeleton-loader v-if="userStore.pending"/>
+        <skeleton-loader v-if="userStore.pending || userStore.avatarPending"/>
         <v-img
             v-else
             class="user-avatar"
-            :src="userStore.mainUserInfo?.avatar"
+            :src="userStore.userAvatar || userStore.mainUserInfo?.avatar"
             alt="Avatar"
         >
           <template v-slot:placeholder>
-            <lazy-placeholder-loader/>
+            <skeleton-loader/>
           </template>
         </v-img>
       </v-avatar>
@@ -43,19 +43,19 @@ onClickOutside(refAvatarMenu, e => clickOutside())
       <v-icon>{{ isMenuVisible ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
     </div>
 
-    <v-fade-transition>
+    <v-scroll-y-transition>
       <ul class="menu" v-if="isMenuVisible">
 
         <li class="avatar-prev">
           <v-avatar class="ready-avatar" size="80">
-            <skeleton-loader v-if="userStore.pending"/>
+            <skeleton-loader v-if="userStore.pending || userStore.avatarPending"/>
             <v-img
                 v-else
-                :src="userStore.mainUserInfo?.avatar"
+                :src="userStore.userAvatar || userStore.mainUserInfo?.avatar"
                 alt="Avatar"
             >
               <template v-slot:placeholder>
-                <lazy-placeholder-loader/>
+                <skeleton-loader/>
               </template>
             </v-img>
           </v-avatar>
@@ -99,7 +99,7 @@ onClickOutside(refAvatarMenu, e => clickOutside())
           </v-btn>
         </li>
       </ul>
-    </v-fade-transition>
+    </v-scroll-y-transition>
 
   </div>
 </template>
@@ -111,12 +111,6 @@ onClickOutside(refAvatarMenu, e => clickOutside())
   border-radius: 15px;
   display: flex;
   justify-content: flex-end;
-
-  &:hover {
-    .avatar {
-      opacity: .8;
-    }
-  }
 }
 
 .avatar-block {
@@ -125,6 +119,12 @@ onClickOutside(refAvatarMenu, e => clickOutside())
   align-items: center;
   gap: 5px;
   color: green;
+
+  &:hover {
+    .avatar {
+      opacity: .8;
+    }
+  }
 
   .avatar {
     position: relative;

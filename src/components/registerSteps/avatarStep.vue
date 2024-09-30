@@ -42,14 +42,23 @@ const initializeCropper = () => {
         dragMode: "move",
         viewMode: 3,
         aspectRatio: 1,
-        cropBoxMovable: false,
-        cropBoxResizable: false,
-        minCropBoxHeight: 280,
-        minCropBoxWidth: 280,
+        cropBoxMovable: true,
+        cropBoxResizable: true,
+        cropBoxZoom: false,
+        minCropBoxHeight: 200,
+        minCropBoxWidth: 200,
         toggleDragModeOnDblclick: false, // настроект дх взчл с прошлого проекта, мб переделать размер окна зума чтобы было не в упор
-      });// ps поправил размер до 280
+        ready() {
+          cropperAvatarResize()
+        }
+      });
     }
   });
+};
+
+const cropperAvatarResize = () => {
+  document.querySelector(".cropper-view-box")?.classList.add("cropper-view-box-avatar");
+  document.querySelector(".cropper-face")?.classList.add("cropper-face-avatar");
 };
 
 const handleCrop = () => {
@@ -176,6 +185,7 @@ onUnmounted(() => {
       <img ref="imageElement" :src="typeof imageUrl === 'string' ? imageUrl : ''" alt="Preview"
            @load="initializeCropper"/>
     </div>
+
     <div class="d-flex flex-column gap-1 mt-5">
 
       <v-btn
@@ -245,4 +255,6 @@ onUnmounted(() => {
   width: 300px;
   height: 300px;
 }
+
+
 </style>

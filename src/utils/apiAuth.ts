@@ -5,7 +5,7 @@ import {refreshToken} from "@/stores/sync";
 const apiAuth: AxiosInstance = axios.create({
     // 'https://talkmapserver-production.up.railway.app/api/'
     // 'http://localhost:5000/api/'
-    baseURL: 'https://talkmapserver-production.up.railway.app/api/'
+    baseURL: import.meta.env.VITE_API_URL
 });
 
 apiAuth.interceptors.request.use((config => {

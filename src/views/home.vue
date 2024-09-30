@@ -8,7 +8,6 @@ import WallpaperAvatar from "@/components/home/wallpaperAvatar.vue";
   <wallpaper>
     <wallpaper-avatar/>
   </wallpaper>
-
 </template>
 
 <style scoped>

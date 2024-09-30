@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import {useUserStore} from "@/stores/user";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
-import {useImageUploadStore} from "@/stores/imageUpload";
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
+import ChangeWallpaperMenu from "@/components/home/changeWallpaperMenu.vue";
 
-const imageUploadStore = useImageUploadStore();
 const userStore = useUserStore()
 
 </script>
@@ -12,9 +11,7 @@ const userStore = useUserStore()
 <template>
   <div class="wallpaper-block">
 
-    <button class="change-wallpaper" @click="imageUploadStore.openPopup('single', 'wallpaper')">
-      <v-icon>mdi-pencil-outline</v-icon>
-    </button>
+    <change-wallpaper-menu/>
 
     <v-img
         :src="userStore.userWallpaper || userStore.mainUserInfo?.wallpaper || 'https://i.ibb.co/3yMfWxN/wallpaper-bg.jpg'"
@@ -23,7 +20,7 @@ const userStore = useUserStore()
         alt="wallpaper"
     >
       <template v-slot:placeholder>
-          <lazy-placeholder-loader/>
+          <skeleton-loader/>
       </template>
     </v-img>
 
@@ -47,7 +44,6 @@ const userStore = useUserStore()
 .wallpaper-block {
   position: relative;
   border-radius: 15px;
-  overflow: hidden;
 
   display: flex;
   box-shadow: 0 1px 10px currentColor;
@@ -58,22 +54,6 @@ const userStore = useUserStore()
     justify-content: center;
   }
 
-  .change-wallpaper {
-    position: absolute;
-    background: rgb(var(--v-theme-background));
-    z-index: 10;
-    padding: 5px;
-    border-radius: 10px;
-    right: 5px;
-    top: 5px;
-    opacity: .7;
-    transition: 0.3s;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-
   .wallpaper-img {
     position: absolute;
     inset: 0;
@@ -81,6 +61,8 @@ const userStore = useUserStore()
     object-fit: cover;
     min-height: 70%;
     max-height: 75%;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
   }
 
   .wallpaper-loader {
@@ -96,7 +78,8 @@ const userStore = useUserStore()
     height: 30%;
     bottom: 0;
     background: rgb(var(--v-theme-background));
-    border-radius: 15px 15px 0 0;
+    border-radius: 15px;
+    overflow: hidden;
 
     display: flex;
     align-items: center;
