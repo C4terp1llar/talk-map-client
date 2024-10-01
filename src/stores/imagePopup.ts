@@ -27,13 +27,15 @@ export const useImagePopupStore = defineStore('imagePopup', () => {
     const senderType = ref<'wallpaper' | 'avatar' | ''>('');
     const modeType = ref<'single' | 'many' | ''>('')
     const actionType = ref<'upload' | 'crop' | ''>('')
+    const exactForce = ref<'onlyUpload' | 'onlyCrop' | 'uploadCrop' | ''>('')
 
     const cropImageData = ref<(string | ArrayBuffer)[]>([])
 
-    const openPopup = (mode: 'single' | 'many', sender: 'wallpaper' | 'avatar', type: 'upload' | 'crop') => {
+    const openPopup = (mode: 'single' | 'many', sender: 'wallpaper' | 'avatar', type: 'upload' | 'crop', force: 'onlyUpload' | 'onlyCrop' | 'uploadCrop') => {
         modeType.value = mode;
         senderType.value = sender;
         actionType.value = type
+        exactForce.value = force
         isPopupVisible.value = true;
         lockScroll();
     }
@@ -42,6 +44,7 @@ export const useImagePopupStore = defineStore('imagePopup', () => {
         modeType.value = '';
         senderType.value = '';
         actionType.value = '';
+        exactForce.value = ''
         cropImageData.value = []
         isPopupVisible.value = false;
         unlockScroll();
@@ -54,6 +57,7 @@ export const useImagePopupStore = defineStore('imagePopup', () => {
         senderType,
         modeType,
         actionType,
+        exactForce,
         cropImageData,
         openPopup,
         closePopup,

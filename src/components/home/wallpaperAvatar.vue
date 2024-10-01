@@ -30,13 +30,11 @@ const userStore = useUserStore()
 
 <style scoped lang="scss">
 .wallpaper-avatar-wrapper{
-  margin: 15px;
+  width: fit-content;
+  height: fit-content;
   align-self: flex-end;
   z-index: 9;
   position: relative;
-  @media screen and (max-width: 850px) {
-    margin: 0 0 60px 0;
-  }
   .wallpaper-avatar {
     background: rgb(var(--v-theme-background));
     border: 4px solid rgb(var(--v-theme-background));

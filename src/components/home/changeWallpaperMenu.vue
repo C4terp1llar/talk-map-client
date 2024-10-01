@@ -3,11 +3,12 @@ import {ref} from "vue";
 import {onClickOutside} from "@vueuse/core";
 import {useImagePopupStore} from "@/stores/imagePopup";
 import {useUserStore} from "@/stores/user";
-import {useConvertUrlStore} from "@/stores/convertUrl";
+import {useNotificationStore} from "@/stores/notifications";
 
 const imagePopupStore = useImagePopupStore();
 const userStore = useUserStore()
-const convertUrlStore = useConvertUrlStore();
+const notificationStore = useNotificationStore()
+
 
 const isMenuVisible = ref<boolean>(false)
 
@@ -22,17 +23,20 @@ onClickOutside(refWallpaper, e => clickOutside())
 
 const handleChangeWallpaper = () => {
   clickOutside()
-  imagePopupStore.openPopup('single', 'wallpaper', 'upload')
+  imagePopupStore.openPopup('single', 'wallpaper', 'upload', 'uploadCrop')
 }
 
 const handleRefreshWallpaper = async () => {
-  const wallpaperUrl = userStore?.userWallpaper || userStore.mainUserInfo?.wallpaper
-  if (wallpaperUrl){
-    const base64Avatar = await convertUrlStore.urlToBase64(wallpaperUrl);
-    clickOutside();
-    imagePopupStore.cropImageData = [base64Avatar];
-    imagePopupStore.openPopup('single', 'wallpaper', 'crop')
+  const origImg = await userStore.getOriginalImg('getOriginalWallpaper')
+  imagePopupStore.cropImageData = [origImg];
+
+  if(userStore.originalError){
+    notificationStore.addNotification('error', userStore.originalError, 5000)
+    return
   }
+
+  clickOutside();
+  imagePopupStore.openPopup('single', 'wallpaper', 'crop', 'onlyCrop');
 }
 </script>
 
@@ -57,8 +61,9 @@ const handleRefreshWallpaper = async () => {
             variant="text"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-crop"
+            :loading="userStore.originalPending"
+            v-if="userStore.mainUserInfo?.wallpaper || userStore.userWallpaper"
             @click="handleRefreshWallpaper"
-            :loading="convertUrlStore.pending"
         >
           Обновить
         </v-btn>
@@ -67,6 +72,7 @@ const handleRefreshWallpaper = async () => {
             variant="text"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-delete-outline"
+            v-if="userStore.mainUserInfo?.wallpaper || userStore.userWallpaper"
         >
           Удалить
         </v-btn>

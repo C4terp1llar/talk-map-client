@@ -51,14 +51,24 @@ export const useUserStore = defineStore('user', () => {
     const wallpaperError = ref<string | null>(null);
     const userWallpaper = ref<string>();
 
-    const setUserWallpaper = async (img: string | ArrayBuffer) => {
+    const setUserWallpaper = async (newImg: string | ArrayBuffer, oldImg: string | ArrayBuffer, force: string) => {
         wallpaperPending.value = true;
         wallpaperError.value = null;
 
         try {
-            const response = await apiAuth.post('user/setWallpaper', {
-                imgBlob: img
-            });
+            let response;
+            if (force === 'uploadCrop'){
+                response = await apiAuth.post('user/setWallpaper', {
+                    croppedImg: newImg,
+                    originalImg: oldImg,
+                    force: force
+                });
+            }else{
+                response = await apiAuth.post('user/setWallpaper', {
+                    croppedImg: newImg,
+                    force: force
+                });
+            }
 
             if (response && response.data){
                 userWallpaper.value = response.data;
@@ -75,14 +85,25 @@ export const useUserStore = defineStore('user', () => {
     const avatarError = ref<string | null>(null);
     const userAvatar = ref<string>();
 
-    const setUserAvatar = async (img: string | ArrayBuffer) => {
+    const setUserAvatar = async (newImg: string | ArrayBuffer, oldImg: string | ArrayBuffer, force: string) => {
         avatarPending.value = true;
         avatarError.value = null;
 
         try {
-            const response = await apiAuth.post('user/setAvatar', {
-                imgBlob: img
-            });
+
+            let response;
+            if (force === 'uploadCrop'){
+                response = await apiAuth.post('user/setAvatar', {
+                    croppedImg: newImg,
+                    originalImg: oldImg,
+                    force: force
+                });
+            }else{
+                response = await apiAuth.post('user/setAvatar', {
+                    croppedImg: newImg,
+                    force: force
+                });
+            }
 
             if (response && response.data){
                 userAvatar.value = response.data;
@@ -92,6 +113,27 @@ export const useUserStore = defineStore('user', () => {
             console.error(e);
         } finally {
             avatarPending.value = false;
+        }
+    }
+
+    const originalPending = ref<boolean>(false);
+    const originalError = ref<string | null>(null);
+
+    const getOriginalImg = async (currentResource: 'getOriginalAvatar' | 'getOriginalWallpaper') => {
+        originalPending.value = true;
+        originalError.value = null;
+
+        try {
+            const response = await apiAuth.post(`user/${currentResource}`)
+
+            if (response && response.data){
+                return response.data
+            }
+        } catch (e: any) {
+            originalError.value = "Произошла ошибка при получении картинки в полном разрешении для редактирования, попробуйте позже";
+            console.error(e);
+        } finally {
+            originalPending.value = false;
         }
     }
 
@@ -111,5 +153,9 @@ export const useUserStore = defineStore('user', () => {
         avatarError,
         userAvatar,
         setUserAvatar,
+
+        originalPending,
+        originalError,
+        getOriginalImg,
     }
 })

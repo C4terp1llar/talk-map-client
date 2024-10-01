@@ -17,7 +17,7 @@ const cropperOptions = computed(() => {
     return {
       background: false,
       dragMode: "move",
-      viewMode: 1,
+      viewMode: 3,
       aspectRatio: 1,
       cropBoxMovable: true,
       cropBoxResizable: true,
@@ -30,7 +30,7 @@ const cropperOptions = computed(() => {
     return {
       background: false,
       dragMode: "move",
-      viewMode: 1,
+      viewMode: 3,
       cropBoxMovable: false,
       cropBoxResizable: false,
       cropBoxZoom: false,
@@ -108,20 +108,27 @@ const handleCrop = async () => {
     const croppedImg = cropperInstance.value.getCroppedCanvas().toDataURL();
 
     const sender = imagePopupStore.senderType
+    const force = imagePopupStore.exactForce
+    const originalImage = imageSrc.value;
 
     imagePopupStore.closePopup();
 
     if (sender === "avatar") {
-      await avatarActions(croppedImg);
+      await avatarActions(croppedImg, originalImage, force);
     } else if (sender === "wallpaper") {
-      await wallpaperActions(croppedImg);
+      await wallpaperActions(croppedImg, originalImage, force);
     }
+
   }
 };
 
-const avatarActions = async (newImg: string | ArrayBuffer) => {
+const avatarActions = async (newImg: string | ArrayBuffer, oldImg: string | ArrayBuffer, force: string) => {
 
-  await userStore.setUserAvatar(newImg)
+  if (force === 'uploadCrop'){
+    await userStore.setUserAvatar(newImg, oldImg, 'uploadCrop')
+  }else{
+    await userStore.setUserAvatar(newImg,'', 'onlyCrop')
+  }
 
   if (userStore.avatarError) {
     notificationStore.addNotification('error', userStore.avatarError, 3000)
@@ -129,9 +136,13 @@ const avatarActions = async (newImg: string | ArrayBuffer) => {
 
 }
 
-const wallpaperActions = async (newImg: string | ArrayBuffer) => {
+const wallpaperActions = async (newImg: string | ArrayBuffer, oldImg: string | ArrayBuffer, force: string) => {
 
-  await userStore.setUserWallpaper(newImg)
+  if (force === 'uploadCrop'){
+    await userStore.setUserWallpaper(newImg, oldImg, 'uploadCrop')
+  }else{
+    await userStore.setUserWallpaper(newImg, '','onlyCrop')
+  }
 
   if (userStore.wallpaperError) {
     notificationStore.addNotification('error', userStore.wallpaperError, 3000)

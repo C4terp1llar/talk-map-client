@@ -64,7 +64,7 @@ const handleSubmit = () => {
             :rules="[rules.fieldSymbols(nickname), rules.required, rules.lengthNickname(nickname)]"
             class="w-100"
             variant="outlined"
-            maxlength="25"
+            maxlength="20"
             hide-details="auto"
             @input="handleInputNickname"
             :error-messages="errorMessages"

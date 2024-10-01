@@ -2,6 +2,8 @@
 import {useAvatarSliderStore} from "@/stores/regAvatarSlider";
 import {onMounted} from "vue";
 import {useNotificationStore} from "@/stores/notifications";
+import SkeletonLoader from "@/components/common/skeletonLoader.vue";
+import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 
 const regAvatarSliderStore = useAvatarSliderStore();
 const notificationStore = useNotificationStore()
@@ -29,7 +31,11 @@ onMounted(async () => {
             v-for="(item, i) in regAvatarSliderStore.avatars"
             :key="i"
         >
-          <v-img :src="item" height="200px"></v-img>
+          <v-img :src="item" height="200px">
+            <template v-slot:placeholder>
+              <lazy-placeholder-loader/>
+            </template>
+          </v-img>
         </v-carousel-item>
       </v-carousel>
       <template v-else>

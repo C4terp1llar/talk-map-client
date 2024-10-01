@@ -64,12 +64,18 @@ onClickOutside(refAvatarMenu, e => clickOutside())
           <span class="text-span opacity-80">{{ userStore.mainUserInfo?.nickname }}</span>
         </li>
 
-        <v-divider/>
+        <v-divider class="mt-2 mb-2"/>
 
         <li class="settings">
           <router-link @click="clickOutside" to="/app/settings"/>
           <v-icon>mdi-cog-outline</v-icon>
           <span class="text-span">Настройки</span>
+        </li>
+
+        <li class="profile">
+          <router-link @click="clickOutside" to="/app/home"/>
+          <v-icon>mdi-home-outline</v-icon>
+          <span class="text-span">Профиль</span>
         </li>
 
         <li class="theme-item">
@@ -81,7 +87,7 @@ onClickOutside(refAvatarMenu, e => clickOutside())
           <theme-switcher/>
         </li>
 
-        <v-divider/>
+        <v-divider class="mt-2 mb-2"/>
 
         <li>
           <v-btn @click="authStore.logout" variant="outlined" class="text-none w-100">
@@ -134,7 +140,7 @@ onClickOutside(refAvatarMenu, e => clickOutside())
 }
 
 .menu {
-  width: 200px;
+  min-width: 200px;
 
   position: absolute;
   right: -25px;
@@ -153,16 +159,22 @@ onClickOutside(refAvatarMenu, e => clickOutside())
   gap: 5px;
 
   z-index: 10000;
-
-  .separator {
-    width: 100%;
-    border: 1px solid currentColor;
-    opacity: .5;
-    margin: 5px 0;
-  }
 }
 
-.settings {
+.settings,
+.profile{
+  transition: .3s;
+  &:hover{
+    background-color: rgba(211, 211, 211, 0.25);
+  }
+}
+.settings,
+.profile,
+.theme-item{
+  padding: 10px 5px;
+}
+
+.settings, .profile {
   position: relative;
   display: flex;
   gap: 5px;

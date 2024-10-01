@@ -161,7 +161,7 @@ export const useRegistrationStore = defineStore('registration', () => {
 
     //todo финальный для рега по всем данным
 
-    const regNewUser = async () => {
+    const regNewUser = async (originalImg: string | ArrayBuffer) => {
         //!email || !password || !nickname || !date_b || !gender || !avatar || !address || !device_info
 
         pending.value = true;
@@ -175,6 +175,7 @@ export const useRegistrationStore = defineStore('registration', () => {
                 date_b: newUserDateB.value,
                 gender: newUserGender.value,
                 avatar: newUserAvatar.value,
+                originalAvatar: originalImg,
                 address: newUserAddress.value,
                 device_info: getDeviceInfo()
             }, { withCredentials: true });

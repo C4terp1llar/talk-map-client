@@ -3,13 +3,13 @@ import { ref } from "vue";
 import { onClickOutside } from "@vueuse/core";
 import { useImagePopupStore } from "@/stores/imagePopup";
 import { useUserStore } from "@/stores/user";
-import {useConvertUrlStore} from "@/stores/convertUrl";
+import {useNotificationStore} from "@/stores/notifications";
 
 const isMenuVisible = ref<boolean>(false);
 
 const imagePopupStore = useImagePopupStore();
 const userStore = useUserStore();
-const convertUrlStore = useConvertUrlStore();
+const notificationStore = useNotificationStore()
 
 const clickOutside = () => {
   if (isMenuVisible.value) {
@@ -22,17 +22,20 @@ onClickOutside(refAvatarChangeMenu, clickOutside);
 
 const handleChangeAvatar = () => {
   clickOutside();
-  imagePopupStore.openPopup('single', 'avatar', 'upload');
+  imagePopupStore.openPopup('single', 'avatar', 'upload', 'uploadCrop');
 };
 
 const handleRefreshAvatar = async () => {
-  const avatarUrl = userStore?.userAvatar || userStore.mainUserInfo?.avatar;
-  if (avatarUrl){
-    const base64Avatar = await convertUrlStore.urlToBase64(avatarUrl);
-    clickOutside();
-    imagePopupStore.cropImageData = [base64Avatar];
-    imagePopupStore.openPopup('single', 'avatar', 'crop');
+  const origImg = await userStore.getOriginalImg('getOriginalAvatar')
+  imagePopupStore.cropImageData = [origImg];
+
+  if(userStore.originalError){
+    notificationStore.addNotification('error', userStore.originalError, 5000)
+    return
   }
+
+  clickOutside();
+  imagePopupStore.openPopup('single', 'avatar', 'crop', 'onlyCrop');
 };
 </script>
 
@@ -51,6 +54,7 @@ const handleRefreshAvatar = async () => {
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-pencil-outline"
             @click="handleChangeAvatar"
+            v-if="userStore.mainUserInfo?.avatar || userStore.userAvatar"
         >
           Изменить
         </v-btn>
@@ -60,7 +64,8 @@ const handleRefreshAvatar = async () => {
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-crop"
             @click="handleRefreshAvatar"
-            :loading="convertUrlStore.pending"
+            :loading="userStore.originalPending"
+            v-if="userStore.mainUserInfo?.avatar || userStore.userAvatar"
         >
           Обновить
         </v-btn>

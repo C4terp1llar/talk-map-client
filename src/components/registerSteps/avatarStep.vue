@@ -15,6 +15,9 @@ const regAvatarSliderStore = useAvatarSliderStore();
 const notificationStore = useNotificationStore();
 
 const imageUrl = ref<string | ArrayBuffer | null>(null);
+const imageUrlOriginal = ref<string | ArrayBuffer | null>(null);
+
+
 const showModal = ref(false);
 const cropper = ref<Cropper | null>(null);
 const imageElement = ref<HTMLImageElement | null>(null);
@@ -27,6 +30,7 @@ const handleImageUpload = (event: Event) => {
     const reader = new FileReader();
     reader.onload = () => {
       imageUrl.value = reader.result;
+      imageUrlOriginal.value = reader.result;
       showModal.value = true;
     };
     reader.readAsDataURL(file);
@@ -79,20 +83,20 @@ const handleSubmit = async () => {
   if (chooseCommonImg.value){
     regStore.setNewUserAvatar(regAvatarSliderStore.avatars[regAvatarSliderStore.currentSlide])
 
-    await handleRegistration();
-  }else if(cropper.value && !chooseCommonImg.value){
+    await handleRegistration(regAvatarSliderStore.avatars[regAvatarSliderStore.currentSlide]);
+  }else if(cropper.value && imageUrlOriginal.value && !chooseCommonImg.value){
     const avatar = imageUrl.value = cropper.value.getCroppedCanvas().toDataURL();
     regStore.setNewUserAvatar(avatar)
 
-    await handleRegistration();
+    await handleRegistration(imageUrlOriginal.value);
   }
 
   // если флаг на готовый аватары false или нет загруженной картинки просто ретернимся
   return;
 };
 
-const handleRegistration = async () => {
-  await regStore.regNewUser()
+const handleRegistration = async (originalImg: string | ArrayBuffer) => {
+  await regStore.regNewUser(originalImg)
 
   if(!regStore.error){
     await router.push('/app');
