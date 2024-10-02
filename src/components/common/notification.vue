@@ -41,7 +41,7 @@ const getIcon = (type: string) => {
   bottom: 0;
   right: 0;
   padding: 1rem;
-  z-index: 10002;
+  z-index: 10005;
 
   @media (max-width: 650px) {
     bottom: unset;

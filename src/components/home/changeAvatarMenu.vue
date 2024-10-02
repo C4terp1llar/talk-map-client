@@ -21,11 +21,15 @@ const refAvatarChangeMenu = ref<HTMLDivElement | null>(null);
 onClickOutside(refAvatarChangeMenu, clickOutside);
 
 const handleChangeAvatar = () => {
+  if (userStore.originalPending) return
+
   clickOutside();
   imagePopupStore.openPopup('single', 'avatar', 'upload', 'uploadCrop');
 };
 
 const handleRefreshAvatar = async () => {
+  if (userStore.originalPending) return
+
   const origImg = await userStore.getOriginalImg('getOriginalAvatar')
   imagePopupStore.cropImageData = [origImg];
 
@@ -50,7 +54,7 @@ const handleRefreshAvatar = async () => {
     <v-scroll-y-transition>
       <div class="change-avatar-menu" v-if="isMenuVisible">
         <v-btn
-            variant="text"
+            variant="flat"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-pencil-outline"
             @click="handleChangeAvatar"
@@ -60,11 +64,12 @@ const handleRefreshAvatar = async () => {
         </v-btn>
 
         <v-btn
-            variant="text"
+            variant="flat"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-crop"
             @click="handleRefreshAvatar"
             :loading="userStore.originalPending"
+            :disabled="userStore.originalPending"
             v-if="userStore.mainUserInfo?.avatar || userStore.userAvatar"
         >
           Обновить

@@ -5,16 +5,6 @@ import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue
 import ChangeWallpaperMenu from "@/components/home/changeWallpaperMenu.vue";
 
 const userStore = useUserStore()
-
-
-/*
-      <div class="info">
-        <div class="user-info" v-if="!userStore.pending">
-          <h3 class="ma-0">{{ userStore.mainUserInfo?.nickname }}</h3>
-        </div>
-        <skeleton-loader v-if="userStore.pending"/>
-      </div>
-*/
 </script>
 
 <template>
@@ -24,15 +14,18 @@ const userStore = useUserStore()
 
     <div class="wallpaper-img-block">
       <v-img
-          :src="userStore.userWallpaper || userStore.mainUserInfo?.wallpaper || 'https://i.ibb.co/3yMfWxN/wallpaper-bg.jpg'"
+          v-if="userStore.userWallpaper || userStore.mainUserInfo?.wallpaper"
+          :src="userStore.userWallpaper || userStore.mainUserInfo?.wallpaper"
           class="wallpaper-img"
-          cover
           alt="wallpaper"
+          cover
       >
         <template v-slot:placeholder>
           <skeleton-loader/>
         </template>
       </v-img>
+
+      <div class="without-wallpaper" v-else-if="!userStore.userWallpaper || !userStore.mainUserInfo?.wallpaper"></div>
 
       <skeleton-loader v-if="userStore.pending || userStore.wallpaperPending"/>
     </div>
@@ -65,10 +58,16 @@ const userStore = useUserStore()
     position: relative;
     border-radius: 15px;
     overflow: hidden;
-    .wallpaper-img {
-      height: 200px;
+    height: 200px;
+    .wallpaper-img, .without-wallpaper{
+      height: inherit;
+    }
+    .without-wallpaper{
+      background: linear-gradient(150deg, rgb(var(--v-theme-background)), #4CAF50);
     }
   }
+
+
 
   .bottom-wallpaper-block {
     position: relative;
@@ -106,7 +105,11 @@ const userStore = useUserStore()
       z-index: 1;
       display: flex;
       flex-direction: column;
-      padding: 0 15px 15px 15px;
+      padding: 15px 15px 15px 0;
+
+      @media (max-width: 850px){
+        padding: 0 15px 15px 15px;
+      }
     }
   }
 }

@@ -9,7 +9,7 @@ interface MainUserInfo {
     b_date: string;
     gender: 'male' | 'female';
     avatar: string;
-    wallpaper?: string;
+    wallpaper?: string | null;
 }
 
 interface UserAddress {
@@ -49,7 +49,7 @@ export const useUserStore = defineStore('user', () => {
 
     const wallpaperPending = ref<boolean>(false);
     const wallpaperError = ref<string | null>(null);
-    const userWallpaper = ref<string>();
+    const userWallpaper = ref<string | null>(null);
 
     const setUserWallpaper = async (newImg: string | ArrayBuffer, oldImg: string | ArrayBuffer, force: string) => {
         wallpaperPending.value = true;
@@ -137,6 +137,28 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+    const deleteUserWallpaper = async () => {
+        wallpaperPending.value = true;
+        wallpaperError.value = null;
+
+        try {
+            const response = await apiAuth.post('user/deleteWallpaper')
+
+            if (response.status === 200){
+                userWallpaper.value = null;
+
+                if (mainUserInfo.value) {
+                    mainUserInfo.value.wallpaper = null;
+                }
+            }
+        } catch (e: any) {
+            wallpaperError.value = "Произошла ошибка при удалении обоев, попробуйте позже";
+            console.error(e);
+        } finally {
+            wallpaperPending.value = false;
+        }
+    }
+
     return{
         pending,
         error,
@@ -157,5 +179,7 @@ export const useUserStore = defineStore('user', () => {
         originalPending,
         originalError,
         getOriginalImg,
+
+        deleteUserWallpaper
     }
 })

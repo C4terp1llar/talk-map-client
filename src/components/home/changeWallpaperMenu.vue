@@ -22,11 +22,24 @@ const refWallpaper = ref<HTMLDivElement | null>(null);
 onClickOutside(refWallpaper, e => clickOutside())
 
 const handleChangeWallpaper = () => {
+  if (userStore.originalPending) return
+
   clickOutside()
   imagePopupStore.openPopup('single', 'wallpaper', 'upload', 'uploadCrop')
 }
 
+const handleDeleteWallpaper = async () => {
+  if (userStore.originalPending) return
+  clickOutside()
+  await userStore.deleteUserWallpaper();
+
+  if (userStore.wallpaperError) {
+    notificationStore.addNotification('error', userStore.wallpaperError, 3000)
+  }
+}
+
 const handleRefreshWallpaper = async () => {
+  if (userStore.originalPending) return
   const origImg = await userStore.getOriginalImg('getOriginalWallpaper')
   imagePopupStore.cropImageData = [origImg];
 
@@ -50,7 +63,7 @@ const handleRefreshWallpaper = async () => {
       <div class="change-wallpaper-menu" v-if="isMenuVisible">
         <v-btn
             @click="handleChangeWallpaper"
-            variant="text"
+            variant="flat"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-pencil-outline"
         >
@@ -58,10 +71,11 @@ const handleRefreshWallpaper = async () => {
         </v-btn>
 
         <v-btn
-            variant="text"
+            variant="flat"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-crop"
             :loading="userStore.originalPending"
+            :disabled="userStore.originalPending"
             v-if="userStore.mainUserInfo?.wallpaper || userStore.userWallpaper"
             @click="handleRefreshWallpaper"
         >
@@ -69,10 +83,11 @@ const handleRefreshWallpaper = async () => {
         </v-btn>
 
         <v-btn
-            variant="text"
+            variant="flat"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-delete-outline"
             v-if="userStore.mainUserInfo?.wallpaper || userStore.userWallpaper"
+            @click="handleDeleteWallpaper"
         >
           Удалить
         </v-btn>

@@ -17,7 +17,7 @@ const cropperOptions = computed(() => {
     return {
       background: false,
       dragMode: "move",
-      viewMode: 3,
+      viewMode: 1,
       aspectRatio: 1,
       cropBoxMovable: true,
       cropBoxResizable: true,
@@ -29,8 +29,9 @@ const cropperOptions = computed(() => {
   } else if (imagePopupStore.senderType === "wallpaper") {
     return {
       background: false,
+      zoomable: false,
       dragMode: "move",
-      viewMode: 3,
+      viewMode: 1,
       cropBoxMovable: false,
       cropBoxResizable: false,
       cropBoxZoom: false,
@@ -48,11 +49,13 @@ const cropperInstance = ref<Cropper | null>(null);
 const imageElement = ref<HTMLImageElement | null>(null);
 
 const adjustCropBox = () => {
-  if (cropperInstance.value) {
+  if (cropperInstance.value && imagePopupStore.senderType === 'wallpaper') {
     const cropperWidth = refModalCropperPopup.value?.clientWidth;
+    const canvasHeight = document.querySelector(".cropper-face")?.clientHeight;
     if (cropperWidth) {
       cropperInstance.value.setCropBoxData({
         width: cropperWidth,
+        height: canvasHeight ? canvasHeight / 3 : 200,
       });
     }
   }
@@ -182,9 +185,14 @@ const wallpaperActions = async (newImg: string | ArrayBuffer, oldImg: string | A
   position: relative;
   margin: 5px;
 
-  max-width: 700px;
-  min-width: 250px;
-  max-height: 50vh;
+
+  min-width: 80%;
+  height: 80vh;
+
+  @media screen and (max-width: 650px) {
+    width: 100%;
+    height: calc(100% - 10px);
+  }
 
   box-shadow: 0 1px 10px currentColor;
   background: rgb(var(--v-theme-background));
@@ -206,6 +214,7 @@ const wallpaperActions = async (newImg: string | ArrayBuffer, oldImg: string | A
   overflow: hidden;
   border-radius: 15px;
   border: 1px solid black;
+  height: 100%;
 }
 
 </style>
