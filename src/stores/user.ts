@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
-import Wallpaper from "@/components/home/wallpaper.vue";
+import type {Address} from "@/helpers/interfaces";
 
 interface MainUserInfo {
     email: string;
@@ -9,21 +9,16 @@ interface MainUserInfo {
     b_date: string;
     gender: 'male' | 'female';
     avatar: string;
-    wallpaper?: string | null;
+    wallpaper: string | null;
 }
 
-interface UserAddress {
-    lat: string;
-    lon: string;
-    address: string;
-}
 
 export const useUserStore = defineStore('user', () => {
     const pending = ref<boolean>(false);
     const error = ref<string | null>(null);
 
     const mainUserInfo = ref< MainUserInfo | null>(null)
-    const userAddressInfo = ref< UserAddress | null>(null)
+    const userAddressInfo = ref< Address | null>(null)
 
     const getMainUserInfo = async () => {
         pending.value = true;

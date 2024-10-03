@@ -63,7 +63,7 @@ const handleRefreshWallpaper = async () => {
       <div class="change-wallpaper-menu" v-if="isMenuVisible">
         <v-btn
             @click="handleChangeWallpaper"
-            variant="flat"
+            variant="text"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-pencil-outline"
         >
@@ -71,7 +71,7 @@ const handleRefreshWallpaper = async () => {
         </v-btn>
 
         <v-btn
-            variant="flat"
+            variant="text"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-crop"
             :loading="userStore.originalPending"
@@ -83,7 +83,7 @@ const handleRefreshWallpaper = async () => {
         </v-btn>
 
         <v-btn
-            variant="flat"
+            variant="text"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-delete-outline"
             v-if="userStore.mainUserInfo?.wallpaper || userStore.userWallpaper"

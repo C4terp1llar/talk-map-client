@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import api from "@/utils/api";
 import {getDeviceInfo} from "@/helpers/deviceInfo";
+import type {Address} from "@/helpers/interfaces";
 
 export const useRegistrationStore = defineStore('registration', () => {
     const pending = ref<boolean>(false);
@@ -120,33 +121,31 @@ export const useRegistrationStore = defineStore('registration', () => {
     }
 
 
-    const guessCities = ref<{ name: string; lat: number; lon: number }[]>([]);
+    const guessCities = ref<Address[]>([]);
+    const newUserAddress = ref<Address | null>(null)
 
-    const newUserAddress = ref<{ name: string; lat: number; lon: number } | null>(null)
-
-    const setNewUserAddress = (clientAddress: { name: string; lat: number; lon: number }) => {
+    const setNewUserAddress = (clientAddress: Address) => {
         newUserAddress.value = clientAddress;
         guessCities.value = []
     }
 
-    const getAddresses = async (clientAddress: string) => {
+    const getAddresses = async (clientAddressQuery: string) => {
         pending.value = true;
         error.value = null;
 
         try {
             const response = await api.post('reg/getCitiesByQ', {
-                query: clientAddress
+                query: clientAddressQuery,
+                filter: 'buildings'
             });
 
             if (response.data.message){
-                error.value = response.data.message;
+                return response.data.message;
             }else{
                 guessCities.value = response.data
             }
-
-            console.log(guessCities.value);
         } catch (e) {
-            error.value = "Произошла ошибка, попробуйте позже";
+            error.value = "Произошла ошибка при поиске адреса, попробуйте позже";
             console.error(e);
         } finally {
             pending.value = false;

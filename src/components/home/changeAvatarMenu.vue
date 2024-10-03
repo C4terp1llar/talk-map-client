@@ -54,7 +54,7 @@ const handleRefreshAvatar = async () => {
     <v-scroll-y-transition>
       <div class="change-avatar-menu" v-if="isMenuVisible">
         <v-btn
-            variant="flat"
+            variant="text"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-pencil-outline"
             @click="handleChangeAvatar"
@@ -64,7 +64,7 @@ const handleRefreshAvatar = async () => {
         </v-btn>
 
         <v-btn
-            variant="flat"
+            variant="text"
             class="text-none w-100 justify-content-start"
             prepend-icon="mdi-crop"
             @click="handleRefreshAvatar"

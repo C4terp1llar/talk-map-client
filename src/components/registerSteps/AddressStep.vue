@@ -1,21 +1,29 @@
 <script setup lang="ts">
-import {ref, onMounted} from 'vue';
+import {ref, onMounted, computed} from 'vue';
 import L from 'leaflet';
 import {rules} from "@/helpers/baseTextValidator";
 import {useRegistrationStore} from "@/stores/regSteps";
 import {useNotificationStore} from "@/stores/notifications";
+import type {Address} from "@/helpers/interfaces";
+import {onClickOutside} from "@vueuse/core";
 
 const notificationStore = useNotificationStore();
 const regStore = useRegistrationStore();
 
+
+const deepCity = ref<string>('');
+const deepStreet = ref<string>('');
+const deepHouse = ref<string>('');
+
 const address = ref<string>('');
-const selectedAddress = ref<{ name: string, lat: number, lon: number } | null>(null)
+const selectedAddress = ref<Address | null>(null)
+
 const map = ref<L.Map | null | any>(null);
-const markers = ref<L.Marker[]>([]); // Массив маркеров
+const markers = ref<L.Marker[]>([]);
 
 const isMenuOpen = ref(false);
+const isDeepSearch = ref(false);
 const addressNotFound = ref(false);
-
 
 const initMap = () => {
   map.value = L.map('map').setView([55.7558, 37.6176], 10); // если нет доступа к геолокации то ставим москву
@@ -42,84 +50,98 @@ const locateUser = () => {
   }
 };
 
-// удаление всех маркеров
 const clearMarkers = () => {
-  markers.value.forEach((marker: any) => { // проходимся по массиву с маркерами и удаляем все
+  markers.value.forEach((marker: any) => {
     map.value?.removeLayer(marker);
   });
   markers.value = [];
 };
 
-// добавления маркера
-const addMarker = (lat: number, lon: number, name: string) => {
-  const newMarker = L.marker([lat, lon], {
-    title: name,
+
+const addMarker = (city: Address) => {
+  const addressTitle = nameString(city)
+
+  const newMarker = L.marker([city.lat, city.lon], {
+    title: addressTitle,
     riseOnHover: true,
     riseOffset: 250,
     autoPan: true,
   }).addTo(map.value);
 
   newMarker.on('click', () => {
-    handleMarkerClick(newMarker, name, lat, lon); // Передаем сам маркер в обработчик клика
+    handleMarkerClick(newMarker, city); // Передаем сам маркер в обработчик клика
   });
 
   markers.value.push(newMarker);
 };
 
-const handleMarkerClick = (marker: any, name: string, lat: number, lon: number) => {
-  map.value?.setView([lat, lon], 15); // центрируем карту на выбранный маркер
+const handleMarkerClick = (marker: any, city: Address) => {
 
-  // ставим в модель маркера данные с кликнутого маркера
-  selectedAddress.value = {
-    name: name,
-    lat: lat,
-    lon: lon,
-  };
+  map.value?.setView([city.lat, city.lon], 15);
 
-  // удаляем все классы активных маркеров
+  selectedAddress.value = city
+
   markers.value.forEach((m) => {
     const markerElement = m.getElement();
     markerElement?.classList.remove('selected-marker');
   });
 
-  // делаем нажатый маркер зеленым
   const markerElement = marker.getElement();
   markerElement?.classList.add('selected-marker');
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const findAddress = async () => {
-  if  (regStore.pending || !address.value.length) return
+  if (regStore.pending) return
+
+  if (!isDeepSearch.value) {
+    if (!address.value.length) return
+  } else {
+    if (!deepCity.value.length || !deepHouse.value.length || !deepStreet.value.length) return
+  }
+
+  if (!isMenuOpen.value) isMenuOpen.value = true
 
   addressNotFound.value = false;
+  regStore.guessCities = [];
 
-  await regStore.getAddresses(address.value);
+  const searchQuery = isDeepSearch.value ? `${deepCity.value} ул ${deepStreet.value} ${deepHouse.value}` : address.value
 
-  if (regStore.error ){
+  const isNotFound = await regStore.getAddresses(searchQuery);
+
+  if (isNotFound) {
+    notificationStore.addNotification('info', isNotFound, 3000);
+    addressNotFound.value = true;
+    return
+  }
+
+  if (regStore.error) {
     notificationStore.addNotification('error', regStore.error, 3000);
     addressNotFound.value = true;
     return
   }
 
-  clearMarkers(); // Очистка всех маркеров перед добавлением новых
+  clearMarkers();
+
   const bounds = L.latLngBounds([]);
 
   for (let city of regStore.guessCities) {
-    const {lat, lon, name} = city;
-    addMarker(lat, lon, name);
-    bounds.extend([lat, lon]);
+    addMarker(city);
+    bounds.extend([city.lat, city.lon]);
   }
 
   isMenuOpen.value = true
   map.value?.fitBounds(bounds);
 };
 
-const handleListClick = (item: { name: string, lat: number, lon: number }) => {
+const handleListClick = (item: Address) => {
   console.log(item)
-  // маркер который соответствует координатам выбранного элемента списка
+
   const marker = markers.value.find(m => m.getLatLng().lat === item.lat && m.getLatLng().lng === item.lon);
 
   if (marker) {
-    handleMarkerClick(marker, item.name, item.lat, item.lon);  // Вызываем обработку клика по маркеру
+    handleMarkerClick(marker, item);  // Вызываем обработку клика по маркеру
     isMenuOpen.value = false
   }
 };
@@ -137,27 +159,103 @@ onMounted(() => {
   locateUser();
 });
 
+const clickOutside = () => {
+  if (isMenuOpen.value && !regStore.pending && !regStore.guessCities.length) {
+    isMenuOpen.value = false;
+  }
+};
 
+const refGuessCitiesList = ref<HTMLDivElement | null>(null);
+onClickOutside(refGuessCitiesList, clickOutside);
+
+const nameString = (item: Address): string => {
+  if (item.city && item.road && item.house_number && item.name) {
+    return `${item.city}, ${item.road}, ${item.house_number}, ${item.name}`
+  } else if (item.city && item.road && item.house_number) {
+    return `${item.city}, ${item.road}, ${item.house_number}`
+  } else if (item.city && item.road) {
+    return `${item.city}, ${item.road}`
+  } else {
+    return item.display_name.split(', ').reverse().slice(0, 6).reverse().join(', ');
+  }
+}
 </script>
 
 <template>
 
 
-  <div class="position-relative field w-100 d-flex flex-column mb-1">
-    <label class="inp-default-label">Адрес:</label>
-    <v-text-field
-        v-model="address"
-        variant="outlined"
-        :append-inner-icon="'mdi-magnify'"
-        @click:append-inner="findAddress"
-        @keydown.enter="findAddress"
-        @focus="isMenuOpen = true"
-        @blur="isMenuOpen && (addressNotFound || !regStore.guessCities.length) ? isMenuOpen = false : false "
-    />
+  <div class="position-relative field w-100 d-flex flex-column mb-1 h-100">
+
+    <div v-if="!isDeepSearch">
+      <label class="inp-default-label">Адрес:</label>
+
+      <div class="d-flex gap-1">
+        <v-text-field
+            v-model="address"
+            variant="outlined"
+            @keydown.enter="findAddress"
+            @focus="isMenuOpen = true"
+            hide-details
+            placeholder="Город, ул Улица, Номер дома"
+            :rules="[rules.required]"
+        />
+
+        <v-btn class="search-btn" variant="tonal" @click="findAddress">
+          <v-icon size="large">mdi-magnify</v-icon>
+        </v-btn>
+      </div>
+    </div>
+
+    <div class="deep-search-block" v-else>
+      <div class="city-info-block">
+        <label class="inp-default-label">Город: </label>
+        <v-text-field
+            v-model="deepCity"
+            hide-details
+            variant="outlined"
+            placeholder="Город"
+            @focus="isMenuOpen = true"
+            :rules="[rules.required]"
+        ></v-text-field>
+      </div>
+      <div class="street-info-block">
+        <div class="w-100">
+          <label class="inp-default-label">Улица: </label>
+          <v-text-field
+              v-model="deepStreet"
+              hide-details="auto"
+              variant="outlined"
+              placeholder="Улица"
+              @focus="isMenuOpen = true"
+              :rules="[rules.required]"
+          ></v-text-field>
+        </div>
+        <div class="w-75">
+          <label class="inp-default-label">Дом: </label>
+          <v-text-field
+              v-model="deepHouse"
+              hide-details
+              variant="outlined"
+              placeholder="Дом"
+              @focus="isMenuOpen = true"
+              :rules="[rules.required]"
+          ></v-text-field>
+        </div>
+        <v-btn class="search-btn-deep search-btn" variant="tonal" @click="findAddress">
+          <v-icon size="large">mdi-magnify</v-icon>
+        </v-btn>
+      </div>
+    </div>
+
+    <v-btn @click="isDeepSearch = !isDeepSearch" class="text-none mt-1" variant="plain">
+      {{ isDeepSearch ? 'Обычный поиск' : 'Детальный поиск' }}
+    </v-btn>
+
 
     <v-fade-transition>
       <v-list
-          class="address-menu-selector"
+          ref="refGuessCitiesList"
+          :class="['address-menu-selector', isDeepSearch ? 'address-menu-selector-deep' : '']"
           v-if="isMenuOpen"
       >
         <template v-if="regStore.pending">
@@ -181,9 +279,10 @@ onMounted(() => {
               :key="index"
               @click="handleListClick(item)"
           >
-            <v-list-item-title class="address-text">{{ item.name }}</v-list-item-title>
+            <v-list-item-title class="address-text">{{ nameString(item) }}</v-list-item-title>
           </v-list-item>
         </template>
+
         <template v-if="!addressNotFound && !regStore.pending && !regStore.guessCities.length">
           <v-list-item>
             <v-list-item-title class="text-center">Найдите свой адрес</v-list-item-title>
@@ -191,24 +290,21 @@ onMounted(() => {
         </template>
       </v-list>
     </v-fade-transition>
-
   </div>
 
   <div id="map" style="height: 300px; width: 100%;"></div>
 
   <v-fade-transition>
     <div v-if="selectedAddress" class="selected-address-block d-flex w-100 flex-column ga-1 pt-2">
-      <h5 class="align-self-center">Выбранный адрес:</h5>
+      <h5 class="align-self-center ma-0">Выбранный адрес:</h5>
       <div class="d-flex align-items-center justify-content-center">
-        <p class="address-text text-center ma-0">{{ selectedAddress.name }}</p>
+        <p class="address-text text-center ma-0">{{ nameString(selectedAddress) }}</p>
       </div>
     </div>
   </v-fade-transition>
 
   <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
-
     <div class="d-flex flex-column gap-1 mt-5">
-
       <v-btn
           class="text-none flex-1-0"
           type="submit"
@@ -235,23 +331,28 @@ onMounted(() => {
 #map {
   border-radius: 15px;
   border: 1px solid black;
-
 }
 
 .address-menu-selector {
   position: absolute;
   width: 100%;
-  top: 106px;
+  max-height: 350px;
+  top: 84px;
   right: 0;
   z-index: 9999;
   border: 1px solid black;
-  max-height: 300px;
   border-radius: 15px;
   padding: 15px;
   gap: 5px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+}
+
+.address-menu-selector-deep {
+  @media screen and (max-width: 500px) {
+    top: 168px;
+  }
 }
 
 .address-text {
@@ -263,9 +364,34 @@ onMounted(() => {
   white-space: normal; /* Обеспечивает нормальный перенос строк */
 }
 
+.search-btn {
+  height: 56px;
+}
 
+.search-btn-deep {
+  top: 24px;
+}
 
+.deep-search-block {
+  display: flex;
+  gap: 4px;
+  @media screen and (max-width: 500px) {
+    flex-direction: column;
+  }
 
+  .city-info-block {
+    width: 50%;
+    @media screen and (max-width: 500px) {
+      width: 100%;
+    }
+  }
+
+  .street-info-block {
+    width: 100%;
+    display: flex;
+    gap: 4px;
+  }
+}
 
 /* скролбар джля списка */
 .address-menu-selector::-webkit-scrollbar {

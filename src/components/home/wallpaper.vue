@@ -41,8 +41,13 @@ const userStore = useUserStore()
 
 
       <div class="bottom-wallpaper-block-content">
-        <h3>{{ userStore.mainUserInfo?.nickname }}</h3>
+        <h3 class="position-relative">{{ userStore.mainUserInfo?.nickname }}</h3>
+        <div class="location position-relative" v-if="userStore.userAddressInfo?.city">
+          <v-icon>mdi-map-marker-outline</v-icon>
+          <span>{{ userStore.userAddressInfo?.city }}</span>
+        </div>
 
+        <v-skeleton-loader type="text, text" v-if="userStore.pending"/>
       </div>
     </div>
   </div>
@@ -103,12 +108,20 @@ const userStore = useUserStore()
 
     .bottom-wallpaper-block-content{
       z-index: 1;
+      width: 100%;
       display: flex;
       flex-direction: column;
       padding: 15px 15px 15px 0;
 
       @media (max-width: 850px){
         padding: 0 15px 15px 15px;
+      }
+
+      .location{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #4CAF50;
       }
     }
   }
