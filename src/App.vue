@@ -19,7 +19,6 @@ const appThemeStore = useAppThemeStore()
     <v-dialog-transition>
       <img-popup/>
     </v-dialog-transition>
-
   </v-app>
 </template>
 

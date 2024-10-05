@@ -14,6 +14,8 @@ export interface Address {
 
     city_district: string | null;
     state: string | null;
+    country: string;
+    country_code: string;
 
-    boundingbox: string[] | null;
+    boundingbox: string[];
 }

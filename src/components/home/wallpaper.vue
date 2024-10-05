@@ -39,13 +39,19 @@ const userStore = useUserStore()
 
       <div class="wallpaper-avatar-block-relative-mask"></div>
 
-
       <div class="bottom-wallpaper-block-content">
-        <h3 class="position-relative">{{ userStore.mainUserInfo?.nickname }}</h3>
-        <div class="location position-relative" v-if="userStore.userAddressInfo?.city">
-          <v-icon>mdi-map-marker-outline</v-icon>
-          <span>{{ userStore.userAddressInfo?.city }}</span>
+        <div class="info-block">
+          <h4 class="user-nickname">{{ userStore.mainUserInfo?.nickname }}</h4>
+
+          <div class="user-location" v-if="userStore.userAddressInfo?.city">
+            <i :class="`flag fi fi-${userStore.userAddressInfo.country_code}`"></i>
+            <span>{{ `${userStore.userAddressInfo?.city}, ${userStore.userAddressInfo.country}` }}</span>
+          </div>
         </div>
+        <div class="actions-block">
+          <v-btn variant="tonal" class="text-none" prepend-icon="mdi-palette-outline">Настроить</v-btn>
+        </div>
+
 
         <v-skeleton-loader type="text, text" v-if="userStore.pending"/>
       </div>
@@ -64,14 +70,15 @@ const userStore = useUserStore()
     border-radius: 15px;
     overflow: hidden;
     height: 200px;
-    .wallpaper-img, .without-wallpaper{
+
+    .wallpaper-img, .without-wallpaper {
       height: inherit;
     }
-    .without-wallpaper{
+
+    .without-wallpaper {
       background: linear-gradient(150deg, rgb(var(--v-theme-background)), #4CAF50);
     }
   }
-
 
 
   .bottom-wallpaper-block {
@@ -80,7 +87,7 @@ const userStore = useUserStore()
     border-radius: 15px;
     display: flex;
 
-    @media (max-width: 850px){
+    @media (max-width: 850px) {
       flex-direction: column;
     }
 
@@ -88,7 +95,7 @@ const userStore = useUserStore()
       position: absolute;
       top: -75px;
       left: 25px;
-      @media (max-width: 850px){
+      @media (max-width: 850px) {
         width: 100%;
         top: -50px;
         left: 0;
@@ -97,31 +104,45 @@ const userStore = useUserStore()
       }
     }
 
-    .wallpaper-avatar-block-relative-mask{
+    .wallpaper-avatar-block-relative-mask {
       min-height: 75px;
       min-width: 200px;
-      @media (max-width: 850px){
+      @media (max-width: 850px) {
         min-width: unset;
         min-height: 50px;
       }
     }
 
-    .bottom-wallpaper-block-content{
+    .bottom-wallpaper-block-content {
       z-index: 1;
       width: 100%;
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       padding: 15px 15px 15px 0;
 
-      @media (max-width: 850px){
+      @media (max-width: 850px) {
         padding: 0 15px 15px 15px;
       }
+      @media (max-width: 500px) {
+        flex-direction: column;
+      }
 
-      .location{
+
+      .user-location {
         display: flex;
         align-items: center;
         gap: 10px;
-        color: #4CAF50;
+
+        span {
+          font-size: 14px;
+          font-weight: bold;
+          opacity: .8;
+        }
+
+        .flag {
+          box-shadow: 0 0 5px currentColor;
+          border-radius: 15%;
+        }
       }
     }
   }

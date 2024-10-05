@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@mdi/font/css/materialdesignicons.css'
+import 'flag-icons/css/flag-icons.min.css';
 import './assets/main.scss';
 import './assets/map.scss'
 import './assets/cropper.scss'
