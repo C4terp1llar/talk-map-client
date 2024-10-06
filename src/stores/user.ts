@@ -10,6 +10,7 @@ interface MainUserInfo {
     gender: 'male' | 'female';
     avatar: string;
     wallpaper: string | null;
+    nickname_color?: string | null;
 }
 
 
@@ -139,18 +140,61 @@ export const useUserStore = defineStore('user', () => {
         try {
             const response = await apiAuth.post('user/deleteWallpaper')
 
-            if (response.status === 200){
+            if (response.status === 200 && mainUserInfo.value){
                 userWallpaper.value = null;
-
-                if (mainUserInfo.value) {
-                    mainUserInfo.value.wallpaper = null;
-                }
+                mainUserInfo.value.wallpaper = null;
             }
         } catch (e: any) {
             wallpaperError.value = "Произошла ошибка при удалении обоев, попробуйте позже";
             console.error(e);
         } finally {
             wallpaperPending.value = false;
+        }
+    }
+
+    const nicknamePending = ref<boolean>(false);
+    const nicknameError = ref<string | null>(null);
+
+    const changeUserNickname = async (newNickname: string) => {
+        nicknamePending.value = true;
+        nicknameError.value = null;
+
+        try {
+            const response = await apiAuth.post('user/changeNickname',{
+                nickname: newNickname
+            })
+
+            if (response.status === 200 && mainUserInfo.value){
+                mainUserInfo.value.nickname = newNickname;
+            }
+        } catch (e: any) {
+            nicknameError.value = "Произошла ошибка при изменении никнейма, попробуйте позже";
+            console.error(e);
+        } finally {
+            nicknamePending.value = false;
+        }
+    }
+
+    const nicknameColorPending = ref<boolean>(false);
+    const nicknameColorError = ref<string | null>(null);
+
+    const changeUserNicknameColor = async (newColor: string) => {
+        nicknameColorPending.value = true;
+        nicknameColorError.value = null;
+
+        try {
+            const response = await apiAuth.post('user/changeNicknameColor',{
+                color: newColor
+            })
+
+            if (response.status === 200 && mainUserInfo.value){
+                newColor === 'default' ? mainUserInfo.value.nickname_color = null : mainUserInfo.value.nickname_color = newColor;
+            }
+        } catch (e: any) {
+            nicknameColorError.value = "Произошла ошибка при изменении цвета никнейма, попробуйте позже";
+            console.error(e);
+        } finally {
+            nicknameColorPending.value = false;
         }
     }
 
@@ -175,6 +219,14 @@ export const useUserStore = defineStore('user', () => {
         originalError,
         getOriginalImg,
 
-        deleteUserWallpaper
+        deleteUserWallpaper,
+
+        nicknamePending,
+        nicknameError,
+        changeUserNickname,
+
+        nicknameColorPending,
+        nicknameColorError,
+        changeUserNicknameColor,
     }
 })

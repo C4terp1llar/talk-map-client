@@ -6,6 +6,10 @@ import ChangeAvatarMenu from "@/components/home/changeAvatarMenu.vue";
 
 const userStore = useUserStore()
 
+interface Props {
+  withActions: boolean
+}
+const props = defineProps<Props>()
 </script>
 
 <template>
@@ -24,7 +28,7 @@ const userStore = useUserStore()
       </v-img>
     </v-avatar>
 
-    <change-avatar-menu/>
+    <change-avatar-menu v-if="props.withActions"/>
   </div>
 </template>
 

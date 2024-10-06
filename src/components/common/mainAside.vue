@@ -4,7 +4,7 @@ import {computed} from 'vue';
 
 const route = useRoute();
 
-const isActive = (path: string) => computed(() => route.path === `/app/${path}`);
+const isActive = (path: string) => computed(() => route.path.includes(`/app/${path}`));
 </script>
 
 <template>

@@ -3,14 +3,25 @@ import {useUserStore} from "@/stores/user";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 import ChangeWallpaperMenu from "@/components/home/changeWallpaperMenu.vue";
+import {useRouter} from "vue-router";
+import {useProfilePreviewStore} from "@/stores/profilePreview";
 
 const userStore = useUserStore()
+const profilePreview = useProfilePreviewStore();
+
+const router = useRouter()
+
+interface Props {
+  withActions: boolean,
+  isPreview?: boolean
+}
+const props = defineProps<Props>()
 </script>
 
 <template>
   <div class="wallpaper-block">
 
-    <change-wallpaper-menu/>
+    <change-wallpaper-menu v-if="props.withActions"/>
 
     <div class="wallpaper-img-block">
       <v-img
@@ -41,19 +52,32 @@ const userStore = useUserStore()
 
       <div class="bottom-wallpaper-block-content">
         <div class="info-block">
-          <h4 class="user-nickname">{{ userStore.mainUserInfo?.nickname }}</h4>
+          <h4
+              class="user-nickname"
+              :style="{ color: props.isPreview ? profilePreview.newUserNicknameColor || userStore.mainUserInfo?.nickname_color || 'currentColor' : userStore.mainUserInfo?.nickname_color || 'currentColor' }"
+          >
+            {{ props.isPreview ? profilePreview.newUserNickname || userStore.mainUserInfo?.nickname : userStore.mainUserInfo?.nickname }}
+          </h4>
 
           <div class="user-location" v-if="userStore.userAddressInfo?.city">
             <i :class="`flag fi fi-${userStore.userAddressInfo.country_code}`"></i>
             <span>{{ `${userStore.userAddressInfo?.city}, ${userStore.userAddressInfo.country}` }}</span>
           </div>
         </div>
-        <div class="actions-block">
-          <v-btn variant="tonal" class="text-none" prepend-icon="mdi-palette-outline">Настроить</v-btn>
+        <div class="actions-block" v-if="!userStore.pending">
+          <v-btn
+              v-if="props.withActions"
+              variant="tonal"
+              class="text-none"
+              prepend-icon="mdi-palette-outline"
+              @click="router.push({name: 'settings-profile'})"
+          >
+            Настроить
+          </v-btn>
         </div>
 
 
-        <v-skeleton-loader type="text, text" v-if="userStore.pending"/>
+        <v-skeleton-loader class="w-100" type="text, text" v-if="userStore.pending"/>
       </div>
     </div>
   </div>
@@ -64,6 +88,8 @@ const userStore = useUserStore()
   position: relative;
   box-shadow: 0 1px 10px currentColor;
   border-radius: 15px;
+  background: rgb(var(--v-theme-background));
+
 
   .wallpaper-img-block {
     position: relative;
@@ -79,7 +105,6 @@ const userStore = useUserStore()
       background: linear-gradient(150deg, rgb(var(--v-theme-background)), #4CAF50);
     }
   }
-
 
   .bottom-wallpaper-block {
     position: relative;

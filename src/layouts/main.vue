@@ -2,14 +2,14 @@
 
 import MainAside from "@/components/common/mainAside.vue";
 import MainHeader from "@/components/common/mainHeader.vue";
-import {onMounted} from "vue";
+import {onBeforeMount, onMounted} from "vue";
 import {useUserStore} from "@/stores/user";
 import {useNotificationStore} from "@/stores/notifications";
 
 const userStore = useUserStore()
 const notificationStore = useNotificationStore()
 
-onMounted(async () => {
+onBeforeMount(async () => {
   await userStore.getMainUserInfo()
 
   if (userStore.error){

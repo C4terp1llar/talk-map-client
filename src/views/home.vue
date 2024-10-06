@@ -5,9 +5,10 @@ import WallpaperAvatar from "@/components/home/wallpaperAvatar.vue";
 </script>
 
 <template>
-  <wallpaper>
-    <wallpaper-avatar/>
+  <wallpaper :with-actions="true">
+    <wallpaper-avatar :with-actions="true"/>
   </wallpaper>
+
 </template>
 
 <style scoped>
