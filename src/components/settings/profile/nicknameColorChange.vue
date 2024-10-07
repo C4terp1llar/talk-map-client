@@ -9,25 +9,34 @@ const profilePreview = useProfilePreviewStore()
 const userStore = useUserStore()
 const notificationStore = useNotificationStore()
 
+const handleClose = () => {
+  profilePreview.newUserNicknameColor = null;
+  profilePreview.colorValue = 0
+}
+
 const handleChange = async () => {
   if (!profilePreview.newUserNicknameColor) return
+
+  profilePreview.colorValue = 0
 
   await userStore.changeUserNicknameColor(profilePreview.newUserNicknameColor)
 
   if (userStore.nicknameColorError) {
     notificationStore.addNotification('error', userStore.nicknameColorError, 5000)
   } else {
-    profilePreview.newUserNicknameColor = null;
+    handleClose()
     notificationStore.addNotification('success', `Цвет никнейма успешно изменен!`, 5000)
   }
 }
 
 const handleChangeDefault = async () => {
+
   await userStore.changeUserNicknameColor('default')
 
   if (userStore.nicknameColorError) {
     notificationStore.addNotification('error', userStore.nicknameColorError, 5000)
   } else {
+    handleClose()
     notificationStore.addNotification('success', `Цвет никнейма успешно изменен на стандартный!`, 5000)
   }
 }
@@ -38,7 +47,7 @@ const handleChangeDefault = async () => {
     <div class="change-nickname-color-changing">
       <v-btn
           variant="outlined"
-          @click="profilePreview.newUserNicknameColor = null"
+          @click="handleClose"
           :loading="userStore.nicknameColorPending"
           :disabled="userStore.nicknameColorPending"
       >

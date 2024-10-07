@@ -6,14 +6,23 @@ import {useRegistrationStore} from "@/stores/regSteps";
 import {useNotificationStore} from "@/stores/notifications";
 import type {Address} from "@/helpers/interfaces";
 import {onClickOutside} from "@vueuse/core";
+import {useUserStore} from "@/stores/user";
+
+
+interface Props {
+  regMode: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+  regMode: true,
+});
 
 const notificationStore = useNotificationStore();
 const regStore = useRegistrationStore();
-
+const userStore = useUserStore()
 
 const deepCity = ref<string>('');
 const deepStreet = ref<string>('');
-const deepHouse = ref<string>('');
+const deepHouse = ref<string>( '');
 
 const address = ref<string>('');
 const selectedAddress = ref<Address | null>(null)
@@ -93,7 +102,7 @@ const handleMarkerClick = (marker: any, city: Address) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const findAddress = async () => {
-  if (regStore.pending) return
+  if (regStore.addressPending) return
 
   if (!isDeepSearch.value) {
     if (!address.value.length) return
@@ -136,8 +145,6 @@ const findAddress = async () => {
 };
 
 const handleListClick = (item: Address) => {
-  console.log(item)
-
   const marker = markers.value.find(m => m.getLatLng().lat === item.lat && m.getLatLng().lng === item.lon);
 
   if (marker) {
@@ -146,13 +153,42 @@ const handleListClick = (item: Address) => {
   }
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!selectedAddress.value) return
 
-  regStore.setNewUserAddress(selectedAddress.value)
+  if (props.regMode){
+    regStore.setNewUserAddress(selectedAddress.value)
 
-  regStore.nextStep();
+    regStore.nextStep();
+  }else{
+
+    if (selectedAddress.value.display_name === userStore.userAddressInfo?.display_name){
+      notificationStore.addNotification('info', 'Данный адрес уже указан в вашем аккаунте', 5000);
+      return
+    }
+
+    await userStore.changeUserAddress(selectedAddress.value)
+
+    clearAll()
+
+    if (userStore.addressError){
+      notificationStore.addNotification('error', userStore.addressError, 5000);
+    }else{
+      notificationStore.addNotification('success', 'Адрес успешно изменен', 5000);
+    }
+  }
 };
+
+const clearAll = () => {
+  isMenuOpen.value = false;
+  selectedAddress.value = null;
+  clearMarkers();
+  regStore.guessCities = [];
+  deepCity.value = ''
+  deepStreet.value = ''
+  deepHouse.value = ''
+  address.value = ''
+}
 
 onMounted(() => {
   initMap();
@@ -160,7 +196,7 @@ onMounted(() => {
 });
 
 const clickOutside = () => {
-  if (isMenuOpen.value && !regStore.pending && !regStore.guessCities.length) {
+  if (isMenuOpen.value && !regStore.addressPending && !regStore.guessCities.length) {
     isMenuOpen.value = false;
   }
 };
@@ -183,24 +219,29 @@ const nameString = (item: Address): string => {
 
 <template>
 
+  <div class="selected-address-non-reg" v-if="!props.regMode && userStore.userAddressInfo">
+    <div class="selected-address-non-reg-content mb-4">
+      <span class="fw-bold">Текущий адрес: </span>
+      <span >{{nameString(userStore.userAddressInfo)}}</span>
+    </div>
+  </div>
 
   <div class="position-relative field w-100 d-flex flex-column mb-1 h-100">
 
     <div v-if="!isDeepSearch">
-      <label class="inp-default-label">Адрес:</label>
+      <label class="inp-default-label" v-if="props.regMode">Адрес:</label>
 
-      <div class="d-flex gap-1">
+      <div class="regular-search">
         <v-text-field
             v-model="address"
             variant="outlined"
             @keydown.enter="findAddress"
             @focus="isMenuOpen = true"
             hide-details
-            placeholder="Город, ул Улица, Номер дома"
-            :rules="[rules.required]"
+            placeholder="Город, Улица, Дом"
         />
 
-        <v-btn class="search-btn" variant="tonal" @click="findAddress">
+        <v-btn class="search-btn" variant="outlined" @click="findAddress">
           <v-icon size="large">mdi-magnify</v-icon>
         </v-btn>
       </div>
@@ -208,46 +249,48 @@ const nameString = (item: Address): string => {
 
     <div class="deep-search-block" v-else>
       <div class="city-info-block">
-        <label class="inp-default-label">Город: </label>
+        <label class="inp-default-label"  v-if="props.regMode">Город: </label>
         <v-text-field
             v-model="deepCity"
             hide-details
             variant="outlined"
             placeholder="Город"
             @focus="isMenuOpen = true"
-            :rules="[rules.required]"
         ></v-text-field>
       </div>
       <div class="street-info-block">
         <div class="w-100">
-          <label class="inp-default-label">Улица: </label>
+          <label class="inp-default-label"  v-if="props.regMode">Улица: </label>
           <v-text-field
               v-model="deepStreet"
               hide-details="auto"
               variant="outlined"
               placeholder="Улица"
               @focus="isMenuOpen = true"
-              :rules="[rules.required]"
           ></v-text-field>
         </div>
         <div class="w-75">
-          <label class="inp-default-label">Дом: </label>
+          <label class="inp-default-label"  v-if="props.regMode">Дом: </label>
           <v-text-field
               v-model="deepHouse"
               hide-details
               variant="outlined"
               placeholder="Дом"
               @focus="isMenuOpen = true"
-              :rules="[rules.required]"
           ></v-text-field>
         </div>
-        <v-btn class="search-btn-deep search-btn" variant="tonal" @click="findAddress">
+        <v-btn class="search-btn-deep search-btn" variant="outlined" @click="findAddress">
           <v-icon size="large">mdi-magnify</v-icon>
         </v-btn>
       </div>
     </div>
 
-    <v-btn @click="isDeepSearch = !isDeepSearch" class="text-none mt-1" variant="plain">
+    <v-btn
+        :color="props.regMode ? '' : 'green'"
+        @click="isDeepSearch = !isDeepSearch"
+        class="text-none mt-1"
+        variant="plain"
+    >
       {{ isDeepSearch ? 'Обычный поиск' : 'Детальный поиск' }}
     </v-btn>
 
@@ -255,10 +298,10 @@ const nameString = (item: Address): string => {
     <v-fade-transition>
       <v-list
           ref="refGuessCitiesList"
-          :class="['address-menu-selector', isDeepSearch ? 'address-menu-selector-deep' : '']"
+          :class="['address-menu-selector', !props.regMode ? 'address-menu-selector-non-reg' : '', isDeepSearch ? 'address-menu-selector-deep' : '', !props.regMode && isDeepSearch ? 'address-menu-selector-deep-non-reg' : '']"
           v-if="isMenuOpen"
       >
-        <template v-if="regStore.pending">
+        <template v-if="regStore.addressPending">
           <v-progress-circular
               class="align-self-center"
               color="green"
@@ -270,7 +313,7 @@ const nameString = (item: Address): string => {
             <v-list-item-title class="text-center">Адрес не найден</v-list-item-title>
           </v-list-item>
         </template>
-        <template v-if="!addressNotFound && !regStore.pending && regStore.guessCities.length">
+        <template v-if="!addressNotFound && !regStore.addressPending && regStore.guessCities.length">
           <v-list-item-action class="w-100">
             <v-btn color="green" class="w-100 text-none" @click="isMenuOpen = false">Выбрать на карте</v-btn>
           </v-list-item-action>
@@ -283,7 +326,7 @@ const nameString = (item: Address): string => {
           </v-list-item>
         </template>
 
-        <template v-if="!addressNotFound && !regStore.pending && !regStore.guessCities.length">
+        <template v-if="!addressNotFound && !regStore.addressPending && !regStore.guessCities.length">
           <v-list-item>
             <v-list-item-title class="text-center">Найдите свой адрес</v-list-item-title>
           </v-list-item>
@@ -309,14 +352,25 @@ const nameString = (item: Address): string => {
           class="text-none flex-1-0"
           type="submit"
           variant="outlined"
-          :disabled="regStore.pending"
+          :disabled="regStore.addressPending || userStore.addressPending"
       >
-        Далее
+        <template v-if="!userStore.addressPending">
+          {{ props.regMode ? 'Далее' : 'Изменить' }}
+        </template>
+        <template v-else>
+          <v-progress-circular
+              class="align-self-center"
+              color="green"
+              size="small"
+              indeterminate
+          ></v-progress-circular>
+        </template>
       </v-btn>
       <v-btn
+          v-if="props.regMode"
           class="text-none flex-1-0"
           @click="regStore.prevStep()"
-          :disabled="regStore.pending"
+          :disabled="regStore.addressPending"
           variant="plain"
           color="green"
       >
@@ -349,9 +403,19 @@ const nameString = (item: Address): string => {
   overflow-y: auto;
 }
 
+.address-menu-selector-non-reg{
+  top: 65px;
+}
+
 .address-menu-selector-deep {
   @media screen and (max-width: 500px) {
     top: 168px;
+  }
+}
+
+.address-menu-selector-deep-non-reg{
+  @media screen and (max-width: 500px) {
+    top: 130px;
   }
 }
 
@@ -369,12 +433,17 @@ const nameString = (item: Address): string => {
 }
 
 .search-btn-deep {
-  top: 24px;
+  margin-top: auto;
+}
+
+.regular-search{
+  display: flex;
+  gap: 10px;
 }
 
 .deep-search-block {
   display: flex;
-  gap: 4px;
+  gap: 10px;
   @media screen and (max-width: 500px) {
     flex-direction: column;
   }
@@ -389,7 +458,20 @@ const nameString = (item: Address): string => {
   .street-info-block {
     width: 100%;
     display: flex;
-    gap: 4px;
+    gap: 10px;
+  }
+}
+
+.selected-address-non-reg-content{
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  @media screen and (max-width: 500px) {
+    flex-direction: column;
+    gap: 2px;
   }
 }
 

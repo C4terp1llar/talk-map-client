@@ -14,7 +14,7 @@ const registrationStore = useRegistrationStore();
 <template>
   <div class="indicator-wrapper">
     <v-progress-circular
-        v-if="registrationStore.pending"
+        v-if="registrationStore.nicknamePending"
         size="15"
         indeterminate
         color="green"

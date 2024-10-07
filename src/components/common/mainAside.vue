@@ -70,8 +70,7 @@ const isActive = (path: string) => computed(() => route.path.includes(`/app/${pa
     left: 0;
     top: unset;
     z-index: 10001;
-    background: rgba(255, 255, 255, 0); /* Прозрачный фон */
-    backdrop-filter: blur(50px); /* Эффект размытия */
+    background: rgb(var(--v-theme-background));
   }
 }
 

@@ -5,6 +5,7 @@ import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue
 import ChangeWallpaperMenu from "@/components/home/changeWallpaperMenu.vue";
 import {useRouter} from "vue-router";
 import {useProfilePreviewStore} from "@/stores/profilePreview";
+import WallpaperBottomContentSkeleton from "@/components/skeletons/wallpaperBottomContentSkeleton.vue";
 
 const userStore = useUserStore()
 const profilePreview = useProfilePreviewStore();
@@ -50,7 +51,8 @@ const props = defineProps<Props>()
 
       <div class="wallpaper-avatar-block-relative-mask"></div>
 
-      <div class="bottom-wallpaper-block-content">
+      <div class="bottom-wallpaper-block-content" v-if="!userStore.pending">
+
         <div class="info-block">
           <h4
               class="user-nickname"
@@ -64,7 +66,8 @@ const props = defineProps<Props>()
             <span>{{ `${userStore.userAddressInfo?.city}, ${userStore.userAddressInfo.country}` }}</span>
           </div>
         </div>
-        <div class="actions-block" v-if="!userStore.pending">
+
+        <div class="actions-block">
           <v-btn
               v-if="props.withActions"
               variant="tonal"
@@ -75,10 +78,10 @@ const props = defineProps<Props>()
             Настроить
           </v-btn>
         </div>
-
-
-        <v-skeleton-loader class="w-100" type="text, text" v-if="userStore.pending"/>
       </div>
+      <wallpaper-bottom-content-skeleton v-else/>
+
+
     </div>
   </div>
 </template>
@@ -147,11 +150,23 @@ const props = defineProps<Props>()
 
       @media (max-width: 850px) {
         padding: 0 15px 15px 15px;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
       }
       @media (max-width: 500px) {
         flex-direction: column;
       }
 
+      .info-block{
+        display: flex;
+        flex-direction: column;
+
+        @media (max-width: 850px) {
+          align-items: center;
+          justify-content: center;
+        }
+      }
 
       .user-location {
         display: flex;

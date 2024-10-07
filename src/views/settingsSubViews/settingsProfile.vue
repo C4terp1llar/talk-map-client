@@ -7,6 +7,7 @@ import NicknameChange from "@/components/settings/profile/nicknameChange.vue";
 import {useUserStore} from "@/stores/user";
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 import NicknameColorChange from "@/components/settings/profile/nicknameColorChange.vue";
+import AddressStep from "@/components/registerSteps/AddressStep.vue";
 
 const userStore = useUserStore()
 </script>
@@ -33,6 +34,13 @@ const userStore = useUserStore()
         <v-divider/>
       </div>
 
+      <div class="profile-address">
+        <h4 class="text-center">Адрес</h4>
+        <v-divider/>
+        <address-step :reg-mode="false"/>
+        <v-divider/>
+      </div>
+
 
     </div>
 
@@ -45,4 +53,5 @@ const userStore = useUserStore()
   display: flex;
   flex-direction: column;
 }
+
 </style>

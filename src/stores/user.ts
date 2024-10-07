@@ -198,6 +198,29 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+    const addressPending = ref<boolean>(false);
+    const addressError = ref<string | null>(null);
+
+    const changeUserAddress = async (newAddress: Address) => {
+        addressPending.value = true;
+        addressError.value = null;
+
+        try {
+            const response = await apiAuth.post('user/changeAddress',{
+                address: newAddress
+            })
+
+            if (response.data && response.data.address){
+                userAddressInfo.value = response.data.address
+            }
+        } catch (e: any) {
+            addressError.value = "Произошла ошибка при изменении адреса, попробуйте позже";
+            console.error(e);
+        } finally {
+            addressPending.value = false;
+        }
+    }
+
     return{
         pending,
         error,
@@ -228,5 +251,9 @@ export const useUserStore = defineStore('user', () => {
         nicknameColorPending,
         nicknameColorError,
         changeUserNicknameColor,
+
+        addressPending,
+        addressError,
+        changeUserAddress,
     }
 })

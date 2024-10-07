@@ -87,9 +87,10 @@ export const useRegistrationStore = defineStore('registration', () => {
     }
 
     const isNicknameTaken = ref<string>('');
+    const nicknamePending= ref<boolean>(false);
 
     const checkNicknameAvailable = async (clientNickname: string) => {
-        pending.value = true;
+        nicknamePending.value = true;
         error.value = null;
 
         try {
@@ -106,7 +107,7 @@ export const useRegistrationStore = defineStore('registration', () => {
             error.value = "Произошла ошибка попробуйте позже";
             console.error(e);
         }finally {
-            pending.value = false;
+            nicknamePending.value = false;
         }
     };
 
@@ -129,8 +130,10 @@ export const useRegistrationStore = defineStore('registration', () => {
         guessCities.value = []
     }
 
+    const addressPending= ref<boolean>(false);
+
     const getAddresses = async (clientAddressQuery: string) => {
-        pending.value = true;
+        addressPending.value = true;
         error.value = null;
 
         try {
@@ -148,7 +151,7 @@ export const useRegistrationStore = defineStore('registration', () => {
             error.value = "Произошла ошибка при поиске адреса, попробуйте позже";
             console.error(e);
         } finally {
-            pending.value = false;
+            addressPending.value = false;
         }
     };
 
@@ -220,6 +223,7 @@ export const useRegistrationStore = defineStore('registration', () => {
         setNewUserPassword,
 
         isNicknameTaken,
+        nicknamePending,
         checkNicknameAvailable,
 
         newUserNickname,
@@ -231,6 +235,7 @@ export const useRegistrationStore = defineStore('registration', () => {
         setNewUserAddress,
 
         guessCities,
+        addressPending,
         getAddresses,
 
         newUserAvatar,

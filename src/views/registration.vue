@@ -36,7 +36,7 @@ const currentProgress = computed(() =>  (regStore.currentStep / Object.keys(step
     />
 
 
-      <component :is="currentComponent"/>
+      <component :is="currentComponent" v-bind="currentComponent === AddressStep ? {regMode: true} : {}" />
 
 
 

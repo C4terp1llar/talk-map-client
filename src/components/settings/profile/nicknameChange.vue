@@ -34,7 +34,8 @@ const handleInputNickname = () => {
 };
 
 const debouncedOperation = debounce(async () => {
-  if (nickname.value === userStore.mainUserInfo?.nickname) {
+  if (nickname.value === userStore.mainUserInfo?.nickname || nickname.value.length <= 5 || rules.lengthNickname(nickname.value) !== true || rules.fieldSymbols(nickname.value) !== true) {
+    profilePreview.newUserNickname = userStore.mainUserInfo?.nickname
     return
   }
 
@@ -42,13 +43,14 @@ const debouncedOperation = debounce(async () => {
 
   if (isTaken) {
     errorMessages.value.push('Данный никнейм уже занят');
+    profilePreview.newUserNickname = userStore.mainUserInfo?.nickname
   } else {
     profilePreview.newUserNickname = nickname.value;
   }
 }, 1000);
 
 const handleBlur = () => {
-  if (regStore.isNicknameTaken !== 'false' || rules.lengthNickname(nickname.value) !== true || rules.fieldSymbols(nickname.value) !== true){
+  if (rules.lengthNickname(nickname.value) !== true || rules.fieldSymbols(nickname.value) !== true){
     if (userStore.mainUserInfo?.nickname) {
       nickname.value = userStore.mainUserInfo?.nickname
       profilePreview.newUserNickname = userStore.mainUserInfo?.nickname

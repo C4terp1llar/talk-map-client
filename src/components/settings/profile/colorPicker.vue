@@ -4,13 +4,16 @@ import {useProfilePreviewStore} from "@/stores/profilePreview";
 
 const profilePreview = useProfilePreviewStore()
 
-const hue = ref(0);
+const hue = ref(profilePreview.colorValue || 0);
 
 const getColor = () => {
-  return `hsl(${hue.value}, 100%, 50%)`;
+  return `hsl(${profilePreview.colorValue}, 100%, 50%)`;
 };
 
-onUnmounted(() => profilePreview.newUserNicknameColor = '')
+onUnmounted(() => {
+  profilePreview.newUserNicknameColor = null;
+  profilePreview.colorValue = 0
+})
 </script>
 
 <template>
@@ -19,9 +22,9 @@ onUnmounted(() => profilePreview.newUserNicknameColor = '')
         type="range"
         min="0"
         max="360"
-        v-model="hue"
+        v-model="profilePreview.colorValue"
         class="slider"
-        @change="profilePreview.newUserNicknameColor = getColor()"
+        @input="profilePreview.newUserNicknameColor = getColor()"
     />
 
 </template>
