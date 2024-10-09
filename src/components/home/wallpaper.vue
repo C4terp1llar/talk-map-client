@@ -69,7 +69,7 @@ const props = defineProps<Props>()
 
         <div class="actions-block">
           <v-btn
-              v-if="props.withActions"
+              v-if="!props.isPreview"
               variant="tonal"
               class="text-none"
               prepend-icon="mdi-palette-outline"

@@ -114,7 +114,7 @@ const handleSubmitUpload = async () => {
 <template>
   <div class="modal-block" @dragover.prevent @drop="handleFileUpload" ref="refModalPopup">
     <div class="file-drop-area" @click="openFileDialog">
-      <input ref="fileInput" type="file" @change="handleFileUpload" multiple class="file-input"/>
+      <input ref="fileInput" type="file" @change="handleFileUpload" multiple accept="image/*" class="file-input"/>
       <span class="file-drop-text">Перетащите картинки сюда или нажмите, чтобы выбрать</span>
     </div>
 

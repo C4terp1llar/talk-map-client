@@ -9,7 +9,6 @@ const imagePopupStore = useImagePopupStore();
 const userStore = useUserStore()
 const notificationStore = useNotificationStore()
 
-
 const isMenuVisible = ref<boolean>(false)
 
 const clickOutside = () => {
@@ -22,14 +21,14 @@ const refWallpaper = ref<HTMLDivElement | null>(null);
 onClickOutside(refWallpaper, e => clickOutside())
 
 const handleChangeWallpaper = () => {
-  if (userStore.originalPending) return
+  if (userStore.originalPending || userStore.wallpaperPending) return
 
   clickOutside()
   imagePopupStore.openPopup('single', 'wallpaper', 'upload', 'uploadCrop')
 }
 
 const handleDeleteWallpaper = async () => {
-  if (userStore.originalPending) return
+  if (userStore.originalPending || userStore.wallpaperPending) return
   clickOutside()
   await userStore.deleteUserWallpaper();
 
@@ -39,7 +38,7 @@ const handleDeleteWallpaper = async () => {
 }
 
 const handleRefreshWallpaper = async () => {
-  if (userStore.originalPending) return
+  if (userStore.originalPending || userStore.wallpaperPending) return
   const origImg = await userStore.getOriginalImg('getOriginalWallpaper')
   imagePopupStore.cropImageData = [origImg];
 
@@ -55,7 +54,7 @@ const handleRefreshWallpaper = async () => {
 
 <template>
   <div class="change-wallpaper-wrapper" ref="refWallpaper">
-    <button class="change-wallpaper" @click="isMenuVisible = !isMenuVisible">
+    <button class="change-wallpaper" @click="isMenuVisible = !isMenuVisible" :disabled="userStore.originalPending || userStore.wallpaperPending">
       <v-icon>mdi-pencil</v-icon>
     </button>
 

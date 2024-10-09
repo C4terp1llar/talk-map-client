@@ -5,6 +5,11 @@ import { useImagePopupStore } from "@/stores/imagePopup";
 import { useUserStore } from "@/stores/user";
 import {useNotificationStore} from "@/stores/notifications";
 
+interface Props {
+  isPreview: boolean,
+}
+const props = defineProps<Props>()
+
 const isMenuVisible = ref<boolean>(false);
 
 const imagePopupStore = useImagePopupStore();
@@ -21,14 +26,14 @@ const refAvatarChangeMenu = ref<HTMLDivElement | null>(null);
 onClickOutside(refAvatarChangeMenu, clickOutside);
 
 const handleChangeAvatar = () => {
-  if (userStore.originalPending) return
+  if (userStore.originalPending || userStore.avatarPending) return
 
   clickOutside();
   imagePopupStore.openPopup('single', 'avatar', 'upload', 'uploadCrop');
 };
 
 const handleRefreshAvatar = async () => {
-  if (userStore.originalPending) return
+  if (userStore.originalPending || userStore.avatarPending) return
 
   const origImg = await userStore.getOriginalImg('getOriginalAvatar')
   imagePopupStore.cropImageData = [origImg];
@@ -46,8 +51,8 @@ const handleRefreshAvatar = async () => {
 <template>
   <div class="change-avatar-wrapper" ref="refAvatarChangeMenu">
 
-    <button class="change-avatar" @click="isMenuVisible = !isMenuVisible">
-      <v-icon>mdi-pencil</v-icon>
+    <button :class="props.isPreview ? 'change-avatar__preview' : 'change-avatar'" @click="isMenuVisible = !isMenuVisible" :disabled="userStore.originalPending || userStore.avatarPending">
+      <v-icon class="change-icon">mdi-camera-outline</v-icon>
     </button>
 
 
@@ -87,6 +92,7 @@ const handleRefreshAvatar = async () => {
 
   display: flex;
   justify-content: center;
+  padding: 4px;
 }
 
 .change-avatar {
@@ -99,10 +105,28 @@ const handleRefreshAvatar = async () => {
 
   &:hover {
     opacity: 1;
-    box-shadow: 0 1px 10px currentColor;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(5px);
   }
 }
+
+.change-avatar__preview{
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  border-radius: 50%;
+  transition: 0.3s;
+
+  &:hover {
+    backdrop-filter: blur(5px);
+  }
+}
+
+.change-icon {
+  color: currentColor;
+  filter: drop-shadow(0 0 5px currentColor);
+  font-size: 35px;
+}
+
 
 .change-avatar-menu {
   position: absolute;
@@ -111,10 +135,10 @@ const handleRefreshAvatar = async () => {
   border-radius: 15px;
   box-shadow: 0 1px 10px currentColor;
   background: rgb(var(--v-theme-background));
-  margin-top: 155px;
+  margin-top: 150px;
 
   @media screen and (max-width: 850px) {
-    margin-top: 105px;
+    margin-top: 100px;
   }
 }
 </style>

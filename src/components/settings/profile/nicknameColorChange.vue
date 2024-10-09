@@ -48,7 +48,6 @@ const handleChangeDefault = async () => {
       <v-btn
           variant="outlined"
           @click="handleClose"
-          :loading="userStore.nicknameColorPending"
           :disabled="userStore.nicknameColorPending"
       >
         <v-icon>mdi-close-outline</v-icon>

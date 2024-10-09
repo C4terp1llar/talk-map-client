@@ -20,8 +20,8 @@ const userStore = useUserStore()
       <div class="profile-preview">
         <h4 class="text-center">Предпросмотр профиля</h4>
         <v-divider/>
-        <wallpaper :with-actions="false" :is-preview="true">
-          <wallpaper-avatar :with-actions="false" />
+        <wallpaper :with-actions="true" :is-preview="true">
+          <wallpaper-avatar :with-actions="true" :is-preview="true"/>
         </wallpaper>
         <v-divider/>
       </div>

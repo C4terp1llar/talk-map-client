@@ -6,7 +6,7 @@ import WallpaperAvatar from "@/components/home/wallpaperAvatar.vue";
 
 <template>
   <wallpaper :with-actions="true">
-    <wallpaper-avatar :with-actions="true"/>
+    <wallpaper-avatar :with-actions="true" :is-preview="false"/>
   </wallpaper>
 
 </template>

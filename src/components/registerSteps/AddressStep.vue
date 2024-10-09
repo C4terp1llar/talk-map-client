@@ -46,14 +46,14 @@ const initMap = () => {
 // получаем геолокации и обновления карты
 const locateUser = () => {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((position) => {
-          const {latitude, longitude} = position.coords;
-          map.value.setView([latitude, longitude], 10); // Центрируем карту на текущих координатах
-        },
-        (error) => {
-          console.error('ошибка:', error);
-        }
-    )
+      navigator.geolocation.getCurrentPosition((position) => {
+            const {latitude, longitude} = position.coords;
+            map.value.setView([latitude, longitude], 10); // Центрируем карту на текущих координатах
+          },
+          (error) => {
+            console.error('ошибка:', error);
+          }
+      )
   } else {
     console.log('Геолокация не поддерживается')
   }
@@ -67,7 +67,7 @@ const clearMarkers = () => {
 };
 
 
-const addMarker = (city: Address) => {
+const addMarker = (city: Address, mode: 'default' | 'selected') => {
   const addressTitle = nameString(city)
 
   const newMarker = L.marker([city.lat, city.lon], {
@@ -77,16 +77,20 @@ const addMarker = (city: Address) => {
     autoPan: true,
   }).addTo(map.value);
 
-  newMarker.on('click', () => {
-    handleMarkerClick(newMarker, city); // Передаем сам маркер в обработчик клика
-  });
+  if (mode === 'default'){
+    newMarker.on('click', () => {
+      handleMarkerClick(newMarker, city); // Передаем сам маркер в обработчик клика
+    });
+  }else{
+    const markerElement = newMarker.getElement();
+    markerElement?.classList.add('selected-marker');
+  }
 
   markers.value.push(newMarker);
 };
 
 const handleMarkerClick = (marker: any, city: Address) => {
 
-  map.value?.setView([city.lat, city.lon], 15);
 
   selectedAddress.value = city
 
@@ -136,7 +140,7 @@ const findAddress = async () => {
   const bounds = L.latLngBounds([]);
 
   for (let city of regStore.guessCities) {
-    addMarker(city);
+    addMarker(city, 'default');
     bounds.extend([city.lat, city.lon]);
   }
 
@@ -169,11 +173,11 @@ const handleSubmit = async () => {
 
     await userStore.changeUserAddress(selectedAddress.value)
 
-    clearAll()
-
     if (userStore.addressError){
       notificationStore.addNotification('error', userStore.addressError, 5000);
     }else{
+      clearAll();
+      locateExistedAddress();
       notificationStore.addNotification('success', 'Адрес успешно изменен', 5000);
     }
   }
@@ -192,7 +196,11 @@ const clearAll = () => {
 
 onMounted(() => {
   initMap();
-  locateUser();
+  if (props.regMode){
+    locateUser();
+  }else{
+    locateExistedAddress();
+  }
 });
 
 const clickOutside = () => {
@@ -213,6 +221,13 @@ const nameString = (item: Address): string => {
     return `${item.city}, ${item.road}`
   } else {
     return item.display_name.split(', ').reverse().slice(0, 6).reverse().join(', ');
+  }
+}
+
+const locateExistedAddress = () => {
+  if (!props.regMode && userStore.userAddressInfo){
+    map.value?.setView([userStore.userAddressInfo.lat, userStore.userAddressInfo.lon], 10);
+    addMarker(userStore.userAddressInfo, 'selected')
   }
 }
 </script>
@@ -241,7 +256,7 @@ const nameString = (item: Address): string => {
             placeholder="Город, Улица, Дом"
         />
 
-        <v-btn class="search-btn" variant="outlined" @click="findAddress">
+        <v-btn class="search-btn" variant="outlined" @click="findAddress" :disabled="regStore.addressPending" :loading="regStore.addressPending">
           <v-icon size="large">mdi-magnify</v-icon>
         </v-btn>
       </div>
@@ -279,7 +294,7 @@ const nameString = (item: Address): string => {
               @focus="isMenuOpen = true"
           ></v-text-field>
         </div>
-        <v-btn class="search-btn-deep search-btn" variant="outlined" @click="findAddress">
+        <v-btn class="search-btn-deep search-btn" variant="outlined" @click="findAddress" :disabled="regStore.addressPending" :loading="regStore.addressPending">
           <v-icon size="large">mdi-magnify</v-icon>
         </v-btn>
       </div>
@@ -301,18 +316,12 @@ const nameString = (item: Address): string => {
           :class="['address-menu-selector', !props.regMode ? 'address-menu-selector-non-reg' : '', isDeepSearch ? 'address-menu-selector-deep' : '', !props.regMode && isDeepSearch ? 'address-menu-selector-deep-non-reg' : '']"
           v-if="isMenuOpen"
       >
-        <template v-if="regStore.addressPending">
-          <v-progress-circular
-              class="align-self-center"
-              color="green"
-              indeterminate
-          ></v-progress-circular>
-        </template>
         <template v-if="addressNotFound">
           <v-list-item>
             <v-list-item-title class="text-center">Адрес не найден</v-list-item-title>
           </v-list-item>
         </template>
+
         <template v-if="!addressNotFound && !regStore.addressPending && regStore.guessCities.length">
           <v-list-item-action class="w-100">
             <v-btn color="green" class="w-100 text-none" @click="isMenuOpen = false">Выбрать на карте</v-btn>
@@ -326,7 +335,7 @@ const nameString = (item: Address): string => {
           </v-list-item>
         </template>
 
-        <template v-if="!addressNotFound && !regStore.addressPending && !regStore.guessCities.length">
+        <template v-if="!addressNotFound && !regStore.guessCities.length">
           <v-list-item>
             <v-list-item-title class="text-center">Найдите свой адрес</v-list-item-title>
           </v-list-item>
@@ -337,14 +346,14 @@ const nameString = (item: Address): string => {
 
   <div id="map" style="height: 300px; width: 100%;"></div>
 
-  <v-fade-transition>
-    <div v-if="selectedAddress" class="selected-address-block d-flex w-100 flex-column ga-1 pt-2">
-      <h5 class="align-self-center ma-0">Выбранный адрес:</h5>
+  <v-dialog-transition>
+    <div v-if="selectedAddress" class="selected-address-block d-flex w-100 flex-column pt-2">
+      <span class="fw-bold align-self-center ma-0">Выбранный адрес:</span>
       <div class="d-flex align-items-center justify-content-center">
         <p class="address-text text-center ma-0">{{ nameString(selectedAddress) }}</p>
       </div>
     </div>
-  </v-fade-transition>
+  </v-dialog-transition>
 
   <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
     <div class="d-flex flex-column gap-1 mt-5">
@@ -384,7 +393,8 @@ const nameString = (item: Address): string => {
 <style scoped lang="scss">
 #map {
   border-radius: 15px;
-  border: 1px solid black;
+  border: 1px solid currentColor;
+  position: relative;
 }
 
 .address-menu-selector {
@@ -394,7 +404,7 @@ const nameString = (item: Address): string => {
   top: 84px;
   right: 0;
   z-index: 9999;
-  border: 1px solid black;
+  border: 1px solid currentColor;
   border-radius: 15px;
   padding: 15px;
   gap: 5px;

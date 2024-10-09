@@ -7,7 +7,8 @@ import ChangeAvatarMenu from "@/components/home/changeAvatarMenu.vue";
 const userStore = useUserStore()
 
 interface Props {
-  withActions: boolean
+  withActions: boolean,
+  isPreview: boolean,
 }
 const props = defineProps<Props>()
 </script>
@@ -28,7 +29,7 @@ const props = defineProps<Props>()
       </v-img>
     </v-avatar>
 
-    <change-avatar-menu v-if="props.withActions"/>
+    <change-avatar-menu v-if="props.withActions" :is-preview="props.isPreview"/>
   </div>
 </template>
 
