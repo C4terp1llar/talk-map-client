@@ -499,7 +499,7 @@ const locateExistedAddress = () => {
 
 .address-menu-selector::-webkit-scrollbar-track {
   margin: 10px;
-  background-color: rgb(var(--v-theme-background));
+  background: #777777;
   border-radius: 15px;
 }
 </style>

@@ -23,6 +23,7 @@
     "perfect-debounce": "^1.0.0",
     "pinia": "^2.1.7",
     "scss": "^0.2.4",
+    "unicode-emoji-json": "^0.8.0",
     "vue": "^3.4.29",
     "vue-cropperjs": "^5.0.0",
     "vue-router": "^4.3.3",
