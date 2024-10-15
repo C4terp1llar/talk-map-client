@@ -1,14 +1,25 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css'
-import {rules} from "@/helpers/baseTextValidator";
 import {useRegistrationStore} from "@/stores/regSteps";
 import {useNotificationStore} from "@/stores/notifications";
 import type {Address} from "@/helpers/interfaces";
 import {onClickOutside} from "@vueuse/core";
 import {useUserStore} from "@/stores/user";
 
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import markerRetina from 'leaflet/dist/images/marker-icon-2x.png';
+
+const defaultIcon = L.icon({
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+  iconRetinaUrl: markerRetina,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
 interface Props {
   regMode: boolean
@@ -72,6 +83,7 @@ const addMarker = (city: Address, mode: 'default' | 'selected') => {
   const addressTitle = nameString(city)
 
   const newMarker = L.marker([city.lat, city.lon], {
+    icon: defaultIcon,
     title: addressTitle,
     riseOnHover: true,
     riseOffset: 250,
