@@ -20,8 +20,9 @@ const imagePopupStore = useImagePopupStore();
 
 <style scoped lang="scss">
 .modal-img-upload-wrapper {
-  z-index: 10003;
   position: fixed;
+  inset: 0;
+  z-index: 10003;
   width: 100%;
   height: 100%;
   display: flex;

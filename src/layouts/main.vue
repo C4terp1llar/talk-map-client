@@ -46,12 +46,12 @@ onBeforeMount(async () => {
 
 .main {
   border-radius: 15px;
-  padding: 15px;
   margin: 5px;
+  padding: 15px;
   box-shadow: 0 1px 10px currentColor;
 
   @media (max-width: 650px) {
-    padding-bottom: 90px;
+    padding: 5px 5px 90px 5px;
   }
 }
 

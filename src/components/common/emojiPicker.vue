@@ -95,7 +95,7 @@ onClickOutside(emojiWrapperRef, clickOutside);
   @media screen and (max-width: 350px) {
     gap: 5px;
   }
-  @media screen and (max-width: 300px) {
+  @media screen and (max-width: 320px) {
     gap: 2px;
   }
 
@@ -109,7 +109,7 @@ onClickOutside(emojiWrapperRef, clickOutside);
     .emoji-wrapper__tab-icon{
       font-size: 24px;
       display: block;
-      @media (max-width: 350px) {
+      @media (max-width: 400px) {
         font-size: 20px ;
       }
     }

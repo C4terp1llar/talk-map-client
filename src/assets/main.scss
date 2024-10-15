@@ -1,3 +1,4 @@
+
 @mixin flexbox($display: flex, $justify-content: center, $align-items: center, $flex-direction: row) {
   display: $display;
   justify-content: $justify-content;
@@ -40,6 +41,10 @@ a:hover{
 
 .nav-link:hover{
   color: greenyellow;
+}
+
+:root {
+  scroll-behavior: unset;
 }
 
 *{
