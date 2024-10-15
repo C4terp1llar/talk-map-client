@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css'
 import {rules} from "@/helpers/baseTextValidator";
 import {useRegistrationStore} from "@/stores/regSteps";
 import {useNotificationStore} from "@/stores/notifications";

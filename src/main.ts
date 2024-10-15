@@ -4,7 +4,6 @@ import 'flag-icons/css/flag-icons.min.css';
 import './assets/main.scss';
 import './assets/map.scss'
 import './assets/cropper.scss'
-import './assets/mapStyles/leaflet.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
