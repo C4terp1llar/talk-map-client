@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import emojiData from 'unicode-emoji-json/data-by-group.json';
+import {ref} from "vue";
+import {onClickOutside} from "@vueuse/core";
+
+const emit = defineEmits();
+
+interface Props {
+  selectMode: 'single' | 'multiple',
+}
+const props = defineProps<Props>()
 
 const categoriesIcons = {
   smileys_emotion: 'mdi-emoticon-happy-outline',
   people_body: 'mdi-human-greeting-variant',
-  animals_nature:'mdi-fishbowl-outline',
+  animals_nature:'mdi-penguin',
   food_drink:'mdi-food-apple-outline',
   travel_places:'mdi-train-car',
   activities:'mdi-airplane',
@@ -13,14 +22,48 @@ const categoriesIcons = {
   flags:'mdi-flag-outline',
 }
 
+const emojiWrapperRef = ref<HTMLElement | null>(null);
+
+
+const scrollToSection = (slug: string) => {
+  const element = document.getElementById(slug);
+  if (element && emojiWrapperRef.value) {
+
+    const container = emojiWrapperRef.value;
+    const elementPosition = element.offsetTop;
+
+    container.scrollTo({
+      top: elementPosition - 80,
+      behavior: 'smooth',
+    });
+
+  }
+};
+
+const handleSelect = (emoji: string) => {
+  if (props.selectMode === 'single') {
+    emit('select', emoji)
+    emit('close')
+  }else{
+    emit('select', emoji)
+  }
+}
+
+const clickOutside = () => {
+  emit('close')
+}
+onClickOutside(emojiWrapperRef, clickOutside);
+
+
 </script>
 
 <template>
-  <div class="emoji-wrapper">
+
+  <div class="emoji-wrapper" ref="emojiWrapperRef">
     <div class="emoji-wrapper__tabs">
-      <div class="emoji-wrapper__tab" v-for="obj in emojiData" :key="obj.slug">
-        <a :href="`#${obj.slug}`"></a>
+      <div class="emoji-wrapper__tab" v-for="obj in emojiData" :key="obj.slug" >
         <i :class="['emoji-wrapper__tab-icon','mdi', categoriesIcons[obj.slug]]"></i>
+        <button @click="scrollToSection(obj.slug)"></button>
       </div>
     </div>
     <div class="emoji-wrapper__content" v-for="obj in emojiData" :key="obj.slug">
@@ -28,7 +71,7 @@ const categoriesIcons = {
       <ul class="emoji-wrapper__content-emojis" :id="obj.slug">
         <li class="emoji-wrapper__content-emojis__item" v-for="subObj in obj.emojis" :key="subObj.slug">
           <div class="item__icon" v-if="subObj.emoji.length === 2">{{ subObj.emoji }}</div>
-          <button></button>
+          <button @click="handleSelect(subObj.emoji)"></button>
         </li>
       </ul>
     </div>
@@ -38,7 +81,7 @@ const categoriesIcons = {
 <style scoped lang="scss">
 
 .emoji-wrapper__tabs{
-  z-index: 10004;
+  z-index: 9990;
   position: sticky;
   top: 0;
   display: flex;
@@ -58,6 +101,10 @@ const categoriesIcons = {
 
   .emoji-wrapper__tab{
     position: relative;
+    transition: .2s;
+    &:hover{
+      color: green !important;
+    }
 
     .emoji-wrapper__tab-icon{
       font-size: 24px;
@@ -67,7 +114,7 @@ const categoriesIcons = {
       }
     }
 
-    a{
+    button{
       position: absolute;
       inset: 0;
     }
@@ -75,10 +122,7 @@ const categoriesIcons = {
 }
 
 .emoji-wrapper {
-  scroll-padding-top: 80px;
-
-  z-index: 10003;
-  position: absolute;
+  z-index: 9980;
 
   background-color: rgb(var(--v-theme-background));
   font-family: "Noto Color Emoji", sans-serif;
@@ -90,8 +134,7 @@ const categoriesIcons = {
   height: 400px;
   padding: 0 10px 10px 10px;
 
-  overflow-y: scroll;
-  scroll-behavior: smooth;
+  overflow-y: auto;
 
   @media (max-width: 350px) {
     margin: 5px;
@@ -116,9 +159,15 @@ const categoriesIcons = {
 
     .emoji-wrapper__content-emojis__item{
       position: relative;
+      border-radius: 5px;
+      transition: .2s;
+      &:hover{
+        background-color: rgba(136, 136, 136, 0.35);
+      }
 
       .item__icon{
         font-size: 20px;
+        padding: 5px;
       }
 
       button{

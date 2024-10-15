@@ -20,7 +20,6 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-<emoji-picker/>
   <div class="wrapper">
     <aside class="aside">
       <main-aside/>

@@ -1,3 +1,8 @@
 .leaflet-marker-icon.selected-marker {
   filter: hue-rotate(250deg);
 }
+
+
+.leaflet-attribution-flag{
+  width: 0 !important;
+}

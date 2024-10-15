@@ -95,7 +95,7 @@ onMounted(() => profilePreview.newUserNickname = nickname.value)
 
       <v-btn
           type="submit"
-          class="change-btn"
+          class="h-auto"
           @click="handleChange"
           variant="outlined"
           :loading="userStore.nicknamePending"
@@ -108,9 +108,6 @@ onMounted(() => profilePreview.newUserNickname = nickname.value)
 </template>
 
 <style scoped>
-.change-btn {
-  height: 56px;
-}
 
 .indicator {
   right: 15px;

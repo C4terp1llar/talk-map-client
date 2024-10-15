@@ -8,11 +8,19 @@ import {useUserStore} from "@/stores/user";
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 import NicknameColorChange from "@/components/settings/profile/nicknameColorChange.vue";
 import AddressStep from "@/components/registerSteps/AddressStep.vue";
+import TagMake from "@/components/settings/profile/tagMake.vue";
+import TagPreview from "@/components/settings/profile/tagPreview.vue";
+import TagCompleteMake from "@/components/settings/profile/tagCompleteMake.vue";
+import TagCompleteChange from "@/components/settings/profile/tagCompleteChange.vue";
 
 const userStore = useUserStore()
+
+// <emoji-picker select-mode="single" @close="console.log('close')" @select=" qwe => console.log(qwe)"/>
+
 </script>
 
 <template>
+
   <div class="wrapper-settings-tab">
 
     <div class="wrapper-settings-tab__profile" v-if="!userStore.pending">
@@ -26,11 +34,20 @@ const userStore = useUserStore()
         <v-divider/>
       </div>
 
+
       <div class="profile-nickname">
         <h4 class="text-center">Никнейм</h4>
         <v-divider/>
         <nickname-change/>
         <nickname-color-change class="mt-3"/>
+        <v-divider/>
+      </div>
+
+      <div class="profile-nickname">
+        <h4 class="text-center">Теги</h4>
+        <v-divider/>
+        <tag-complete-make/>
+        <tag-complete-change/>
         <v-divider/>
       </div>
 
@@ -49,7 +66,7 @@ const userStore = useUserStore()
 </template>
 
 <style scoped>
-.wrapper-settings-tab__profile{
+.wrapper-settings-tab__profile {
   display: flex;
   flex-direction: column;
 }

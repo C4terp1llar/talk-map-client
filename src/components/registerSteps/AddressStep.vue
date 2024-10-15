@@ -236,7 +236,7 @@ const locateExistedAddress = () => {
 
   <div class="selected-address-non-reg" v-if="!props.regMode && userStore.userAddressInfo">
     <div class="selected-address-non-reg-content mb-4">
-      <span class="fw-bold">Текущий адрес: </span>
+      <span class="fw-bold">Ваш адрес: </span>
       <span >{{nameString(userStore.userAddressInfo)}}</span>
     </div>
   </div>

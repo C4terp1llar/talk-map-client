@@ -11,6 +11,7 @@ interface MainUserInfo {
     avatar: string;
     wallpaper: string | null;
     nickname_color?: string | null;
+    tags?: {emoji: string, text: string}[] | null;
 }
 
 
@@ -221,6 +222,58 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+    const newTagText = ref<string>('')
+    const newTagEmoji = ref<string>('')
+
+    const tagPending = ref<boolean>(false);
+    const tagError = ref<string | null>(null);
+
+    const setUserTag = async () => {
+        if (!newTagText.value || !newTagEmoji.value) return;
+        tagPending.value = true;
+        tagError.value = null;
+
+        try {
+            const response = await apiAuth.post('user/setTag',{
+                text: newTagText.value,
+                emoji: newTagEmoji.value
+            })
+
+            if (response.status === 200 && mainUserInfo.value){
+                mainUserInfo.value.tags = response.data.tagsArr;
+            }
+        } catch (e: any) {
+            tagError.value = "Произошла ошибка при добавлении тега, попробуйте позже";
+            console.error(e);
+        } finally {
+            tagPending.value = false;
+        }
+    }
+
+    const tagDeletePending = ref<boolean>(false);
+    const tagDeleteError = ref<string | null>(null);
+
+    const deleteUserTag = async (deleteTagText: string) => {
+        tagDeletePending.value = true;
+        tagDeleteError.value = null;
+
+        try {
+            const response = await apiAuth.post('user/deleteTag',{
+                deleteTagText: deleteTagText
+            })
+
+            if (response.status === 200 && mainUserInfo.value){
+                mainUserInfo.value.tags = response.data.tagsArr;
+            }
+        } catch (e: any) {
+            tagDeleteError.value = "Произошла ошибка при удалении тега, попробуйте позже";
+            console.error(e);
+        } finally {
+            tagDeletePending.value = false;
+        }
+    }
+
+
     return{
         pending,
         error,
@@ -255,5 +308,15 @@ export const useUserStore = defineStore('user', () => {
         addressPending,
         addressError,
         changeUserAddress,
+
+        newTagText,
+        newTagEmoji,
+        tagPending,
+        tagError,
+        setUserTag,
+
+        tagDeletePending,
+        tagDeleteError,
+        deleteUserTag,
     }
 })
