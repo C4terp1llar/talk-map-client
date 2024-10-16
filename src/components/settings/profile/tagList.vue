@@ -28,7 +28,7 @@ const deleteTag = async (deleteTagText: string) => {
 </script>
 
 <template>
-  <div class="tags-wrapper" v-if="userStore.mainUserInfo">
+  <div :class="['tags-wrapper',props.isPreview ? '__prev' : '__non-prev']" v-if="userStore.mainUserInfo">
 
     <div
         class="tag-content-wrapper"
@@ -61,9 +61,14 @@ const deleteTag = async (deleteTagText: string) => {
 <style scoped lang="scss">
 .tags-wrapper {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
+  &.__prev{
+    flex-wrap: wrap;
+  }
+  &.__non-prev{
+    flex-wrap: nowrap;
+  }
 }
 
 .tag-content-wrapper {
@@ -99,8 +104,6 @@ const deleteTag = async (deleteTagText: string) => {
 }
 
 .delete-btn{
-  display: flex;
-  align-items: center;
   transition: .3s;
   opacity: 1;
 

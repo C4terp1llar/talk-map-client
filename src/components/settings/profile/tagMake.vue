@@ -13,7 +13,7 @@ const isPickerVisible = ref<boolean>(false)
 const handleClosePicker = () => {
   setTimeout(() => {
     isPickerVisible.value = false
-  }, 1)
+  })
 }
 
 const handleSelect = (emoji: string) => {

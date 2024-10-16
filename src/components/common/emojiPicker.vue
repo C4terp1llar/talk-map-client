@@ -1,82 +1,62 @@
 <script setup lang="ts">
-import emojiData from 'unicode-emoji-json/data-by-group.json';
-import {ref} from "vue";
-import {onClickOutside} from "@vueuse/core";
+import { ref } from 'vue';
+import { onClickOutside } from '@vueuse/core';
+import {processedEmojiData} from "@/helpers/emojiData";
 
 const emit = defineEmits();
 
 interface Props {
   selectMode: 'single' | 'multiple',
 }
-const props = defineProps<Props>()
-
-const categoriesIcons = {
-  smileys_emotion: 'mdi-emoticon-happy-outline',
-  people_body: 'mdi-human-greeting-variant',
-  animals_nature:'mdi-penguin',
-  food_drink:'mdi-food-apple-outline',
-  travel_places:'mdi-train-car',
-  activities:'mdi-airplane',
-  objects:'mdi-ufo-outline',
-  symbols:'mdi-wheelchair',
-  flags:'mdi-flag-outline',
-}
+const props = defineProps<Props>();
 
 const emojiWrapperRef = ref<HTMLElement | null>(null);
-
 
 const scrollToSection = (slug: string) => {
   const element = document.getElementById(slug);
   if (element && emojiWrapperRef.value) {
-
     const container = emojiWrapperRef.value;
     const elementPosition = element.offsetTop;
-
     container.scrollTo({
       top: elementPosition - 80,
       behavior: 'smooth',
     });
-
   }
 };
 
 const handleSelect = (emoji: string) => {
+  emit('select', emoji);
   if (props.selectMode === 'single') {
-    emit('select', emoji)
-    emit('close')
-  }else{
-    emit('select', emoji)
+    emit('close');
   }
-}
+};
 
 const clickOutside = () => {
-  emit('close')
-}
+  emit('close');
+};
 onClickOutside(emojiWrapperRef, clickOutside);
-
-
 </script>
 
 <template>
-
   <div class="emoji-wrapper" ref="emojiWrapperRef">
     <div class="emoji-wrapper__tabs">
-      <div class="emoji-wrapper__tab" v-for="obj in emojiData" :key="obj.slug" >
-        <i :class="['emoji-wrapper__tab-icon','mdi', categoriesIcons[obj.slug]]"></i>
+      <div class="emoji-wrapper__tab" v-for="obj in processedEmojiData" :key="obj.slug">
+        <i :class="['emoji-wrapper__tab-icon', 'mdi', obj.iconClass]"></i>
         <button @click="scrollToSection(obj.slug)"></button>
       </div>
     </div>
-    <div class="emoji-wrapper__content" v-for="obj in emojiData" :key="obj.slug">
+    <div class="emoji-wrapper__content" v-for="obj in processedEmojiData" :key="obj.slug">
       <div class="emoji-wrapper__content-divider"></div>
       <ul class="emoji-wrapper__content-emojis" :id="obj.slug">
         <li class="emoji-wrapper__content-emojis__item" v-for="subObj in obj.emojis" :key="subObj.slug">
-          <div class="item__icon" v-if="subObj.emoji.length === 2">{{ subObj.emoji }}</div>
+          <div class="item__icon">{{ subObj.emoji }}</div>
           <button @click="handleSelect(subObj.emoji)"></button>
         </li>
       </ul>
     </div>
   </div>
 </template>
+
 
 <style scoped lang="scss">
 

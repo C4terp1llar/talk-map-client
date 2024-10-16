@@ -6,6 +6,8 @@ import ChangeWallpaperMenu from "@/components/home/changeWallpaperMenu.vue";
 import {useRouter} from "vue-router";
 import {useProfilePreviewStore} from "@/stores/profilePreview";
 import WallpaperBottomContentSkeleton from "@/components/skeletons/wallpaperBottomContentSkeleton.vue";
+import TagList from "@/components/settings/profile/tagList.vue";
+import ScrollableContainer from "@/components/common/scrollableContainer.vue";
 
 const userStore = useUserStore()
 const profilePreview = useProfilePreviewStore();
@@ -51,6 +53,7 @@ const props = defineProps<Props>()
 
       <div class="wallpaper-avatar-block-relative-mask"></div>
 
+
       <div class="bottom-wallpaper-block-content" v-if="!userStore.pending">
 
         <div class="info-block">
@@ -65,6 +68,7 @@ const props = defineProps<Props>()
             <i :class="`flag fi fi-${userStore.userAddressInfo.country_code}`"></i>
             <span>{{ `${userStore.userAddressInfo?.city}, ${userStore.userAddressInfo.country}` }}</span>
           </div>
+
         </div>
 
         <div class="actions-block">
@@ -79,6 +83,7 @@ const props = defineProps<Props>()
           </v-btn>
         </div>
       </div>
+
       <wallpaper-bottom-content-skeleton v-else/>
 
 

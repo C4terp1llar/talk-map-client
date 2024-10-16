@@ -52,6 +52,7 @@ const debouncedOperation = debounce(async () => {
 const handleBlur = () => {
   if (rules.lengthNickname(nickname.value) !== true || rules.fieldSymbols(nickname.value) !== true){
     if (userStore.mainUserInfo?.nickname) {
+      regStore.isNicknameTaken = ''
       nickname.value = userStore.mainUserInfo?.nickname
       profilePreview.newUserNickname = userStore.mainUserInfo?.nickname
     }
@@ -95,7 +96,7 @@ onMounted(() => profilePreview.newUserNickname = nickname.value)
 
       <v-btn
           type="submit"
-          class="h-auto"
+          class="btn-change"
           @click="handleChange"
           variant="outlined"
           :loading="userStore.nicknamePending"
@@ -112,7 +113,9 @@ onMounted(() => profilePreview.newUserNickname = nickname.value)
 .indicator {
   right: 15px;
 }
-
+.btn-change{
+  height: 56px;
+}
 .field-content {
   display: flex;
   gap: 10px;
