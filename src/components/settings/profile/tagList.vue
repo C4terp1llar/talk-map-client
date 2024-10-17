@@ -3,6 +3,7 @@ import {useUserStore} from "@/stores/user";
 import {vAutoAnimate} from "@formkit/auto-animate/vue";
 import {useNotificationStore} from "@/stores/notifications";
 import {ref} from "vue";
+import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 
 interface Props {
   isPreview: boolean,

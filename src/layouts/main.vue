@@ -2,19 +2,40 @@
 
 import MainAside from "@/components/common/mainAside.vue";
 import MainHeader from "@/components/common/mainHeader.vue";
-import {onBeforeMount, onMounted} from "vue";
+import {onBeforeMount, onMounted, onUnmounted} from "vue";
 import {useUserStore} from "@/stores/user";
 import {useNotificationStore} from "@/stores/notifications";
 import EmojiPicker from "@/components/common/emojiPicker.vue";
+import connectSocket from "@/utils/socket";
+import {useWsStore} from "@/stores/wsStore";
 
+const wsStore = useWsStore()
 const userStore = useUserStore()
 const notificationStore = useNotificationStore()
 
 onBeforeMount(async () => {
   await userStore.getMainUserInfo()
 
-  if (userStore.error){
+  if (userStore.error) {
     notificationStore.addNotification('error', userStore.error, 3000)
+  }
+})
+
+onMounted(async () => {
+  try {
+    await wsStore.connectSocket();
+  } catch (error) {
+    console.error(error);
+    notificationStore.addNotification('error', 'Ошибка при подключении ws', 3000)
+  }
+})
+
+onUnmounted(() => {
+  try {
+    wsStore.disconnectSocket();
+  } catch (error) {
+    console.error(error);
+    notificationStore.addNotification('error', 'Ошибка при отключении ws', 3000)
   }
 })
 </script>
@@ -34,12 +55,12 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
-.aside{
+.aside {
   grid-row: span 2;
   grid-column: span 1;
 }
 
-.header{
+.header {
   position: sticky;
   top: 0;
 }
