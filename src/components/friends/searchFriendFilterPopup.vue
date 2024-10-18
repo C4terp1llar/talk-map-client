@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import { ref} from "vue";
 import {onClickOutside} from "@vueuse/core";
-import {rules} from "@/helpers/baseTextValidator";
+import {useFindFriendFilterStore} from "@/stores/findFriendFilter";
+
+const filterStore = useFindFriendFilterStore()
 
 const emit = defineEmits();
 
-const gender = ref<'male' | 'female' | null>(null);
-const age = ref< (string | number)[]>([14, 100]);
-const city = ref<string | null>(null);
+const gender = ref<'male' | 'female' | null>(filterStore.userFindFriendFilter.gender || null);
+const age = ref< (string | number)[]>(filterStore.userFindFriendFilter.age || [14, 100]);
+const city = ref<string | null>(filterStore.userFindFriendFilter.city || null);
 
 const filterPopupRef = ref<HTMLElement | null>(null);
 
@@ -15,6 +17,13 @@ const clickOutside = () => {
   emit('close');
 };
 onClickOutside(filterPopupRef, clickOutside);
+
+const clearAll = () => {
+  gender.value = null;
+  age.value = [14, 100];
+  city.value = null;
+  filterStore.clearAll();
+}
 </script>
 
 <template>
@@ -28,6 +37,7 @@ onClickOutside(filterPopupRef, clickOutside);
           variant="outlined"
           maxlength="20"
           hide-details="auto"
+          @input="filterStore.userFindFriendFilter.city = city"
       />
     </div>
 
@@ -45,6 +55,7 @@ onClickOutside(filterPopupRef, clickOutside);
             hide-details
             strict
             class="age-range"
+            @update:model-value="filterStore.userFindFriendFilter.age = age"
         ></v-range-slider>
         <v-text-field class="text-age-field" :min="14" :max="100" v-model="age[1]" type="number" variant="outlined" hide-details/>
       </div>
@@ -59,6 +70,7 @@ onClickOutside(filterPopupRef, clickOutside);
           hide-details
           inline
           class="ma-auto"
+          @change="filterStore.userFindFriendFilter.gender = gender"
       >
         <v-radio
             label="Мужской"
@@ -77,6 +89,7 @@ onClickOutside(filterPopupRef, clickOutside);
       color="green"
       variant="text"
       class="text-none"
+      @click="clearAll"
     >Сбросить</v-btn>
   </div>
 </template>

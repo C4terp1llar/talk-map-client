@@ -72,28 +72,6 @@ const router = createRouter({
                     path: '/app/settings',
                     name: 'settings',
                     component: () => import('../views/settings.vue'),
-                    children: [
-                        {
-                            path: '',
-                            name: 'default-settings',
-                            redirect: '/app/settings/profile'
-                        },
-                        {
-                            path: 'profile',
-                            name: 'settings-profile',
-                            component: () => import('../views/settingsSubViews/settingsProfile.vue')
-                        },
-                        {
-                            path: 'security',
-                            name: 'settings-security',
-                            component: () => import('../views/settingsSubViews/settingsSecurity.vue')
-                        },
-                        {
-                            path: 'notifications',
-                            name: 'settings-notifications',
-                            component: () => import('../views/settingsSubViews/settingsNotifications.vue')
-                        }
-                    ]
                 },
             ]
         }

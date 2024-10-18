@@ -2,16 +2,12 @@
 import {ref} from "vue";
 import {useRouter, useRoute} from "vue-router";
 
+type Tab = 'profile' | 'notifications' | 'security';
+
 const router = useRouter();
 const route = useRoute();
 
-
-const activeTab = ref<string>(route.name as string);
-
-const changeTab = (tabName: string) => {
-  router.push({name: tabName});
-  activeTab.value = tabName;
-};
+const activeTab = ref<Tab>(route.query.tab as Tab || 'profile')
 </script>
 
 <template>
@@ -26,24 +22,24 @@ const changeTab = (tabName: string) => {
       <v-tab
           class="text-none"
           prepend-icon="mdi-home-outline"
-          @click="changeTab('settings-profile')"
-          value="settings-profile"
+          @click="router.push({ path: route.path, query: { tab: 'profile' } })"
+          value="profile"
       >
         Профиль
       </v-tab>
       <v-tab
           class="text-none"
           prepend-icon="mdi-bell-outline"
-          @click="changeTab('settings-notifications')"
-          value="settings-notifications"
+          @click="router.push({ path: route.path, query: { tab: 'notifications' } })"
+          value="notifications"
       >
         Уведомления
       </v-tab>
       <v-tab
           class="text-none"
           prepend-icon="mdi-shield-account-outline"
-          @click="changeTab('settings-security')"
-          value="settings-security"
+          @click="router.push({ path: route.path, query: { tab: 'security' } })"
+          value="security"
       >
         Безопасность
       </v-tab>

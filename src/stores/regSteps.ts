@@ -170,6 +170,8 @@ export const useRegistrationStore = defineStore('registration', () => {
         error.value = null;
 
         try{
+            const newUserDeviceInfo = getDeviceInfo();
+
             const response = await api.post('reg/registerUser', {
                 email: newUserEmail.value,
                 password: newUserPassword.value,
@@ -179,11 +181,12 @@ export const useRegistrationStore = defineStore('registration', () => {
                 avatar: newUserAvatar.value,
                 originalAvatar: originalImg,
                 address: newUserAddress.value,
-                device_info: getDeviceInfo()
+                device_info: newUserDeviceInfo
             }, { withCredentials: true });
 
             if (response.data && response.data.accessToken) {
                 localStorage.setItem('access_token', response.data.accessToken);
+                localStorage.setItem('device_info', newUserDeviceInfo);
             }
 
         }catch (e) {

@@ -38,14 +38,17 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null;
 
         try {
+            const currentUserDeviceInfo = localStorage.getItem('device_info') || getDeviceInfo();
+
             const response = await api.post(`auth/login`, {
                 email: clientEmail,
                 password: clientPassword,
-                device_info: getDeviceInfo()
+                device_info: currentUserDeviceInfo
             }, { withCredentials: true });
 
             if (response.data && response.data.accessToken) {
                 localStorage.setItem('access_token', response.data.accessToken);
+                localStorage.setItem('device_info', currentUserDeviceInfo);
             }
 
             return response.data.nickname
@@ -68,6 +71,7 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             await apiAuth.post('auth/logout', {}, { withCredentials: true });
             localStorage.removeItem('access_token');
+            localStorage.removeItem('device_info')
             await router.push('/login');
         } catch (e: any) {
             error.value = "Произошла ошибка при разлогинивании";

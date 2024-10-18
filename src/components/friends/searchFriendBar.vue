@@ -14,6 +14,7 @@ const handleClose = () => {
 
 <template>
   <div class="search-friend-bar-wrapper">
+
     <div class="filter-wrapper">
       <v-scroll-y-transition>
         <search-friend-filter-popup @close="handleClose" v-if="isPopupOpen"/>
