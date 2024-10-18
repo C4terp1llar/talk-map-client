@@ -4,7 +4,6 @@ import api from "@/utils/api";
 import {getDeviceInfo} from "@/helpers/deviceInfo";
 import apiAuth from "@/utils/apiAuth";
 import {useRouter} from "vue-router";
-import connectSocket from "@/utils/socket";
 
 export const useAuthStore = defineStore('auth', () => {
     const pending = ref<boolean>(false);

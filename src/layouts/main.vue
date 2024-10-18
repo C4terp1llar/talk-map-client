@@ -5,8 +5,6 @@ import MainHeader from "@/components/common/mainHeader.vue";
 import {onBeforeMount, onMounted, onUnmounted} from "vue";
 import {useUserStore} from "@/stores/user";
 import {useNotificationStore} from "@/stores/notifications";
-import EmojiPicker from "@/components/common/emojiPicker.vue";
-import connectSocket from "@/utils/socket";
 import {useWsStore} from "@/stores/wsStore";
 
 const wsStore = useWsStore()

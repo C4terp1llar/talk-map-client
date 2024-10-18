@@ -1,16 +1,19 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref} from "vue";
+import type { Ref } from "vue";
 import { io, Socket } from "socket.io-client";
 import { checkTokenValidity, refreshToken } from "@/stores/sync";
+import {attachBaseWsHandlers} from "@/utils/wsBaseHandlers";
+
+type UserSocket = Socket | null;
 
 export const useWsStore = defineStore('ws', () => {
-
-    const userSocket = ref<Socket | null>(null);
+    const userSocket: Ref<UserSocket> = ref(null);
 
     const connectSocket = async () => {
         let token = localStorage.getItem('access_token');
 
-        if (!token) return
+        if (!token) return;
 
         const tokenIsValid = await checkTokenValidity();
 
@@ -18,32 +21,22 @@ export const useWsStore = defineStore('ws', () => {
             token = await refreshToken();
         }
 
-        // Закрытие предыдущего соединения, если оно существует
+        // если сокет уже есть
         if (userSocket.value) {
             userSocket.value.disconnect();
         }
 
-        // Инициализация нового соединения
-        const socket = io(import.meta.env.VITE_API_WS_URL, {
+        //новый сокет
+        const socket: Socket = io(import.meta.env.VITE_API_WS_URL, {
             auth: {
                 token: `Bearer ${token}`,
             },
-            withCredentials: true
-        });
-
-        socket.on("connect", () => {
-            console.log("ws подключен");
-        });
-
-        socket.on("connect_error", (error) => {
-            console.error("Ошибка соединения:", error.message);
-        });
-
-        socket.on("disconnect", (reason) => {
-            console.log("ws отключен");
+            withCredentials: true,
         });
 
         userSocket.value = socket;
+
+        attachBaseWsHandlers(userSocket.value)
     };
 
     const disconnectSocket = () => {
