@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 
+interface Props {
+  mode: 'tags' | 'filter'
+}
+const props = defineProps<Props>()
+
 const contentRef = ref<HTMLElement | null>(null);
 const wrapperRef = ref<HTMLElement | null>(null);
 
@@ -52,7 +57,7 @@ const scrollRight = () => {
 </script>
 
 <template>
-  <div class="scrollable-wrapper" ref="wrapperRef">
+  <div :class="['scrollable-wrapper', props.mode === 'filter' ? '__filter' : '', props.mode === 'tags' ? '__tags' : '']" ref="wrapperRef">
     <button @click="scrollLeft" class="h-100 mr-2" v-if="!isContentFits">
       <v-icon>mdi-chevron-left</v-icon>
     </button>
@@ -73,18 +78,27 @@ const scrollRight = () => {
   grid-template-columns: auto auto auto;
   align-items: center;
   justify-content: center;
+
+  &.__tags{
+    .scrollable-content{
+      padding: 5px 10px;
+      border-radius: 25px;
+      filter: drop-shadow(0 0 1px currentColor);
+    }
+  }
+
+  &.__filter{
+    margin-bottom: 10px;
+  }
 }
 
 .scrollable-content {
-  padding: 5px 10px;
-  border-radius: 25px;
+  position: relative;
   overflow-x: auto;
   white-space: nowrap;
   scroll-behavior: smooth;
   display: flex;
-  filter: drop-shadow(0 0 1px currentColor);
 
-  /* Скрываем полосу прокрутки для всех браузеров */
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }

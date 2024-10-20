@@ -34,5 +34,6 @@ const componentsMap: Record<Tab, Component> = {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  height: 100%;
 }
 </style>

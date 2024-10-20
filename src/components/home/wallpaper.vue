@@ -66,7 +66,7 @@ const props = defineProps<Props>()
 
           <div class="user-location" v-if="userStore.userAddressInfo?.city">
             <i :class="`flag fi fi-${userStore.userAddressInfo.country_code}`"></i>
-            <span>{{ `${userStore.userAddressInfo?.city}, ${userStore.userAddressInfo.country}` }}</span>
+            <span class="flag-txt">{{ `${userStore.userAddressInfo?.city}, ${userStore.userAddressInfo.country}` }}</span>
           </div>
 
         </div>
@@ -177,17 +177,6 @@ const props = defineProps<Props>()
         display: flex;
         align-items: center;
         gap: 10px;
-
-        span {
-          font-size: 14px;
-          font-weight: bold;
-          opacity: .8;
-        }
-
-        .flag {
-          box-shadow: 0 0 5px currentColor;
-          border-radius: 15%;
-        }
       }
     }
   }

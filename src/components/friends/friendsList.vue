@@ -3,7 +3,9 @@
 </script>
 
 <template>
-  <h5 class="align-self-center">тут будет список друзей</h5>
+  <div class="friends-list-wrapper">
+
+  </div>
 </template>
 
 <style scoped>

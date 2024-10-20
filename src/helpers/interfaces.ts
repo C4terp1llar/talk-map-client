@@ -19,3 +19,33 @@ export interface Address {
 
     boundingbox: string[];
 }
+
+export interface ShortAddress {
+    display_name: string;
+    city: string | null;
+    state: string | null;
+    country: string;
+}
+
+export interface SearchFriendFilter {
+    cityFilter: string | null,
+    minAgeFilter: number,
+    maxAgeFilter: number,
+    genderFilter: 'male' | 'female' | 'any',
+    nicknameFilter: string | null
+}
+
+export interface SearchFoundFriend {
+    _id: string,
+    nickname: string,
+    b_date: Date,
+    gender: 'male' | 'female',
+    avatar: {
+        asset_url: string;
+    },
+    address: {
+        city: string;
+        country: string;
+        country_code: string;
+    }
+}

@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
-import type {Address} from "@/helpers/interfaces";
+import type {Address, SearchFoundFriend, SearchFriendFilter} from "@/helpers/interfaces";
 
 interface MainUserInfo {
     email: string;
@@ -273,6 +273,31 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+    const findUserPending = ref<boolean>(false);
+    const findUserError = ref<string | null>(null);
+
+    const foundUsers = ref<SearchFoundFriend[] | null>(null);
+
+    const findUsers = async (filter: SearchFriendFilter) => {
+        findUserPending.value = true;
+        findUserError.value = null;
+
+        try {
+            const response = await apiAuth.post('user/findUsers',{
+                ...filter
+            })
+
+            if (response && response.data.users){
+                foundUsers.value = response.data.users;
+            }
+        } catch (e: any) {
+            findUserError.value = "Произошла ошибка при поиске пользователей, попробуйте позже";
+            console.error(e);
+        } finally {
+            findUserPending.value = false;
+        }
+    }
+
 
     return{
         pending,
@@ -318,5 +343,10 @@ export const useUserStore = defineStore('user', () => {
         tagDeletePending,
         tagDeleteError,
         deleteUserTag,
+
+        findUserPending,
+        findUserError,
+        findUsers,
+        foundUsers,
     }
 })

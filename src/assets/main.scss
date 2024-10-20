@@ -90,11 +90,60 @@ body{
   font-family: "Noto Color Emoji", sans-serif;
 }
 
+.address-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
 
+.collapse-animation{
+  animation: expand-anim ease .2s;
 
+}
+.expand-animation{
+  animation: collapse-anim ease .2s;
+}
+@keyframes expand-anim {
+  from {
+    height: 0;
 
+    transform: translateY(-20px);
+  }
+  to {
+    height: 100%;
 
+    transform: translateY(0);
+  }
+}
+@keyframes collapse-anim {
+  from {
+    height: 100%;
 
+    transform: translateY(0);
+  }
+  to {
+    height: 0;
+
+    transform: translateY(-20px);
+  }
+}
+
+.user-location{
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  .flag {
+    filter: drop-shadow(0 0 1px currentColor);
+    border-radius: 10%;
+  }
+  .flag-txt{
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
 
 
 

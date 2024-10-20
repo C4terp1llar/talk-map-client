@@ -1,22 +1,61 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-
-interface FilterFriend {
-    city: string | null,
-    age: (string | number)[] | null,
-    gender: 'male' | 'female' | null
-}
+import {ref} from 'vue';
+import type {Address, ShortAddress} from "@/helpers/interfaces";
+import api from "@/utils/api";
 
 export const useFindFriendFilterStore = defineStore('findFriendFilter', () => {
 
-    const userFindFriendFilter = ref<FilterFriend>({city: null, age: null, gender: null});
+    const pending = ref<boolean>(false);
+    const error = ref<string | null>(null);
+
+    const cityFilter = ref<string | null>(null);
+    const minAgeFilter = ref<number>(14);
+    const maxAgeFilter = ref<number>(100);
+    const genderFilter = ref<'male' | 'female' | 'any'>('any');
 
     const clearAll = () => {
-        userFindFriendFilter.value = {city: null, age: null, gender: null};
+        cityFilter.value = null;
+        minAgeFilter.value = 14;
+        maxAgeFilter.value = 100;
+        genderFilter.value = 'any';
+        guessCities.value = [];
     }
 
+    const guessCities = ref<ShortAddress[]>([]);
+
+    const getAddresses = async (clientAddressQuery: string) => {
+        pending.value = true;
+        error.value = null;
+
+        try {
+            const response = await api.post('reg/getCitiesByQ', {
+                query: clientAddressQuery,
+                filter: 'onlyTowns'
+            });
+
+            if (response.data.message){
+                return response.data.message;
+            }else{
+                guessCities.value = response.data
+            }
+        } catch (e) {
+            error.value = "Произошла ошибка при поиске адреса, попробуйте позже";
+            console.error(e);
+        } finally {
+            pending.value = false;
+        }
+    };
+
     return{
-        userFindFriendFilter,
-        clearAll
+        cityFilter,
+        minAgeFilter,
+        maxAgeFilter,
+        genderFilter,
+        clearAll,
+
+        pending,
+        error,
+        guessCities,
+        getAddresses,
     }
 });

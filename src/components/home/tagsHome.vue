@@ -12,7 +12,7 @@ const userStore = useUserStore();
 
 <template>
   <div class="tags-home-wrapper" v-if="!userStore.pending">
-    <scrollable-container v-if="userStore.mainUserInfo?.tags && userStore.mainUserInfo?.tags.length">
+    <scrollable-container mode="tags" v-if="userStore.mainUserInfo?.tags && userStore.mainUserInfo?.tags.length">
       <tag-list :is-preview="false"/>
     </scrollable-container>
 

@@ -442,15 +442,6 @@ const locateExistedAddress = () => {
   }
 }
 
-.address-text {
-  display: -webkit-box; /* Используется для реализации многострочного обрезания текста */
-  -webkit-line-clamp: 2; /* Ограничение на 2 строки */
-  -webkit-box-orient: vertical; /* Указывает, что нужно обрезать текст по вертикали */
-  overflow: hidden; /* Обрезка текста, который не помещается */
-  text-overflow: ellipsis; /* Добавляет многоточие в конце строки, если текст слишком длинный */
-  white-space: normal; /* Обеспечивает нормальный перенос строк */
-}
-
 .search-btn {
   height: 56px;
 }

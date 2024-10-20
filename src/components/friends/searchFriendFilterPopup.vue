@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ref} from "vue";
+import {ref} from "vue";
 import {onClickOutside} from "@vueuse/core";
 import {useFindFriendFilterStore} from "@/stores/findFriendFilter";
+import {rules} from "@/helpers/baseTextValidator";
+import TextDivider from "@/components/common/textDivider.vue";
+import SearchFriendFilterCity from "@/components/friends/searchFriendFilterCity.vue";
 
 const filterStore = useFindFriendFilterStore()
 
 const emit = defineEmits();
 
-const gender = ref<'male' | 'female' | null>(filterStore.userFindFriendFilter.gender || null);
-const age = ref< (string | number)[]>(filterStore.userFindFriendFilter.age || [14, 100]);
-const city = ref<string | null>(filterStore.userFindFriendFilter.city || null);
+const gender = ref<'male' | 'female' | 'any'>(filterStore.genderFilter);
+const minAge = ref<number>(filterStore.minAgeFilter);
+const maxAge = ref<number>(filterStore.maxAgeFilter);
+const city = ref<string | null>(filterStore.cityFilter);
 
 const filterPopupRef = ref<HTMLElement | null>(null);
 
@@ -18,9 +22,38 @@ const clickOutside = () => {
 };
 onClickOutside(filterPopupRef, clickOutside);
 
+const handleAgeInput = (mode: 'min' | 'max') => {
+  const currentModel = mode === 'min' ? minAge : maxAge;
+  currentModel.value = Number(currentModel.value);
+  if (mode === 'min') {
+    if (minAge.value >= 14 && minAge.value <= 100 && (minAge.value <= maxAge.value)) {
+      filterStore.minAgeFilter = minAge.value
+    }
+  } else {
+    if (maxAge.value >= 14 && maxAge.value <= 100 && (minAge.value <= maxAge.value)) {
+      filterStore.maxAgeFilter = maxAge.value
+    }
+  }
+}
+
+const handleAgeBlur = (mode: 'min' | 'max') => {
+  if (mode === 'min') {
+    if (!(minAge.value >= 14 && minAge.value <= 100 && (minAge.value <= maxAge.value))) {
+      minAge.value = 14;
+      filterStore.minAgeFilter = 14;
+    }
+  } else {
+    if (!(maxAge.value >= 14 && maxAge.value <= 100 && (minAge.value <= maxAge.value))) {
+      maxAge.value = 100;
+      filterStore.maxAgeFilter = 100;
+    }
+  }
+}
+
 const clearAll = () => {
-  gender.value = null;
-  age.value = [14, 100];
+  gender.value = 'any';
+  minAge.value = 14;
+  maxAge.value = 100;
   city.value = null;
   filterStore.clearAll();
 }
@@ -29,56 +62,53 @@ const clearAll = () => {
 <template>
   <div class="search-friend-filter__wrapper" ref="filterPopupRef">
 
+    <text-divider text="Город" class="mt-2 mb-2"/>
+
     <div class="filter__wrapper-option">
-      <span class="align-self-center">Город</span>
-      <v-text-field
-          v-model="city"
-          class="w-100"
-          variant="outlined"
-          maxlength="20"
-          hide-details="auto"
-          @input="filterStore.userFindFriendFilter.city = city"
-      />
+      <search-friend-filter-city/>
     </div>
 
-    <hr>
+    <text-divider text="Возраст" class="mt-2 mb-2"/>
 
     <div class="filter__wrapper-option">
-      <span class="align-self-center">Возраст</span>
       <div class="filter__wrapper-option-age">
-        <v-text-field class="text-age-field" :min="14" :max="100" v-model="age[0]" type="number" variant="outlined" hide-details/>
-        <v-range-slider
-            v-model="age"
-            :max="100"
-            :min="14"
-            :step="1"
-            hide-details
-            strict
-            class="age-range"
-            @update:model-value="filterStore.userFindFriendFilter.age = age"
-        ></v-range-slider>
-        <v-text-field class="text-age-field" :min="14" :max="100" v-model="age[1]" type="number" variant="outlined" hide-details/>
+        <div class="d-flex gap-2 align-items-center w-100">
+          <span class="small">От: </span>
+          <v-text-field @input="handleAgeInput('min')" @blur="handleAgeBlur('min')" :min="14" :max="100"
+                        v-model="minAge" type="number" variant="outlined" hide-details/>
+        </div>
+        <div class="d-flex gap-2 align-items-center w-100">
+          <span class="small">До: </span>
+          <v-text-field @input="handleAgeInput('max')" @blur="handleAgeBlur('max')" :min="14" :max="100"
+                        v-model="maxAge" type="number" variant="outlined" hide-details/>
+        </div>
       </div>
     </div>
 
-    <hr>
+    <text-divider text="Пол" class="mt-2 mb-2"/>
 
     <div class="filter__wrapper-option">
-      <span class="align-self-center">Пол</span>
       <v-radio-group
           v-model="gender"
           hide-details
+          @change="filterStore.genderFilter = gender"
+          class="m-auto"
           inline
-          class="ma-auto"
-          @change="filterStore.userFindFriendFilter.gender = gender"
       >
         <v-radio
             label="Мужской"
             value="male"
+            class="m-auto"
         ></v-radio>
         <v-radio
             label="Женский"
             value="female"
+            class="m-auto"
+        ></v-radio>
+        <v-radio
+            label="Любой"
+            value="any"
+            class="m-auto"
         ></v-radio>
       </v-radio-group>
     </div>
@@ -86,11 +116,12 @@ const clearAll = () => {
     <hr>
 
     <v-btn
-      color="green"
-      variant="text"
-      class="text-none"
-      @click="clearAll"
-    >Сбросить</v-btn>
+        color="green"
+        variant="text"
+        class="text-none"
+        @click="clearAll"
+    >Сбросить
+    </v-btn>
   </div>
 </template>
 
@@ -100,40 +131,22 @@ const clearAll = () => {
   display: flex;
   flex-direction: column;
 
-  min-width: 350px;
-
   background: rgb(var(--v-theme-background));
-  box-shadow: 0 1px 10px currentColor;
-  border-radius: 15px;
+  border: 1px solid currentColor;
+  border-radius: 5px;
   z-index: 9990;
 
-  @media screen and (max-width: 400px) {
-    min-width: 150px;
-  }
-
-  .filter__wrapper-option{
+  .filter__wrapper-option {
     display: flex;
     flex-direction: column;
     justify-content: center;
 
-    .filter__wrapper-option-age{
-      display: grid;
-      grid-template-columns: 75px 1fr 75px;
+    .filter__wrapper-option-age {
+      display: flex;
       gap: 10px;
-      align-items: center;
-
-      @media screen and (max-width: 400px) {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto;
-
-        .age-range{
-          grid-row: 1;
-          grid-column: span 2;
-        }
-      }
     }
-
-
   }
 }
+
+
 </style>
