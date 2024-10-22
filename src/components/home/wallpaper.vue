@@ -77,7 +77,7 @@ const props = defineProps<Props>()
               variant="tonal"
               class="text-none"
               prepend-icon="mdi-palette-outline"
-              @click="router.push({name: 'settings-profile'})"
+              @click="router.push({name: 'settings'})"
           >
             Настроить
           </v-btn>
