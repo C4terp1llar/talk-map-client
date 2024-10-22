@@ -2,6 +2,9 @@
 
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import type {SearchFoundFriend} from "@/helpers/interfaces";
+import {useUserStore} from "@/stores/user";
+
+const userStore = useUserStore();
 
 interface Props {
   user: SearchFoundFriend
@@ -33,7 +36,10 @@ const getUserAge = (bDate: Date) => {
 
       <div class="search-friend-list-item__info-personal">
         <div class="search-friend-list-item__info-personal__nickname">
-          <h5 class="ma-0">{{props.user.nickname}}</h5>
+          <h5
+              :style="{color: props.user.nickname_color ? props.user.nickname_color : 'currentColor'}"
+              class="ma-0"
+          >{{props.user.nickname}}</h5>
         </div>
         <div class="search-friend-list-item__info-personal__age-gender">
           <v-icon>{{props.user.gender === 'male' ? 'mdi-face-man-shimmer' : 'mdi-face-woman-shimmer'}}</v-icon>

@@ -5,7 +5,7 @@ import ScrollableContainer from "@/components/common/scrollableContainer.vue";
 </script>
 
 <template>
-  <scrollable-container>
+  <scrollable-container mode="tags">
     <div class="tags-home-skeleton-wrapper">
 
       <div

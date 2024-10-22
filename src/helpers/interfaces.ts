@@ -38,6 +38,7 @@ export interface SearchFriendFilter {
 export interface SearchFoundFriend {
     _id: string,
     nickname: string,
+    nickname_color: string | null,
     b_date: Date,
     gender: 'male' | 'female',
     avatar: {
