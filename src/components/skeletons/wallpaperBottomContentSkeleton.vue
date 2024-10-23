@@ -1,6 +1,11 @@
 <script setup lang="ts">
-
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
+import type {SearchFoundFriend} from "@/helpers/interfaces";
+
+interface Props {
+  isExternal?: boolean
+}
+const props = defineProps<Props>()
 </script>
 
 <template>
@@ -19,7 +24,7 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
       </div>
     </div>
 
-    <div class="actions-block ml-2">
+    <div class="actions-block ml-2" v-if="!props.isExternal">
       <v-btn
           variant="tonal"
           class="text-none"

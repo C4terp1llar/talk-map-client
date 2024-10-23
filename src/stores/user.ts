@@ -1,18 +1,7 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
-import type {Address, SearchFoundFriend, SearchFriendFilter} from "@/helpers/interfaces";
-
-interface MainUserInfo {
-    email: string;
-    nickname: string;
-    b_date: string;
-    gender: 'male' | 'female';
-    avatar: string;
-    wallpaper: string | null;
-    nickname_color?: string | null;
-    tags?: {emoji: string, text: string}[] | null;
-}
+import type {Address, MainUserInfo, SearchFoundFriend, SearchFriendFilter} from "@/helpers/interfaces";
 
 
 export const useUserStore = defineStore('user', () => {

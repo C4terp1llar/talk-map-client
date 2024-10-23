@@ -50,3 +50,32 @@ export interface SearchFoundFriend {
         country_code: string;
     }
 }
+
+export interface MainUserInfo {
+    email: string;
+    nickname: string;
+    b_date: string;
+    gender: 'male' | 'female';
+    avatar: string;
+    wallpaper: string | null;
+    nickname_color?: string | null;
+    tags?: { emoji: string, text: string }[] | null;
+}
+
+export interface ExternalUserInfoMain {
+    email: string;
+    nickname: string;
+    b_date: string;
+    gender: 'male' | 'female';
+    avatar: string;
+    wallpaper: string | null;
+    nickname_color?: string | null;
+    tags?: { emoji: string, text: string }[] | null;
+}
+
+export interface ExternalUserInfoAddress {
+    city: string;
+    country: string;
+    country_code: string;
+}
+

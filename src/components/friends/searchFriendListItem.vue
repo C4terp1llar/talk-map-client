@@ -3,8 +3,10 @@
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import type {SearchFoundFriend} from "@/helpers/interfaces";
 import {useUserStore} from "@/stores/user";
+import {useExternalUserStore} from "@/stores/externalUser";
+import {useRouter} from "vue-router";
 
-const userStore = useUserStore();
+const router = useRouter();
 
 interface Props {
   user: SearchFoundFriend
@@ -13,6 +15,10 @@ const props = defineProps<Props>()
 
 const getUserAge = (bDate: Date) => {
   return new Date().getFullYear() - new Date(bDate).getFullYear()
+}
+
+const handleSubmit = (uid: string) => {
+  router.push({ name: 'friends-user', params: { id: uid } })
 }
 </script>
 
@@ -52,6 +58,8 @@ const getUserAge = (bDate: Date) => {
         <span class="flag-txt">{{ `${props.user.address.city}, ${props.user.address.country}` }}</span>
       </div>
 
+
+      <button @click="handleSubmit(props.user._id)"></button>
     </div>
   </div>
 </template>
@@ -85,6 +93,12 @@ const getUserAge = (bDate: Date) => {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    position: relative;
+
+    button{
+      position: absolute;
+      inset: 0;
+    }
 
     .search-friend-list-item__info-personal{
       display: flex;
