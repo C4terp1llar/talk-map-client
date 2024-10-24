@@ -2,8 +2,46 @@
 import {useUserStore} from "@/stores/user";
 import SearchFriendListItem from "@/components/friends/searchFriendListItem.vue";
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
+import {useFindFriendFilterStore} from "@/stores/findFriendFilter";
+import {onBeforeUnmount, onMounted} from "vue";
+import {useNotificationStore} from "@/stores/notifications";
 
 const userStore = useUserStore();
+const filterStore = useFindFriendFilterStore();
+const notificationsStore = useNotificationStore();
+
+const handleScroll = async () => {
+  const scrollTop = window.scrollY;
+  const windowHeight = window.innerHeight;
+  const bodyHeight = document.body.offsetHeight;
+
+  if (scrollTop + windowHeight >= bodyHeight - 100 && userStore.foundUsers && userStore.foundUsers.length === userStore.usersPerPage * userStore.currentPage) {
+    await handleUpgradeList()
+  }
+};
+
+const handleUpgradeList = async () => {
+  await userStore.findUsers({
+    cityFilter: filterStore.cityFilter,
+    minAgeFilter: filterStore.minAgeFilter,
+    maxAgeFilter: filterStore.maxAgeFilter,
+    genderFilter: filterStore.genderFilter,
+    nicknameFilter: filterStore.nickFilter
+  }, 'load-more')
+
+  if (userStore.findUserError) {
+    notificationsStore.addNotification('error', userStore.findUserError, 3000)
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
+
 </script>
 
 <template>
@@ -18,6 +56,8 @@ const userStore = useUserStore();
         <search-friend-list-item v-for="user in userStore.foundUsers" :key="user._id" :user="user" v-else/>
       </div>
     </div>
+
+    <lazy-placeholder-loader v-if="userStore.loadMoreUsersFlag"/>
   </div>
 </template>
 

@@ -9,12 +9,14 @@ export const useFindFriendFilterStore = defineStore('findFriendFilter', () => {
     const error = ref<string | null>(null);
 
     const cityFilter = ref<string | null>(null);
+    const nickFilter = ref<string | null>(null);
     const minAgeFilter = ref<number>(14);
     const maxAgeFilter = ref<number>(100);
     const genderFilter = ref<'male' | 'female' | 'any'>('any');
 
     const clearAll = () => {
         cityFilter.value = null;
+        nickFilter.value = null;
         minAgeFilter.value = 14;
         maxAgeFilter.value = 100;
         genderFilter.value = 'any';
@@ -51,6 +53,7 @@ export const useFindFriendFilterStore = defineStore('findFriendFilter', () => {
         minAgeFilter,
         maxAgeFilter,
         genderFilter,
+        nickFilter,
         clearAll,
 
         pending,

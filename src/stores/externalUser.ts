@@ -7,13 +7,32 @@ export const useExternalUserStore = defineStore('externalUser', () => {
     const pending = ref<boolean>(false);
     const error = ref<string | null>(null);
 
-    const isUserNotFound = ref<boolean>(false);
-
     const main = ref<ExternalUserInfoMain | null>(null);
     const address = ref<ExternalUserInfoAddress | null>(null);
 
+    const existFlag = ref<boolean>(false);
+
+    const isUserExist = async (searchUid: string) => {
+        pending.value = true;
+        error.value = null;
+        existFlag.value = false;
+        try {
+            const response = await apiAuth.post('user/isUserExist', {
+                uid: searchUid
+            });
+
+            if (response.data && response.status === 200){
+                existFlag.value = response.data.isExist;
+            }
+        } catch (e: any) {
+            error.value = "Произошла ошибка при получении информации о стороннем пользователе, попробуйте позже";
+            console.error(e);
+        } finally {
+            pending.value = false;
+        }
+    }
+
     const getExternalMainUserInfo = async (searchUid: string) => {
-        isUserNotFound.value = false;
         pending.value = true;
         error.value = null;
         main.value = null
@@ -27,8 +46,6 @@ export const useExternalUserStore = defineStore('externalUser', () => {
             if (response.data && response.data.main && response.data.address && response.status === 200){
                 main.value = response.data.main;
                 address.value = response.data.address;
-            }else{
-                isUserNotFound.value = true;
             }
         } catch (e: any) {
             error.value = "Произошла ошибка при получении информации о стороннем пользователе, попробуйте позже";
@@ -41,9 +58,10 @@ export const useExternalUserStore = defineStore('externalUser', () => {
     return{
         pending,
         error,
-        isUserNotFound,
         main,
         address,
         getExternalMainUserInfo,
+        existFlag,
+        isUserExist,
     }
 })

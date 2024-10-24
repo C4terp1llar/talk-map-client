@@ -12,6 +12,7 @@ const filterStore = useFindFriendFilterStore();
 
 onUnmounted(() => {
   userStore.foundUsers = null;
+  userStore.currentPage = 1;
   filterStore.clearAll();
 })
 </script>

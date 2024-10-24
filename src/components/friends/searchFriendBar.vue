@@ -21,13 +21,15 @@ const handleClose = () => {
 }
 
 const handleSubmit = async () => {
+  filterStore.nickFilter = searchQuery.value
+
   await userStore.findUsers({
     cityFilter: filterStore.cityFilter,
     minAgeFilter: filterStore.minAgeFilter,
     maxAgeFilter: filterStore.maxAgeFilter,
     genderFilter: filterStore.genderFilter,
-    nicknameFilter: searchQuery.value
-  })
+    nicknameFilter: filterStore.nickFilter
+  }, 'load')
 
   if (userStore.findUserError) {
     notificationStore.addNotification('error', userStore.findUserError, 3000)

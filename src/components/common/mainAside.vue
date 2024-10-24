@@ -32,14 +32,14 @@ const isActive = (path: string) => computed(() => route.path.includes(`/app/${pa
       </li>
 
       <li :class="{ active: isActive('friends').value }">
-        <RouterLink to="/app/friends"/>
+        <RouterLink :to="{name: 'friends',  query: { tab: 'friends' }}"/>
         <v-icon>mdi-account-multiple-outline</v-icon>
         <span>Друзья</span>
 
       </li>
 
       <li :class="['mt-auto',{ active: isActive('settings').value}]">
-        <RouterLink to="/app/settings"/>
+        <RouterLink :to="{name: 'settings',  query: { tab: 'profile' }}"/>
         <v-icon>mdi-cog-outline</v-icon>
         <span>Настройки</span>
 

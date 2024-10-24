@@ -8,7 +8,8 @@ const route = useRoute();
 
 type Tab = 'friends' | 'search';
 
-const activeTab = ref<Tab>(route.query.tab as Tab || 'friends')
+
+const activeTab = computed(() => route.query.tab as Tab | 'friends')
 
 </script>
 
@@ -17,7 +18,7 @@ const activeTab = ref<Tab>(route.query.tab as Tab || 'friends')
 
 
     <v-tabs
-        v-model="activeTab"
+        :model-value="activeTab"
         class="tabs"
         slider-color="green"
         align-tabs="center"

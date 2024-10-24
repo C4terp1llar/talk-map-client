@@ -267,26 +267,41 @@ export const useUserStore = defineStore('user', () => {
 
     const foundUsers = ref<SearchFoundFriend[] | null>(null);
 
-    const findUsers = async (filter: SearchFriendFilter) => {
-        findUserPending.value = true;
+    const currentPage = ref<number>(1);
+    const usersPerPage = ref<number>(10);
+
+    const findUsers = async (filter: SearchFriendFilter, mode: 'load' | 'load-more') => {
+
+        let currentPending = mode === 'load' ? findUserPending : loadMoreUsersFlag;
+
+        if (mode === 'load-more') currentPage.value += 1;
+
+        currentPending.value = true;
         findUserError.value = null;
 
         try {
-            const response = await apiAuth.post('user/findUsers',{
-                ...filter
-            })
+            const response = await apiAuth.post('user/findUsers', {
+                ...filter,
+                page: currentPage.value,
+                limit: usersPerPage.value,
+            });
 
-            if (response && response.data.users){
-                foundUsers.value = response.data.users;
+            if (response && response.data.users) {
+                if (currentPage.value === 1) {
+                    foundUsers.value = response.data.users;
+                } else if (currentPage.value !== 1 && foundUsers.value){
+                    foundUsers.value.push(...response.data.users);
+                }
             }
         } catch (e: any) {
             findUserError.value = "Произошла ошибка при поиске пользователей, попробуйте позже";
             console.error(e);
         } finally {
-            findUserPending.value = false;
+            currentPending.value = false;
         }
-    }
+    };
 
+    const loadMoreUsersFlag = ref<boolean>(false)
 
     return{
         pending,
@@ -337,5 +352,9 @@ export const useUserStore = defineStore('user', () => {
         findUserError,
         findUsers,
         foundUsers,
+
+        currentPage,
+        usersPerPage,
+        loadMoreUsersFlag,
     }
 })

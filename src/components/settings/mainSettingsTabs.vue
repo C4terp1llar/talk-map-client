@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {useRouter, useRoute} from "vue-router";
 
 type Tab = 'profile' | 'notifications' | 'security';
@@ -7,7 +7,7 @@ type Tab = 'profile' | 'notifications' | 'security';
 const router = useRouter();
 const route = useRoute();
 
-const activeTab = ref<Tab>(route.query.tab as Tab || 'profile')
+const activeTab = computed(() => route.query.tab as Tab || 'profile')
 </script>
 
 <template>
@@ -17,7 +17,7 @@ const activeTab = ref<Tab>(route.query.tab as Tab || 'profile')
         slider-color="green"
         align-tabs="center"
         show-arrows
-        v-model="activeTab"
+        :model-value="activeTab"
     >
       <v-tab
           class="text-none"
