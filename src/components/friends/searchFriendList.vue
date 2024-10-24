@@ -5,6 +5,7 @@ import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue
 import {useFindFriendFilterStore} from "@/stores/findFriendFilter";
 import {onBeforeUnmount, onMounted} from "vue";
 import {useNotificationStore} from "@/stores/notifications";
+import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
 
 const userStore = useUserStore();
 const filterStore = useFindFriendFilterStore();
@@ -57,7 +58,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <lazy-placeholder-loader v-if="userStore.loadMoreUsersFlag"/>
+    <pagination-dot-loader v-if="userStore.loadMoreUsersFlag"/>
   </div>
 </template>
 
