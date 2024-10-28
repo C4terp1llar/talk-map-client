@@ -262,6 +262,10 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+
+
+
+
     const findUserPending = ref<boolean>(false);
     const findUserError = ref<string | null>(null);
 
@@ -270,13 +274,24 @@ export const useUserStore = defineStore('user', () => {
     const currentPage = ref<number>(1);
     const usersPerPage = ref<number>(10);
 
+    const loadMoreUsersFlag = ref<boolean>(false)
+
+    const hasMoreFlag = ref<boolean | null>(null);
+
     const findUsers = async (filter: SearchFriendFilter, mode: 'load' | 'load-more') => {
 
         let currentPending = mode === 'load' ? findUserPending : loadMoreUsersFlag;
 
-        if (mode === 'load-more') currentPage.value += 1;
+        if (mode === 'load-more') {
+            currentPage.value += 1;
+            hasMoreFlag.value = null;
+        }else{
+            currentPage.value = 1;
+        }
+
 
         currentPending.value = true;
+
         findUserError.value = null;
 
         try {
@@ -287,6 +302,8 @@ export const useUserStore = defineStore('user', () => {
             });
 
             if (response && response.data.users) {
+                hasMoreFlag.value = response.data.hasMore;
+
                 if (currentPage.value === 1) {
                     foundUsers.value = response.data.users;
                 } else if (currentPage.value !== 1 && foundUsers.value){
@@ -301,7 +318,6 @@ export const useUserStore = defineStore('user', () => {
         }
     };
 
-    const loadMoreUsersFlag = ref<boolean>(false)
 
     return{
         pending,
@@ -356,5 +372,6 @@ export const useUserStore = defineStore('user', () => {
         currentPage,
         usersPerPage,
         loadMoreUsersFlag,
+        hasMoreFlag,
     }
 })

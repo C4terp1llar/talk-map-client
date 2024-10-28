@@ -32,12 +32,17 @@ export const useExternalUserStore = defineStore('externalUser', () => {
         }
     }
 
+    const isOutgoing = ref<boolean | null>(null);
+    const isIncoming = ref<boolean | null>(null);
+
     const getExternalMainUserInfo = async (searchUid: string) => {
         pending.value = true;
         error.value = null;
         main.value = null
         address.value = null
 
+        isOutgoing.value = null;
+        isIncoming.value = null;
         try {
             const response = await apiAuth.post('user/getExternalUserMainInfo', {
                 uid: searchUid
@@ -46,12 +51,49 @@ export const useExternalUserStore = defineStore('externalUser', () => {
             if (response.data && response.data.main && response.data.address && response.status === 200){
                 main.value = response.data.main;
                 address.value = response.data.address;
+                isOutgoing.value = response.data.isOutgoing;
+                isIncoming.value = response.data.isIncoming;
             }
         } catch (e: any) {
             error.value = "Произошла ошибка при получении информации о стороннем пользователе, попробуйте позже";
             console.error(e);
         } finally {
             pending.value = false;
+        }
+    }
+
+    const friendReqPending = ref<boolean>(false);
+    const friendReqError = ref<string | null>(null);
+
+    const sendFriendRequest = async (recipient: string) => {
+        friendReqPending.value = true;
+        friendReqError.value = null;
+
+        try {
+            await apiAuth.post('user/sendFriendRequest', {
+                recipient_id: recipient
+            });
+        } catch (e: any) {
+            friendReqError.value = "Произошла ошибка при отправке заявки, попробуйте позже";
+            console.error(e);
+        } finally {
+            friendReqPending.value = false;
+        }
+    }
+
+    const cancelFriendRequest = async (recipient: string) => {
+        friendReqPending.value = true;
+        friendReqError.value = null;
+
+        try {
+            await apiAuth.post('user/cancelFriendRequest', {
+                recipient_id: recipient
+            });
+        } catch (e: any) {
+            friendReqError.value = "Произошла ошибка при отмене заявки, попробуйте позже";
+            console.error(e);
+        } finally {
+            friendReqPending.value = false;
         }
     }
 
@@ -63,5 +105,11 @@ export const useExternalUserStore = defineStore('externalUser', () => {
         getExternalMainUserInfo,
         existFlag,
         isUserExist,
+        isOutgoing,
+        isIncoming,
+        friendReqPending,
+        friendReqError,
+        sendFriendRequest,
+        cancelFriendRequest
     }
 })

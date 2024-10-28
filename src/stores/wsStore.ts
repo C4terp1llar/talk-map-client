@@ -37,6 +37,11 @@ export const useWsStore = defineStore('ws', () => {
         userSocket.value = socket;
 
         attachBaseWsHandlers(userSocket.value)
+
+        socket.on("tokenError", async () => {
+            console.log('токен истек, реконнект')
+            await connectSocket()
+        });
     };
 
     const disconnectSocket = () => {
@@ -52,3 +57,5 @@ export const useWsStore = defineStore('ws', () => {
         disconnectSocket,
     };
 });
+
+

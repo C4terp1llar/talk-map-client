@@ -63,6 +63,7 @@ export interface MainUserInfo {
 }
 
 export interface ExternalUserInfoMain {
+    _id: string,
     email: string;
     nickname: string;
     b_date: string;

@@ -9,16 +9,74 @@ import WallpaperBottomContentSkeleton from "@/components/skeletons/wallpaperBott
 import TagList from "@/components/settings/profile/tagList.vue";
 import ScrollableContainer from "@/components/common/scrollableContainer.vue";
 import {useExternalUserStore} from "@/stores/externalUser";
+import {useNotificationStore} from "@/stores/notifications";
 
 const externalStore = useExternalUserStore();
+const notificationStore = useNotificationStore();
+
+const handleSendReq = async () => {
+  if (!externalStore.main?._id) return;
+
+  await externalStore.sendFriendRequest(externalStore.main?._id);
+
+  if (externalStore.friendReqError) {
+    notificationStore.addNotification('error', externalStore.friendReqError, 3000);
+  } else {
+    externalStore.isOutgoing = true;
+    notificationStore.addNotification('success', 'Заявка успешно отправлена', 3000);
+  }
+}
+
+const handleCancelReq = async () => {
+  if (!externalStore.main?._id) return;
+
+  await externalStore.cancelFriendRequest(externalStore.main?._id);
+
+  if (externalStore.friendReqError) {
+    notificationStore.addNotification('error', externalStore.friendReqError, 3000);
+    return;
+  }
+
+  externalStore.isOutgoing = false;
+}
 </script>
 
 <template>
   <div class="wallpaper-block">
 
     <div class="actions-block">
-      <v-btn variant="tonal" class="qwe">
+      <v-btn
+          variant="tonal"
+          class="text-none"
+          v-if="externalStore.isIncoming && !externalStore.isOutgoing"
+          :loading="externalStore.friendReqPending"
+          :disabled="externalStore.friendReqPending"
+      >
+        <v-icon color="green" :size="24" class="mr-2">mdi-account-check-outline</v-icon>
+        Принять заявку
+      </v-btn>
+
+      <v-btn
+          variant="tonal"
+          class="text-none"
+          v-if="!externalStore.isIncoming && externalStore.isOutgoing"
+          :loading="externalStore.friendReqPending"
+          :disabled="externalStore.friendReqPending"
+          @click="handleCancelReq"
+      >
+        <v-icon color="red" :size="24" class="mr-1">mdi-trash-can-outline</v-icon>
+        Отменить заявку
+      </v-btn>
+
+      <v-btn
+          variant="tonal"
+          v-if="!externalStore.isIncoming && !externalStore.isOutgoing"
+          :loading="externalStore.friendReqPending"
+          :disabled="externalStore.friendReqPending"
+          @click="handleSendReq"
+      >
         <v-icon :size="24">mdi-account-plus-outline</v-icon>
+        <skeleton-loader v-if="externalStore.pending"/>
       </v-btn>
     </div>
 
@@ -57,7 +115,7 @@ const externalStore = useExternalUserStore();
               class="user-nickname"
               :style="{ color: externalStore.main?.nickname_color ? externalStore.main?.nickname_color : 'currentColor' }"
           >
-            {{externalStore.main?.nickname }}
+            {{ externalStore.main?.nickname }}
           </h4>
 
           <div class="user-location">
@@ -84,7 +142,7 @@ const externalStore = useExternalUserStore();
   border-radius: 15px;
   background: rgb(var(--v-theme-background));
 
-  .actions-block{
+  .actions-block {
     background: rgb(var(--v-theme-background));
     overflow: hidden;
     border-radius: 15px;
@@ -158,7 +216,7 @@ const externalStore = useExternalUserStore();
         flex-direction: column;
       }
 
-      .info-block{
+      .info-block {
         display: flex;
         flex-direction: column;
 

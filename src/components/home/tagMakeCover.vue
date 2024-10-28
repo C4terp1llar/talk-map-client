@@ -9,7 +9,7 @@ const router = useRouter()
     <div class="tag-make-cover__content">
       <h5 class="ma-0">Добавить тег</h5>
       <v-icon class="icon-tag-cover">mdi-tag-heart-outline</v-icon>
-      <button @click="router.push({name: 'settings-profile'})"></button>
+      <button @click="router.push({ name: 'settings', query: { tab: 'profile' } })"></button>
     </div>
   </div>
 </template>

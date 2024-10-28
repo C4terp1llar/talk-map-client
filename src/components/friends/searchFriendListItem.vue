@@ -36,16 +36,18 @@ const handleSubmit = (uid: string) => {
             <skeleton-loader/>
           </template>
         </v-img>
+        <button @click="handleSubmit(props.user._id)"></button>
       </v-avatar>
     </div>
     <div class="search-friend-list-item__info">
 
       <div class="search-friend-list-item__info-personal">
         <div class="search-friend-list-item__info-personal__nickname">
-          <h5
+          <a
               :style="{color: props.user.nickname_color ? props.user.nickname_color : 'currentColor'}"
-              class="ma-0"
-          >{{props.user.nickname}}</h5>
+              class="nickname-txt"
+              @click.prevent="handleSubmit(props.user._id)"
+          >{{props.user.nickname}}</a>
         </div>
         <div class="search-friend-list-item__info-personal__age-gender">
           <v-icon>{{props.user.gender === 'male' ? 'mdi-face-man-shimmer' : 'mdi-face-woman-shimmer'}}</v-icon>
@@ -59,12 +61,19 @@ const handleSubmit = (uid: string) => {
       </div>
 
 
-      <button @click="handleSubmit(props.user._id)"></button>
+      <button class="abs-select-btn" @click="handleSubmit(props.user._id)"></button>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+.abs-select-btn{
+  button{
+    position: absolute;
+    inset: 0;
+  }
+}
+
 .search-friend-list-item {
   display: flex;
   align-items: center;
@@ -78,6 +87,7 @@ const handleSubmit = (uid: string) => {
   }
   .search-friend-list-item__avatar{
     .search-friend-list-item__avatar-item{
+      position: relative;
       border: 2px solid green;
       min-width: 100px;
       min-height: 100px;
@@ -85,6 +95,11 @@ const handleSubmit = (uid: string) => {
       @media screen and (max-width: 768px){
         min-width: 80px;
         min-height: 80px;
+      }
+      button{
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
       }
     }
   }
@@ -95,16 +110,18 @@ const handleSubmit = (uid: string) => {
     gap: 2px;
     position: relative;
 
-    button{
-      position: absolute;
-      inset: 0;
-    }
-
     .search-friend-list-item__info-personal{
       display: flex;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
+
+      .nickname-txt{
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 1.3rem;
+      }
 
       @media screen and (max-width: 450px){
         justify-content: center;
@@ -117,6 +134,14 @@ const handleSubmit = (uid: string) => {
         border-radius: 25px;
         border: 2px solid currentColor;
         font-size: 14px;
+      }
+    }
+
+    .search-friend-list-item__info-location{
+      @media screen and (max-width: 450px){
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
     }
   }

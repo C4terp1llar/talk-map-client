@@ -12,4 +12,8 @@ export const attachBaseWsHandlers = (socket: Socket) => {
     socket.on("disconnect", (reason) => {
         console.log("ws отключен");
     });
+
+    socket.on("send_friend_request", (payload) => {
+        console.log("заявка в друзья", payload);
+    });
 };

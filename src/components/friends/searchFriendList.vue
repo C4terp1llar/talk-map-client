@@ -16,7 +16,7 @@ const handleScroll = async () => {
   const windowHeight = window.innerHeight;
   const bodyHeight = document.body.offsetHeight;
 
-  if (scrollTop + windowHeight >= bodyHeight - 100 && userStore.foundUsers && userStore.foundUsers.length === userStore.usersPerPage * userStore.currentPage) {
+  if (scrollTop + windowHeight >= bodyHeight - 100 && userStore.foundUsers && userStore.foundUsers.length === userStore.usersPerPage * userStore.currentPage && userStore.hasMoreFlag) {
     await handleUpgradeList()
   }
 };
@@ -58,7 +58,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <pagination-dot-loader v-if="userStore.loadMoreUsersFlag"/>
+    <pagination-dot-loader class="mb-2 mt-2" v-if="userStore.loadMoreUsersFlag"/>
   </div>
 </template>
 
