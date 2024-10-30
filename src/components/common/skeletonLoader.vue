@@ -1,9 +1,17 @@
 <script setup lang="ts">
-
+const props = defineProps({
+  brightness: {
+    type: Number,
+    default: 1
+  }
+});
 </script>
 
 <template>
-  <v-skeleton-loader class="loader-sk-abs"></v-skeleton-loader>
+  <v-skeleton-loader
+      class="loader-sk-abs"
+      :style="{ filter: `brightness(${props.brightness})` }"
+  />
 </template>
 
 <style scoped>

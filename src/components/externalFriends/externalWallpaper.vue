@@ -10,75 +10,16 @@ import TagList from "@/components/settings/profile/tagList.vue";
 import ScrollableContainer from "@/components/common/scrollableContainer.vue";
 import {useExternalUserStore} from "@/stores/externalUser";
 import {useNotificationStore} from "@/stores/notifications";
+import ExternalActions from "@/components/externalFriends/externalActions.vue";
 
 const externalStore = useExternalUserStore();
-const notificationStore = useNotificationStore();
 
-const handleSendReq = async () => {
-  if (!externalStore.main?._id) return;
-
-  await externalStore.sendFriendRequest(externalStore.main?._id);
-
-  if (externalStore.friendReqError) {
-    notificationStore.addNotification('error', externalStore.friendReqError, 3000);
-  } else {
-    externalStore.isOutgoing = true;
-    notificationStore.addNotification('success', 'Заявка успешно отправлена', 3000);
-  }
-}
-
-const handleCancelReq = async () => {
-  if (!externalStore.main?._id) return;
-
-  await externalStore.cancelFriendRequest(externalStore.main?._id);
-
-  if (externalStore.friendReqError) {
-    notificationStore.addNotification('error', externalStore.friendReqError, 3000);
-    return;
-  }
-
-  externalStore.isOutgoing = false;
-}
 </script>
 
 <template>
   <div class="wallpaper-block">
 
-    <div class="actions-block">
-      <v-btn
-          variant="tonal"
-          class="text-none"
-          v-if="externalStore.isIncoming && !externalStore.isOutgoing"
-          :loading="externalStore.friendReqPending"
-          :disabled="externalStore.friendReqPending"
-      >
-        <v-icon color="green" :size="24" class="mr-2">mdi-account-check-outline</v-icon>
-        Принять заявку
-      </v-btn>
-
-      <v-btn
-          variant="tonal"
-          class="text-none"
-          v-if="!externalStore.isIncoming && externalStore.isOutgoing"
-          :loading="externalStore.friendReqPending"
-          :disabled="externalStore.friendReqPending"
-          @click="handleCancelReq"
-      >
-        <v-icon color="red" :size="24" class="mr-1">mdi-trash-can-outline</v-icon>
-        Отменить заявку
-      </v-btn>
-
-      <v-btn
-          variant="tonal"
-          v-if="!externalStore.isIncoming && !externalStore.isOutgoing"
-          :loading="externalStore.friendReqPending"
-          :disabled="externalStore.friendReqPending"
-          @click="handleSendReq"
-      >
-        <v-icon :size="24">mdi-account-plus-outline</v-icon>
-        <skeleton-loader v-if="externalStore.pending"/>
-      </v-btn>
-    </div>
+    <external-actions/>
 
     <div class="wallpaper-img-block">
       <v-img
@@ -141,16 +82,6 @@ const handleCancelReq = async () => {
   box-shadow: 0 1px 10px currentColor;
   border-radius: 15px;
   background: rgb(var(--v-theme-background));
-
-  .actions-block {
-    background: rgb(var(--v-theme-background));
-    overflow: hidden;
-    border-radius: 15px;
-    z-index: 10;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-  }
 
   .wallpaper-img-block {
     position: relative;
