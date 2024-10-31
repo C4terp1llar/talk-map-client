@@ -4,8 +4,10 @@ import { useRoute } from "vue-router";
 import MainFriendsTabs from "@/components/friends/mainFriendsTabs.vue";
 import FriendsList from "@/components/friends/friendsList.vue";
 import SearchFriend from "@/components/friends/searchFriend.vue";
+import IncomingReqs from "@/components/friends/incomingReqs.vue";
+import OutgoingReqs from "@/components/friends/outgoingReqs.vue";
 
-type Tab = 'friends' | 'search';
+type Tab = 'friends' | 'search' | 'incoming' | 'outgoing';
 
 const route = useRoute();
 
@@ -16,8 +18,11 @@ const activeTab = computed<Tab>(() => {
 
 const componentsMap: Record<Tab, Component> = {
   friends: FriendsList,
+  incoming: IncomingReqs,
+  outgoing: OutgoingReqs,
   search: SearchFriend
 };
+
 </script>
 
 <template>

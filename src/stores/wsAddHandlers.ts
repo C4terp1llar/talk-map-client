@@ -1,21 +1,32 @@
 import {defineStore} from "pinia";
 import {useExternalUserStore} from "@/stores/externalUser";
+import {useFriendsStore} from "@/stores/friends";
+import type {FriendRequest} from "@/helpers/interfaces";
 
 export const useWsAddStore = defineStore('wsAdd', () => {
 
     const externalStore = useExternalUserStore()
+    const friendStore = useFriendsStore()
 
-    const receiveFriendReq = (id: string) => {
-        console.log('заявка в друзья от ', id);
+    const receiveFriendReq = (req: FriendRequest) => {
+        console.log('заявка в друзья от ', req.sender_id);
 
-        if (externalStore.main?._id !== id) return;
+        if (friendStore.viewMode === 'incoming' && friendStore.foundRequests){
+            friendStore.foundRequests.unshift(req)
+        }
+
+        if (externalStore.main?._id !== req.sender_id) return;
         externalStore.isIncoming = true;
     }
 
-    const abortFriendReq = (id: string) => {
-        console.log('отмена заявки от ', id);
+    const abortFriendReq = (req: FriendRequest) => {
+        console.log('отмена заявки от ', req.sender_id);
 
-        if (externalStore.main?._id !== id) return;
+        if (friendStore.viewMode === 'incoming' && friendStore.foundRequests){
+            friendStore.foundRequests = friendStore.foundRequests.filter(item => item.sender_id !== req.sender_id)
+        }
+
+        if (externalStore.main?._id !== req.sender_id) return;
         externalStore.isIncoming = false;
     }
 

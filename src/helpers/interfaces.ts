@@ -44,11 +44,7 @@ export interface SearchFoundFriend {
     avatar: {
         asset_url: string;
     },
-    address: {
-        city: string;
-        country: string;
-        country_code: string;
-    }
+    address: ExternalUserInfoAddress
 }
 
 export interface MainUserInfo {
@@ -79,4 +75,23 @@ export interface ExternalUserInfoAddress {
     country: string;
     country_code: string;
 }
+
+export interface FriendRequest {
+    _id: string,
+    initiator_id: string,
+    sender_id: string,
+    recipient_id: string,
+    send_time: Date,
+    userInfo: {
+        nickname: string,
+        nickname_color: string | null,
+        b_date: Date,
+        gender: 'male' | 'female',
+    }
+    address: ExternalUserInfoAddress,
+    avatar: {
+        asset_url: string;
+    }
+}
+
 

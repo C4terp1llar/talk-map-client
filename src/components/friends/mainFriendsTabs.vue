@@ -6,7 +6,7 @@ import ScrollableContainer from "@/components/common/scrollableContainer.vue";
 const router = useRouter();
 const route = useRoute();
 
-type Tab = 'friends' | 'search';
+type Tab = 'friends' | 'search' | 'incoming' | 'outgoing';
 
 
 const activeTab = computed(() => route.query.tab as Tab | 'friends')
@@ -14,6 +14,7 @@ const activeTab = computed(() => route.query.tab as Tab | 'friends')
 </script>
 
 <template>
+
   <div class="wrapper-friends-tabs__main">
 
 
@@ -31,6 +32,24 @@ const activeTab = computed(() => route.query.tab as Tab | 'friends')
           @click="router.push({ path: route.path, query: { tab: 'friends' } })"
       >
         Друзья
+      </v-tab>
+
+      <v-tab
+          class="text-none"
+          prepend-icon="mdi-arrow-down-bold-outline"
+          value="incoming"
+          @click="router.push({ path: route.path, query: { tab: 'incoming' } })"
+      >
+        Входящие
+      </v-tab>
+
+      <v-tab
+          class="text-none"
+          prepend-icon="mdi-arrow-up-bold-outline"
+          value="outgoing"
+          @click="router.push({ path: route.path, query: { tab: 'outgoing' } })"
+      >
+        Исходящие
       </v-tab>
 
       <v-tab

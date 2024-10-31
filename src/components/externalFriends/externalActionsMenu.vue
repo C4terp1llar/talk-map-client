@@ -1,17 +1,78 @@
 <script setup lang="ts">
-import {useNotificationStore} from "@/stores/notifications";
-import {useExternalUserStore} from "@/stores/externalUser";
-import SkeletonLoader from "@/components/common/skeletonLoader.vue";
-import {onClickOutside} from "@vueuse/core";
-import {ref} from "vue";
+import { ref, computed } from "vue";
+import { useNotificationStore } from "@/stores/notifications";
+import { useExternalUserStore } from "@/stores/externalUser";
+import { onClickOutside } from "@vueuse/core";
 
+interface Action {
+  label: string,
+  icon: string,
+  color: string,
+  handler: Function,
+}
 
 const emit = defineEmits();
-
 const menuRef = ref<HTMLElement | null>(null);
-
 const externalStore = useExternalUserStore();
 const notificationStore = useNotificationStore();
+
+const actions = computed(() => {
+  const commonAction = {
+    label: 'Добавить в друзья',
+    icon: 'mdi-account-plus-outline',
+    color: 'green',
+    handler: handleSendReq,
+  };
+
+  if (externalStore.isIncoming && !externalStore.isOutgoing) {
+    return [
+      {
+        label: 'Принять заявку',
+        icon: 'mdi-account-check-outline',
+        color: 'green',
+        handler: handleSubmitReq,
+      },
+      {
+        label: 'Отклонить заявку',
+        icon: 'mdi-close-octagon-outline',
+        color: 'red',
+        handler: handleDeclineReq,
+      },
+    ];
+  }
+
+  if (!externalStore.isIncoming && externalStore.isOutgoing) {
+    return [
+      {
+        label: 'Отменить заявку',
+        icon: 'mdi-trash-can-outline',
+        color: 'red',
+        handler: handleCancelReq,
+      },
+    ];
+  }
+
+  if (!externalStore.isIncoming && !externalStore.isOutgoing && externalStore.isFriendship) {
+    return [
+      {
+        label: 'Удалить из друзей',
+        icon: 'mdi-account-remove-outline',
+        color: 'red',
+        handler: deleteFriend,
+      },
+    ];
+  }
+
+  return [commonAction];
+});
+
+const handleAction = async (action: Action) => {
+  if (!externalStore.main?._id) return;
+
+  clickOutside();
+
+  await action.handler();
+}
 
 const handleSendReq = async () => {
   if (!externalStore.main?._id) return;
@@ -91,62 +152,21 @@ const deleteFriend = async () => {
   }
 }
 
-const clickOutside = () => {
-  emit('close');
-};
+const clickOutside = () => emit('close');
 onClickOutside(menuRef, clickOutside);
 </script>
 
 <template>
   <div class="external-actions__menu" ref="menuRef">
     <v-btn
+        v-for="action in actions"
+        :key="action.label"
         variant="text"
         class="text-none w-100 justify-content-start"
-        v-if="externalStore.isIncoming && !externalStore.isOutgoing"
-        @click="handleSubmitReq"
+        @click="handleAction(action)"
     >
-      <v-icon color="green" :size="24" class="mr-2">mdi-account-check-outline</v-icon>
-      Принять заявку
-    </v-btn>
-
-    <v-btn
-        variant="text"
-        class="text-none w-100 justify-content-start"
-        v-if="externalStore.isIncoming && !externalStore.isOutgoing"
-        @click="handleDeclineReq"
-    >
-      <v-icon color="red" :size="24" class="mr-2">mdi-close-octagon-outline</v-icon>
-      Отклонить заявку
-    </v-btn>
-
-    <v-btn
-        variant="text"
-        class="text-none w-100 justify-content-start"
-        v-if="!externalStore.isIncoming && externalStore.isOutgoing"
-        @click="handleCancelReq"
-    >
-      <v-icon color="red" :size="24" class="mr-2">mdi-trash-can-outline</v-icon>
-      Отменить заявку
-    </v-btn>
-
-    <v-btn
-        variant="text"
-        class="text-none w-100 justify-content-start"
-        v-if="!externalStore.isIncoming && !externalStore.isOutgoing && externalStore.isFriendship"
-        @click="deleteFriend"
-    >
-      <v-icon color="red" :size="24" class="mr-2">mdi-account-remove-outline</v-icon>
-      Удалить из друзей
-    </v-btn>
-
-    <v-btn
-        variant="text"
-        class="text-none w-100 justify-content-start"
-        v-if="!externalStore.isIncoming && !externalStore.isOutgoing && !externalStore.isFriendship"
-        @click="handleSendReq"
-    >
-      <v-icon color="green" :size="24" class="mr-2">mdi-account-plus-outline</v-icon>
-      Добавить в друзья
+      <v-icon :color="action.color" :size="24" class="mr-2">{{ action.icon }}</v-icon>
+      {{ action.label }}
     </v-btn>
   </div>
 </template>

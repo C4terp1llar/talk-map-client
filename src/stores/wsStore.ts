@@ -5,6 +5,7 @@ import { io, Socket } from "socket.io-client";
 import { checkTokenValidity, refreshToken } from "@/stores/sync";
 import {attachBaseWsHandlers} from "@/utils/wsBaseHandlers";
 import {useWsAddStore} from "@/stores/wsAddHandlers";
+import type {FriendRequest} from "@/helpers/interfaces";
 
 type UserSocket = Socket | null;
 
@@ -51,12 +52,12 @@ export const useWsStore = defineStore('ws', () => {
     const attachAddWsHandlers = () => {
         if (!userSocket.value) return;
 
-        userSocket.value.on('receive_friend_request', (payload) => {
-            wsAdd.receiveFriendReq(payload.sender_id)
+        userSocket.value.on('receive_friend_request', (payload: { wsFriendRequestSnap: FriendRequest }) => {
+            wsAdd.receiveFriendReq(payload.wsFriendRequestSnap)
         })
 
-        userSocket.value.on('abort_friend_request', (payload) => {
-            wsAdd.abortFriendReq(payload.sender_id)
+        userSocket.value.on('abort_friend_request', (payload: { wsFriendRequestSnap: FriendRequest }) => {
+            wsAdd.abortFriendReq(payload.wsFriendRequestSnap)
         })
 
         userSocket.value.on('decline_friend_request', (payload) => {
