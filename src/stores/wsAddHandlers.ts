@@ -30,17 +30,25 @@ export const useWsAddStore = defineStore('wsAdd', () => {
         externalStore.isIncoming = false;
     }
 
-    const declineFriendReq = (id: string) => {
-        console.log('отклонение заявки от ', id);
+    const declineFriendReq = (req: FriendRequest) => {
+        console.log('отклонение заявки от ', req.recipient_id);
 
-        if (externalStore.main?._id !== id) return;
+        if (friendStore.viewMode === 'outgoing' && friendStore.foundRequests){
+            friendStore.foundRequests = friendStore.foundRequests.filter(item => item.recipient_id !== req.recipient_id)
+        }
+
+        if (externalStore.main?._id !== req.recipient_id) return;
         externalStore.isOutgoing = false;
     }
 
-    const submitFriendReq = (id: string) => {
-        console.log('подтвержение заявки от ', id);
+    const submitFriendReq = (req: FriendRequest) => {
+        console.log('подтвержение заявки от ', req.recipient_id);
 
-        if (externalStore.main?._id !== id) return;
+        if (friendStore.viewMode === 'outgoing' && friendStore.foundRequests){
+            friendStore.foundRequests = friendStore.foundRequests.filter(item => item.recipient_id !== req.recipient_id)
+        }
+
+        if (externalStore.main?._id !== req.recipient_id) return;
         externalStore.isOutgoing = false;
         externalStore.isIncoming = false;
         externalStore.isFriendship = true;

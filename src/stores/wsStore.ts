@@ -60,12 +60,12 @@ export const useWsStore = defineStore('ws', () => {
             wsAdd.abortFriendReq(payload.wsFriendRequestSnap)
         })
 
-        userSocket.value.on('decline_friend_request', (payload) => {
-            wsAdd.declineFriendReq(payload.recipient_id)
+        userSocket.value.on('decline_friend_request', (payload: { wsFriendRequestSnap: FriendRequest }) => {
+            wsAdd.declineFriendReq(payload.wsFriendRequestSnap)
         })
 
-        userSocket.value.on('submit_friend_request', (payload) => {
-            wsAdd.submitFriendReq(payload.recipient_id)
+        userSocket.value.on('submit_friend_request', (payload: { wsFriendRequestSnap: FriendRequest }) => {
+            wsAdd.submitFriendReq(payload.wsFriendRequestSnap)
         })
 
         userSocket.value.on('delete_friendship', (payload) => {

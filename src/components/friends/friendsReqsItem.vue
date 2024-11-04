@@ -2,7 +2,7 @@
 import type {FriendRequest} from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {useRouter} from "vue-router";
-import ExternalActionsMenu from "@/components/externalFriends/externalActionsMenu.vue";
+import FriendsReqsActions from "@/components/friends/friendsReqsActions.vue";
 
 interface Props {
   mode: 'incoming' | 'outgoing',
@@ -23,10 +23,17 @@ const handleSubmit = (recipient: string, sender: string) => {
 const getUserAge = (bDate: Date) => {
   return new Date().getFullYear() - new Date(bDate).getFullYear()
 }
+
+
 </script>
 
 <template>
   <div class="friends-reqs-list-item">
+
+    <div class="friends-reqs-list-item__actions">
+      <friends-reqs-actions :mode="props.mode" :req="{recipient: props.request.recipient_id, sender: props.request.sender_id}"/>
+    </div>
+
     <div class="friends-reqs-list-item__avatar">
       <v-avatar class="friends-reqs-list-item__avatar-item">
         <v-img
@@ -78,12 +85,21 @@ const getUserAge = (bDate: Date) => {
 }
 
 .friends-reqs-list-item {
+  width: 100%;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px;
   border-radius: 15px;
   border: 1px solid currentColor;
+
+  .friends-reqs-list-item__actions{
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    z-index: 10;
+  }
 
   @media screen and (max-width: 450px){
     flex-direction: column;
@@ -149,4 +165,5 @@ const getUserAge = (bDate: Date) => {
     }
   }
 }
+
 </style>

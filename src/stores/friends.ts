@@ -28,7 +28,7 @@ export const useFriendsStore = defineStore('friends', () => {
         viewMode.value = null;
     }
 
-    const getFriendReqs = async (mode: 'incoming' | 'outgoing', pendingMode: 'load' | 'load-more') => {
+    const getFriendReqs = async (mode: 'incoming' | 'outgoing' | 'friends', pendingMode: 'load' | 'load-more') => {
 
         let currentPending = pendingMode === 'load' ? pending : loadMorePending;
 
