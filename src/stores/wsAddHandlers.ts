@@ -2,6 +2,7 @@ import {defineStore} from "pinia";
 import {useExternalUserStore} from "@/stores/externalUser";
 import {useFriendsStore} from "@/stores/friends";
 import type {FriendRequest} from "@/helpers/interfaces";
+import {ref} from "vue";
 
 export const useWsAddStore = defineStore('wsAdd', () => {
 
@@ -23,7 +24,7 @@ export const useWsAddStore = defineStore('wsAdd', () => {
         console.log('отмена заявки от ', req.sender_id);
 
         if (friendStore.viewMode === 'incoming' && friendStore.foundRequests){
-            friendStore.foundRequests = friendStore.foundRequests.filter(item => item.sender_id !== req.sender_id)
+            friendStore.foundRequests = friendStore.foundRequests.filter(item => item._id !== req._id)
         }
 
         if (externalStore.main?._id !== req.sender_id) return;
@@ -34,7 +35,7 @@ export const useWsAddStore = defineStore('wsAdd', () => {
         console.log('отклонение заявки от ', req.recipient_id);
 
         if (friendStore.viewMode === 'outgoing' && friendStore.foundRequests){
-            friendStore.foundRequests = friendStore.foundRequests.filter(item => item.recipient_id !== req.recipient_id)
+            friendStore.foundRequests = friendStore.foundRequests.filter(item => item._id !== req._id)
         }
 
         if (externalStore.main?._id !== req.recipient_id) return;
@@ -45,7 +46,7 @@ export const useWsAddStore = defineStore('wsAdd', () => {
         console.log('подтвержение заявки от ', req.recipient_id);
 
         if (friendStore.viewMode === 'outgoing' && friendStore.foundRequests){
-            friendStore.foundRequests = friendStore.foundRequests.filter(item => item.recipient_id !== req.recipient_id)
+            friendStore.foundRequests = friendStore.foundRequests.filter(item => item._id !== req._id)
         }
 
         if (externalStore.main?._id !== req.recipient_id) return;
