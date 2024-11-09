@@ -41,10 +41,24 @@ export interface SearchFoundFriend {
     nickname_color: string | null,
     b_date: Date,
     gender: 'male' | 'female',
+    mutual: {
+        mFriends: ShortMutualUserFriend[],
+        amount: number,
+        hasMore: boolean | null;
+    },
     avatar: {
         asset_url: string;
     },
     address: ExternalUserInfoAddress
+}
+
+export interface ShortMutualUserFriend{
+    _id: string,
+    nickname: string,
+    nickname_color: string | null,
+    avatar: {
+        asset_url: string;
+    },
 }
 
 export interface MainUserInfo {
@@ -93,5 +107,7 @@ export interface FriendRequest {
         asset_url: string;
     }
 }
+
+
 
 

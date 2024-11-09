@@ -5,6 +5,7 @@ import type {SearchFoundFriend} from "@/helpers/interfaces";
 import {useUserStore} from "@/stores/user";
 import {useExternalUserStore} from "@/stores/externalUser";
 import {useRouter} from "vue-router";
+import FriendsMutual from "@/components/friends/friendsMutual.vue";
 
 const router = useRouter();
 
@@ -39,15 +40,16 @@ const handleSubmit = (uid: string) => {
         <button @click="handleSubmit(props.user._id)"></button>
       </v-avatar>
     </div>
+
     <div class="search-friend-list-item__info">
 
       <div class="search-friend-list-item__info-personal">
         <div class="search-friend-list-item__info-personal__nickname">
-          <a
+          <router-link
               :style="{color: props.user.nickname_color ? props.user.nickname_color : 'currentColor'}"
               class="nickname-txt"
-              @click.prevent="handleSubmit(props.user._id)"
-          >{{props.user.nickname}}</a>
+              :to="{ name: 'friends-user', params: { id: props.user._id } }"
+          >{{props.user.nickname}}</router-link>
         </div>
         <div class="search-friend-list-item__info-personal__age-gender">
           <v-icon>{{props.user.gender === 'male' ? 'mdi-face-man-shimmer' : 'mdi-face-woman-shimmer'}}</v-icon>
@@ -60,6 +62,9 @@ const handleSubmit = (uid: string) => {
         <span class="flag-txt">{{ `${props.user.address.city}, ${props.user.address.country}` }}</span>
       </div>
 
+      <div class="mutual-wrapper" v-if="props.user.mutual.amount">
+        <friends-mutual :mutual="props.user.mutual"/>
+      </div>
 
       <button class="abs-select-btn" @click="handleSubmit(props.user._id)"></button>
     </div>
