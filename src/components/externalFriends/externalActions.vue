@@ -18,7 +18,7 @@ const handleClose = () => {
 
 <template>
   <div class="external-actions__wrapper">
-    <button class="change-wallpaper" @click="isMenuVisible = true">
+    <button class="change-wallpaper" @click="isMenuVisible = true" :disabled="externalStore.friendReqPending">
       <template v-if="!externalStore.friendReqPending">
         <v-icon v-if="!externalStore.isOutgoing && !externalStore.isIncoming && !externalStore.isFriendship" :size="28">mdi-account-plus-outline</v-icon>
         <v-icon v-if="(externalStore.isOutgoing || externalStore.isIncoming) && !externalStore.isFriendship" color="warning" :size="28">mdi-account-badge-outline</v-icon>

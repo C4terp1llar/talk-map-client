@@ -3,6 +3,7 @@ import type {FriendRequest} from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {useRouter} from "vue-router";
 import FriendsReqsActions from "@/components/friends/friendsReqsActions.vue";
+import { format } from 'date-fns';
 
 interface Props {
   mode: 'incoming' | 'outgoing',
@@ -24,6 +25,9 @@ const getUserAge = (bDate: Date) => {
   return new Date().getFullYear() - new Date(bDate).getFullYear()
 }
 
+const getSendTime = (sendTime: Date) => {
+  return format(new Date(sendTime), "HH:mm dd.MM.yyyy");
+}
 
 </script>
 
@@ -32,6 +36,10 @@ const getUserAge = (bDate: Date) => {
 
     <div class="friends-reqs-list-item__actions">
       <friends-reqs-actions :mode="props.mode" :req="{recipient: props.request.recipient_id, sender: props.request.sender_id}"/>
+    </div>
+
+    <div class="friends-reqs-list-item__send-time">
+      <span>{{getSendTime(props.request.send_time)}}</span>
     </div>
 
     <div class="friends-reqs-list-item__avatar">
@@ -99,6 +107,19 @@ const getUserAge = (bDate: Date) => {
     right: 5px;
     top: 5px;
     z-index: 10;
+  }
+
+  .friends-reqs-list-item__send-time{
+    position: absolute;
+    right: 10px;
+    bottom: 5px;
+
+    span{
+      opacity: 0.8;
+      font-size: 12px;
+      font-weight: 500;
+      color: grey;
+    }
   }
 
   @media screen and (max-width: 450px){

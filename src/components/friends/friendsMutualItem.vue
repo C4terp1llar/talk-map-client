@@ -1,0 +1,83 @@
+<script setup lang="ts">
+import {useRouter} from "vue-router";
+import type {ShortMutualUserFriend} from "@/helpers/interfaces";
+import SkeletonLoader from "@/components/common/skeletonLoader.vue";
+
+const router = useRouter();
+
+interface Props {
+  mutual: ShortMutualUserFriend
+}
+const props = defineProps<Props>()
+</script>
+
+<template>
+  <div class="mutual-friends-popup__list_item">
+    <div class="mutual-friends-popup__list_item__avatar">
+      <v-avatar class="search-friend-list-item__avatar-item">
+        <v-img
+            class="avatar-img"
+            :src="props.mutual.avatar.asset_url"
+            alt="avatar"
+            cover
+        >
+          <template v-slot:placeholder>
+            <skeleton-loader/>
+          </template>
+        </v-img>
+        <router-link :to="{ name: 'friends-user', params: { id: props.mutual._id } }"/>
+      </v-avatar>
+    </div>
+    <div class="mutual-friends-popup__list_item__nickname">
+      <router-link
+          :style="{color: props.mutual.nickname_color ? props.mutual.nickname_color : 'currentColor'}"
+          class="nickname-txt"
+          :to="{ name: 'friends-user', params: { id: props.mutual._id } }"
+      >{{props.mutual.nickname}}</router-link>
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.mutual-friends-popup__list_item{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px;
+  min-width: 120px;
+  max-width: 120px;
+
+  .mutual-friends-popup__list_item__nickname{
+    text-align: center;
+
+    .nickname-txt{
+      max-width: 100%;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+  }
+
+
+  .mutual-friends-popup__list_item__avatar{
+    .search-friend-list-item__avatar-item{
+      position: relative;
+      border: 2px solid green;
+      min-width: 100px;
+      min-height: 100px;
+
+      @media screen and (max-width: 768px){
+        min-width: 80px;
+        min-height: 80px;
+      }
+      a{
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+      }
+    }
+  }
+
+
+}
+</style>

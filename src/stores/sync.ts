@@ -1,4 +1,7 @@
 import apiAuth from "@/utils/apiAuth";
+import {useRouter} from "vue-router";
+
+const router = useRouter()
 
 const checkTokenValidity = async () => {
     try {
@@ -16,6 +19,7 @@ const refreshToken = async () => {
         return accessToken;
     } catch (e) {
         localStorage.removeItem('access_token');
+        await router.push({name: 'login'});
         console.error("Ошибка при обновлении токена", e);
         throw e;
     }

@@ -13,6 +13,8 @@ export const useFindFriendFilterStore = defineStore('findFriendFilter', () => {
     const minAgeFilter = ref<number>(14);
     const maxAgeFilter = ref<number>(100);
     const genderFilter = ref<'male' | 'female' | 'any'>('any');
+    const globalSearch = ref<boolean>(true);
+
 
     const clearAll = () => {
         cityFilter.value = null;
@@ -21,6 +23,7 @@ export const useFindFriendFilterStore = defineStore('findFriendFilter', () => {
         maxAgeFilter.value = 100;
         genderFilter.value = 'any';
         guessCities.value = [];
+        globalSearch.value = true;
     }
 
     const guessCities = ref<ShortAddress[]>([]);
@@ -54,6 +57,7 @@ export const useFindFriendFilterStore = defineStore('findFriendFilter', () => {
         maxAgeFilter,
         genderFilter,
         nickFilter,
+        globalSearch,
         clearAll,
 
         pending,

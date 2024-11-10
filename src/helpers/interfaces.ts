@@ -41,6 +41,9 @@ export interface SearchFoundFriend {
     nickname_color: string | null,
     b_date: Date,
     gender: 'male' | 'female',
+    isFriendship: boolean,
+    isIncoming: boolean | null,
+    isOutgoing: boolean | null,
     mutual: {
         mFriends: ShortMutualUserFriend[],
         amount: number,

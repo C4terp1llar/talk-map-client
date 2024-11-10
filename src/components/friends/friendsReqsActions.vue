@@ -48,7 +48,7 @@ const handleDeclineReq = async () => {
   } else {
     if(!friendStore.foundRequests) return;
 
-    friendStore.foundRequests = friendStore.foundRequests.filter(item => item.recipient_id !== props.req.recipient);
+    friendStore.foundRequests = friendStore.foundRequests.filter(item => item.sender_id !== props.req.sender);
     notificationStore.addNotification('success', 'Заявка успешно отклонена :(', 5000);
   }
   pending.value = null;
@@ -64,7 +64,7 @@ const handleSubmitReq = async () => {
   } else {
     if(!friendStore.foundRequests) return;
 
-    friendStore.foundRequests = friendStore.foundRequests.filter(item => item.recipient_id !== props.req.recipient);
+    friendStore.foundRequests = friendStore.foundRequests.filter(item => item.sender_id !== props.req.sender);
     notificationStore.addNotification('success', 'Теперь вы друзья :)', 5000);
   }
   pending.value = null;

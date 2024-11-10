@@ -25,6 +25,11 @@ const handleSubmit = (uid: string) => {
 
 <template>
   <div class="search-friend-list-item">
+    <div class="search-friend-list-item__info-status" v-if="props.user.isFriendship || props.user.isIncoming || props.user.isOutgoing">
+      <v-icon v-if="(props.user.isOutgoing || props.user.isIncoming) && !props.user.isFriendship" color="warning" :size="28">mdi-account-badge-outline</v-icon>
+      <v-icon v-if="props.user.isFriendship" color="green" :size="28">mdi-account-check-outline</v-icon>
+    </div>
+
     <div class="search-friend-list-item__avatar">
       <v-avatar class="search-friend-list-item__avatar-item">
         <v-img
@@ -37,7 +42,7 @@ const handleSubmit = (uid: string) => {
             <skeleton-loader/>
           </template>
         </v-img>
-        <button @click="handleSubmit(props.user._id)"></button>
+        <router-link :to="{ name: 'friends-user', params: { id: props.user._id } }"/>
       </v-avatar>
     </div>
 
@@ -63,7 +68,7 @@ const handleSubmit = (uid: string) => {
       </div>
 
       <div class="mutual-wrapper" v-if="props.user.mutual.amount">
-        <friends-mutual :mutual="props.user.mutual"/>
+        <friends-mutual :mutual="props.user.mutual" :uid="props.user._id"/>
       </div>
 
       <button class="abs-select-btn" @click="handleSubmit(props.user._id)"></button>
@@ -86,6 +91,8 @@ const handleSubmit = (uid: string) => {
   padding: 10px;
   border-radius: 15px;
   border: 1px solid currentColor;
+  position: relative;
+
 
   @media screen and (max-width: 450px){
     flex-direction: column;
@@ -101,12 +108,19 @@ const handleSubmit = (uid: string) => {
         min-width: 80px;
         min-height: 80px;
       }
-      button{
+      a{
         position: absolute;
         inset: 0;
         border-radius: 50%;
       }
     }
+  }
+
+  .search-friend-list-item__info-status{
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    padding: 5px;
   }
 
   .search-friend-list-item__info{

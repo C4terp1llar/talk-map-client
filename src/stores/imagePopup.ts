@@ -64,5 +64,7 @@ export const useImagePopupStore = defineStore('imagePopup', () => {
         cropImageData,
         openPopup,
         closePopup,
+        lockScroll,
+        unlockScroll
     }
 })

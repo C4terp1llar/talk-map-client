@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance } from 'axios';
 import {refreshToken} from "@/stores/sync";
-
+import {useRouter} from "vue-router";
 
 const apiAuth: AxiosInstance = axios.create({
     // 'https://talkmapserver-production.up.railway.app/api/'

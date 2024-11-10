@@ -6,6 +6,7 @@ import SearchFriendList from "@/components/friends/searchFriendList.vue";
 import {useUserStore} from "@/stores/user";
 import {onUnmounted} from "vue";
 import {useFindFriendFilterStore} from "@/stores/findFriendFilter";
+import SearchFriendSubBar from "@/components/friends/searchFriendSubBar.vue";
 
 const userStore = useUserStore();
 const filterStore = useFindFriendFilterStore();
@@ -20,6 +21,9 @@ onUnmounted(() => {
 <template>
   <div class="search-friend-wrapper" v-auto-animate>
     <search-friend-bar/>
+    <v-divider class="ma-0"/>
+    <search-friend-sub-bar/>
+
     <search-friend-list/>
   </div>
 </template>
@@ -28,7 +32,7 @@ onUnmounted(() => {
 .search-friend-wrapper{
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
   height: 100%;
 }
 </style>

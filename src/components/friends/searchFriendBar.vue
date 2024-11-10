@@ -6,6 +6,7 @@ import {useFindFriendFilterStore} from "@/stores/findFriendFilter";
 import {useUserStore} from "@/stores/user";
 import {useNotificationStore} from "@/stores/notifications";
 import CircularLoader from "@/components/common/circularLoader.vue";
+import SearchFriendSubBar from "@/components/friends/searchFriendSubBar.vue";
 
 const filterStore = useFindFriendFilterStore();
 const userStore = useUserStore();
@@ -42,8 +43,7 @@ const handleSubmit = async () => {
     <v-fade-transition>
       <search-friend-filter-chips/>
     </v-fade-transition>
-
-
+    
     <div class="search-friend-bar-wrapper">
 
       <v-btn
@@ -79,7 +79,6 @@ const handleSubmit = async () => {
     <div :class="['filter-wrapper', isPopupOpen ? 'collapse-animation' : 'expand-animation']" v-if="isPopupOpen">
       <search-friend-filter-popup @close="handleClose"/>
     </div>
-
   </div>
 </template>
 

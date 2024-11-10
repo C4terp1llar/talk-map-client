@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
-import type {FriendRequest} from "@/helpers/interfaces";
+import type {FriendRequest, ShortMutualUserFriend} from "@/helpers/interfaces";
 
 
 export const useFriendsStore = defineStore('friends', () => {
@@ -66,6 +66,60 @@ export const useFriendsStore = defineStore('friends', () => {
         }
     }
 
+    const mutualPending = ref<boolean>(false);
+    const mutualMorePending = ref<boolean>(false);
+
+    const mutualError = ref<string | null>(null);
+    const hasMoreMutual = ref<boolean | null>(null);
+
+    const foundMutual = ref<ShortMutualUserFriend[] | null>(null);
+
+    const currentPageMutual = ref<number>(1);
+
+    const mutualClear = () => {
+        currentPageMutual.value = 1;
+        hasMoreMutual.value = null;
+        foundMutual.value = null;
+    }
+
+    const getMutualFriends = async (pendingMode: 'load' | 'load-more', id: string) => {
+
+        let currentPending = pendingMode === 'load' ? mutualPending : mutualMorePending;
+
+        if (pendingMode === 'load-more') {
+            currentPageMutual.value += 1;
+            hasMoreMutual.value = null;
+        }else{
+            currentPageMutual.value = 1;
+        }
+
+        currentPending.value = true;
+        mutualError.value = null;
+
+        try {
+            const response = await apiAuth.post('user/getMutualFriends',{
+                searchUid: id,
+                page: currentPageMutual.value,
+                limit: perPage.value,
+            })
+
+            if (response.status === 200 && response.data){
+                hasMoreMutual.value = response.data.mutual.hasMore;
+
+                if (currentPageMutual.value === 1) {
+                    foundMutual.value = response.data.mutual.mFriends;
+                } else if (currentPageMutual.value !== 1 && foundMutual.value){
+                    foundMutual.value.push(...response.data.mutual.mFriends);
+                }
+            }
+        } catch (e: any) {
+            error.value = "Произошла ошибка при получении общих друзей, попробуйте позже";
+            console.error(e);
+        } finally {
+            currentPending.value = false;
+        }
+    }
+
     return{
         pending,
         error,
@@ -77,6 +131,15 @@ export const useFriendsStore = defineStore('friends', () => {
         foundRequests,
         unmountClear,
         getFriendReqs,
-        viewMode
+        viewMode,
+
+        mutualPending,
+        mutualMorePending,
+        mutualError,
+        hasMoreMutual,
+        foundMutual,
+        currentPageMutual,
+        getMutualFriends,
+        mutualClear,
     }
 })

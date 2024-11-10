@@ -147,7 +147,21 @@ body{
 
 
 
+.styled-scroll::-webkit-scrollbar {
+  width: 8px; /* Ширина скроллбара */
+  margin-right: 5px;
+}
 
+.styled-scroll::-webkit-scrollbar-thumb {
+  background-color: #c4c4c4;
+  border-radius: 15px;
+}
+
+.styled-scroll::-webkit-scrollbar-track {
+  margin: 10px;
+  background: #777777;
+  border-radius: 15px;
+}
 
 
 
