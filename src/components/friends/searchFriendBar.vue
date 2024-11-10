@@ -43,7 +43,7 @@ const handleSubmit = async () => {
     <v-fade-transition>
       <search-friend-filter-chips/>
     </v-fade-transition>
-    
+
     <div class="search-friend-bar-wrapper">
 
       <v-btn

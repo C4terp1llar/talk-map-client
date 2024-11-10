@@ -3,21 +3,22 @@ import type {FriendRequest} from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {useRouter} from "vue-router";
 import FriendsReqsActions from "@/components/friends/friendsReqsActions.vue";
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 
 interface Props {
   mode: 'incoming' | 'outgoing',
   request: FriendRequest
 }
+
 const props = defineProps<Props>()
 
 const router = useRouter();
 
 const handleSubmit = (recipient: string, sender: string) => {
-  if(props.mode === 'incoming') {
-    router.push({ name: 'friends-user', params: { id: sender } })
-  }else{
-    router.push({ name: 'friends-user', params: { id: recipient } })
+  if (props.mode === 'incoming') {
+    router.push({name: 'friends-user', params: {id: sender}})
+  } else {
+    router.push({name: 'friends-user', params: {id: recipient}})
   }
 }
 
@@ -25,8 +26,12 @@ const getUserAge = (bDate: Date) => {
   return new Date().getFullYear() - new Date(bDate).getFullYear()
 }
 
-const getSendTime = (sendTime: Date) => {
-  return format(new Date(sendTime), "HH:mm dd.MM.yyyy");
+const getSendTime = (sendTime: Date, mode: 'time' | 'date') => {
+  if (mode === 'time') {
+    return format(new Date(sendTime), "HH:mm")
+  } else {
+    return format(new Date(sendTime), "dd.MM.yyyy")
+  }
 }
 
 </script>
@@ -35,11 +40,13 @@ const getSendTime = (sendTime: Date) => {
   <div class="friends-reqs-list-item">
 
     <div class="friends-reqs-list-item__actions">
-      <friends-reqs-actions :mode="props.mode" :req="{recipient: props.request.recipient_id, sender: props.request.sender_id}"/>
+      <friends-reqs-actions :mode="props.mode"
+                            :req="{recipient: props.request.recipient_id, sender: props.request.sender_id}"/>
     </div>
 
     <div class="friends-reqs-list-item__send-time">
-      <span>{{getSendTime(props.request.send_time)}}</span>
+      <span>{{ getSendTime(props.request.send_time, 'time') }}</span>
+      <span>{{ getSendTime(props.request.send_time, 'date') }}</span>
     </div>
 
     <div class="friends-reqs-list-item__avatar">
@@ -66,11 +73,12 @@ const getSendTime = (sendTime: Date) => {
               :style="{color: props.request.userInfo.nickname_color ? props.request.userInfo.nickname_color : 'currentColor'}"
               class="nickname-txt"
               @click.prevent="handleSubmit(props.request.recipient_id, props.request.sender_id)"
-          >{{props.request.userInfo.nickname}}</a>
+          >{{ props.request.userInfo.nickname }}</a>
         </div>
         <div class="friends-reqs-list-item__info-personal__age-gender">
-          <v-icon>{{props.request.userInfo.gender === 'male' ? 'mdi-face-man-shimmer' : 'mdi-face-woman-shimmer'}}</v-icon>
-          <span>{{getUserAge(props.request.userInfo.b_date)}}</span>
+          <v-icon>{{ props.request.userInfo.gender === 'male' ? 'mdi-face-man-shimmer' : 'mdi-face-woman-shimmer' }}
+          </v-icon>
+          <span>{{ getUserAge(props.request.userInfo.b_date) }}</span>
         </div>
       </div>
 
@@ -79,14 +87,15 @@ const getSendTime = (sendTime: Date) => {
         <span class="flag-txt">{{ `${props.request.address.city}, ${props.request.address.country}` }}</span>
       </div>
 
-      <button class="abs-select-btn" @click="handleSubmit(props.request.recipient_id, props.request.sender_id)"></button>
+      <button class="abs-select-btn"
+              @click="handleSubmit(props.request.recipient_id, props.request.sender_id)"></button>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.abs-select-btn{
-  button{
+.abs-select-btn {
+  button {
     position: absolute;
     inset: 0;
   }
@@ -102,41 +111,55 @@ const getSendTime = (sendTime: Date) => {
   border-radius: 15px;
   border: 1px solid currentColor;
 
-  .friends-reqs-list-item__actions{
+  .friends-reqs-list-item__actions {
     position: absolute;
     right: 5px;
     top: 5px;
     z-index: 10;
   }
 
-  .friends-reqs-list-item__send-time{
+  .friends-reqs-list-item__send-time {
     position: absolute;
     right: 10px;
     bottom: 5px;
 
-    span{
+    display: flex;
+    gap: 5px;
+
+    @media screen and (max-width: 450px) {
+      top: 5px;
+      gap: 0;
+      left: 10px;
+      flex-direction: column;
+    }
+
+    span {
       opacity: 0.8;
       font-size: 12px;
       font-weight: 500;
       color: grey;
+      align-self: flex-start;
     }
+
   }
 
-  @media screen and (max-width: 450px){
+  @media screen and (max-width: 450px) {
     flex-direction: column;
   }
-  .friends-reqs-list-item__avatar{
-    .friends-reqs-list-item__avatar-item{
+
+  .friends-reqs-list-item__avatar {
+    .friends-reqs-list-item__avatar-item {
       position: relative;
       border: 2px solid green;
       min-width: 100px;
       min-height: 100px;
 
-      @media screen and (max-width: 768px){
+      @media screen and (max-width: 768px) {
         min-width: 80px;
         min-height: 80px;
       }
-      button{
+
+      button {
         position: absolute;
         inset: 0;
         border-radius: 50%;
@@ -144,30 +167,30 @@ const getSendTime = (sendTime: Date) => {
     }
   }
 
-  .friends-reqs-list-item__info{
+  .friends-reqs-list-item__info {
     display: flex;
     flex-direction: column;
     gap: 2px;
     position: relative;
 
-    .friends-reqs-list-item__info-personal{
+    .friends-reqs-list-item__info-personal {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
 
-      .nickname-txt{
+      .nickname-txt {
         margin: 0;
         cursor: pointer;
         font-weight: 500;
         font-size: 1.3rem;
       }
 
-      @media screen and (max-width: 450px){
+      @media screen and (max-width: 450px) {
         justify-content: center;
       }
 
-      .friends-reqs-list-item__info-personal__age-gender{
+      .friends-reqs-list-item__info-personal__age-gender {
         display: flex;
         padding: 5px;
         gap: 5px;
@@ -177,8 +200,8 @@ const getSendTime = (sendTime: Date) => {
       }
     }
 
-    .friends-reqs-list-item__info-location{
-      @media screen and (max-width: 450px){
+    .friends-reqs-list-item__info-location {
+      @media screen and (max-width: 450px) {
         display: flex;
         justify-content: center;
         align-items: center;

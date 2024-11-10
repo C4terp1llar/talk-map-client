@@ -69,19 +69,6 @@ const props = defineProps<Props>();
 </template>
 
 <style scoped lang="scss">
-.mutual-friends__wrapper-popup {
-
-  position: fixed;
-  inset: 0;
-  z-index: 10003;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-
-}
 
 .mutual-friends__wrapper {
   display: flex;

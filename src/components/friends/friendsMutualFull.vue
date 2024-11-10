@@ -76,9 +76,7 @@ onClickOutside(mutualFriendsRef, clickOutside);
     background: rgb(var(--v-theme-background));
     border-radius: 15px;
     padding: 15px;
-    margin: 5px;
     position: relative;
-    display: flex;
 
     overflow-y: auto;
 
@@ -97,8 +95,9 @@ onClickOutside(mutualFriendsRef, clickOutside);
 
     @media screen and (max-width: 650px) {
       width: 100%;
-      height: 100%;
+      height: calc(100% - 10px);
       padding-top: 30px;
+      margin: 5px;
     }
   }
 }
