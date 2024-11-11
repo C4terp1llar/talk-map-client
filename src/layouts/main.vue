@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import MainAside from "@/components/common/mainAside.vue";
 import MainHeader from "@/components/common/mainHeader.vue";
 import {onBeforeMount, onMounted, onUnmounted} from "vue";
@@ -20,21 +19,11 @@ onBeforeMount(async () => {
 })
 
 onMounted(async () => {
-  try {
-    await wsStore.connectSocket();
-  } catch (error) {
-    console.error(error);
-    notificationStore.addNotification('error', 'Ошибка при подключении ws', 3000)
-  }
+  await wsStore.connectSocket();
 })
 
 onUnmounted(() => {
-  try {
-    wsStore.disconnectSocket();
-  } catch (error) {
-    console.error(error);
-    notificationStore.addNotification('error', 'Ошибка при отключении ws', 3000)
-  }
+  wsStore.disconnectSocket();
 })
 </script>
 

@@ -25,6 +25,7 @@ const handleSubmit = async () => {
   filterStore.nickFilter = searchQuery.value
 
   await userStore.findUsers({
+    globalSearch: filterStore.globalSearch,
     cityFilter: filterStore.cityFilter,
     minAgeFilter: filterStore.minAgeFilter,
     maxAgeFilter: filterStore.maxAgeFilter,

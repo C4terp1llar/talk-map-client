@@ -68,13 +68,9 @@ const mutualFriendsRef = ref<HTMLElement | null>(null);
 .mutual-friends-popup__content-list {
   position: relative;
 
-  width: 700px;
-  max-height: 60vh;
-
   @media screen and (max-width: 650px) {
     width: 100%;
-    height: 100%;
-    max-height: unset;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;

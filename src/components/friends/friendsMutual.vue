@@ -33,7 +33,6 @@ const props = defineProps<Props>();
       <v-icon :size="28">mdi-account-supervisor</v-icon>
     </div>
 
-    <scrollable-container class="ma-0" mode="filter">
       <div class="mutual-friends__wrapper">
         <div class="mutual-friends__item" v-for="mutualFriend in props.mutual.mFriends" :key="mutualFriend._id">
 
@@ -49,16 +48,9 @@ const props = defineProps<Props>();
             </v-img>
           </v-avatar>
 
-          <span
-              :style="{color: mutualFriend.nickname_color ? mutualFriend.nickname_color : 'currentColor'}"
-              class="nickname-txt"
-          >{{ mutualFriend.nickname }}
-          </span>
-
           <router-link :to="{ name: 'friends-user', params: { id: mutualFriend._id } }"/>
         </div>
       </div>
-    </scrollable-container>
 
     <button v-if="props.mutual.amount > 3" class="load-more" @click="showFullMutual = true">
       <v-icon color="green">mdi-dots-horizontal</v-icon>
@@ -74,6 +66,7 @@ const props = defineProps<Props>();
   display: flex;
   gap: 5px;
   align-items: center;
+
 
   .load-more {
     padding: 5px;

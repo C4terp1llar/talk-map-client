@@ -28,6 +28,7 @@ export interface ShortAddress {
 }
 
 export interface SearchFriendFilter {
+    globalSearch: boolean,
     cityFilter: string | null,
     minAgeFilter: number,
     maxAgeFilter: number,
@@ -41,7 +42,6 @@ export interface SearchFoundFriend {
     nickname_color: string | null,
     b_date: Date,
     gender: 'male' | 'female',
-    isFriendship: boolean,
     isIncoming: boolean | null,
     isOutgoing: boolean | null,
     mutual: {
@@ -65,6 +65,7 @@ export interface ShortMutualUserFriend{
 }
 
 export interface MainUserInfo {
+    _id: string;
     email: string;
     nickname: string;
     b_date: string;
@@ -105,6 +106,11 @@ export interface FriendRequest {
         b_date: Date,
         gender: 'male' | 'female',
     }
+    mutual: {
+        mFriends: ShortMutualUserFriend[],
+        amount: number,
+        hasMore: boolean | null;
+    },
     address: ExternalUserInfoAddress,
     avatar: {
         asset_url: string;

@@ -9,6 +9,8 @@ import FriendsMutual from "@/components/friends/friendsMutual.vue";
 
 const router = useRouter();
 
+const userStore = useUserStore();
+
 interface Props {
   user: SearchFoundFriend
 }
@@ -25,9 +27,11 @@ const handleSubmit = (uid: string) => {
 
 <template>
   <div class="search-friend-list-item">
-    <div class="search-friend-list-item__info-status" v-if="props.user.isFriendship || props.user.isIncoming || props.user.isOutgoing">
-      <v-icon v-if="(props.user.isOutgoing || props.user.isIncoming) && !props.user.isFriendship" color="warning" :size="28">mdi-account-badge-outline</v-icon>
-      <v-icon v-if="props.user.isFriendship" color="green" :size="28">mdi-account-check-outline</v-icon>
+    <div class="search-friend-list-item__info-status" v-if="(props.user.isOutgoing || props.user.isIncoming) && userStore.wasGlobalFlag">
+      <v-icon color="warning" :size="28">mdi-account-badge-outline</v-icon>
+    </div>
+    <div class="search-friend-list-item__info-status" v-if="!userStore.wasGlobalFlag">
+      <v-icon color="green" :size="28">mdi-account-check-outline</v-icon>
     </div>
 
     <div class="search-friend-list-item__avatar">
@@ -67,7 +71,7 @@ const handleSubmit = (uid: string) => {
         <span class="flag-txt">{{ `${props.user.address.city}, ${props.user.address.country}` }}</span>
       </div>
 
-      <div class="mutual-wrapper" v-if="props.user.mutual.amount">
+      <div class="mutual-wrapper" v-if="userStore.wasGlobalFlag && props.user?.mutual.amount">
         <friends-mutual :mutual="props.user.mutual" :uid="props.user._id"/>
       </div>
 

@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, withDefaults } from 'vue';
 
 interface Props {
-  mode: 'tags' | 'filter'
+  mode: 'tags' | 'filter';
+  useResizeObserver?: boolean;
 }
-const props = defineProps<Props>()
+
+const props = withDefaults(defineProps<Props>(), {
+  useResizeObserver: true,
+});
 
 const contentRef = ref<HTMLElement | null>(null);
 const wrapperRef = ref<HTMLElement | null>(null);
@@ -28,10 +32,12 @@ let resizeObserver: ResizeObserver | null = null;
 onMounted(() => {
   updateSizes();
 
-  resizeObserver = new ResizeObserver(updateSizes);
-  if (wrapperRef.value && contentRef.value) {
-    resizeObserver.observe(wrapperRef.value);
-    resizeObserver.observe(contentRef.value);
+  if (props.useResizeObserver) {
+    resizeObserver = new ResizeObserver(updateSizes);
+    if (wrapperRef.value && contentRef.value) {
+      resizeObserver.observe(wrapperRef.value);
+      resizeObserver.observe(contentRef.value);
+    }
   }
 });
 
@@ -40,6 +46,7 @@ onBeforeUnmount(() => {
     resizeObserver.disconnect();
   }
 });
+
 
 const scrollLeft = () => {
   const container = contentRef.value;
@@ -58,7 +65,7 @@ const scrollRight = () => {
 
 <template>
   <div :class="['scrollable-wrapper', props.mode === 'filter' ? '__filter' : '', props.mode === 'tags' ? '__tags' : '']" ref="wrapperRef">
-    <button @click="scrollLeft" class="h-100 mr-2" v-if="!isContentFits">
+    <button @click="scrollLeft" class="h-100 mr-2" v-if="!isContentFits || !props.useResizeObserver">
       <v-icon>mdi-chevron-left</v-icon>
     </button>
 
@@ -66,7 +73,7 @@ const scrollRight = () => {
       <slot></slot>
     </div>
 
-    <button @click="scrollRight" class="h-100 ml-2" v-if="!isContentFits">
+    <button @click="scrollRight" class="h-100 ml-2" v-if="!isContentFits || !props.useResizeObserver">
       <v-icon>mdi-chevron-right</v-icon>
     </button>
   </div>
@@ -99,11 +106,11 @@ const scrollRight = () => {
   scroll-behavior: smooth;
   display: flex;
 
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .scrollable-content::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari, Opera */
+  display: none;
 }
 </style>

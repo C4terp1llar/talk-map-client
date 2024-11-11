@@ -77,8 +77,12 @@ onClickOutside(mutualFriendsRef, clickOutside);
     border-radius: 15px;
     padding: 15px;
     position: relative;
+    margin: 5px;
 
     overflow-y: auto;
+
+    width: 700px;
+    max-height: 60vh;
 
     button {
       position: absolute;
@@ -95,9 +99,9 @@ onClickOutside(mutualFriendsRef, clickOutside);
 
     @media screen and (max-width: 650px) {
       width: 100%;
+      max-height: unset;
       height: calc(100% - 10px);
       padding-top: 30px;
-      margin: 5px;
     }
   }
 }

@@ -277,6 +277,7 @@ export const useUserStore = defineStore('user', () => {
     const loadMoreUsersFlag = ref<boolean>(false)
 
     const hasMoreFlag = ref<boolean | null>(null);
+    const wasGlobalFlag = ref<boolean | null>(null);
 
     const findUsers = async (filter: SearchFriendFilter, mode: 'load' | 'load-more') => {
 
@@ -291,7 +292,7 @@ export const useUserStore = defineStore('user', () => {
 
 
         currentPending.value = true;
-
+        wasGlobalFlag.value = null;
         findUserError.value = null;
 
         try {
@@ -303,6 +304,7 @@ export const useUserStore = defineStore('user', () => {
 
             if (response && response.data.users) {
                 hasMoreFlag.value = response.data.hasMore;
+                wasGlobalFlag.value = response.data.wasGlobal;
 
                 if (currentPage.value === 1) {
                     foundUsers.value = response.data.users;
@@ -373,5 +375,6 @@ export const useUserStore = defineStore('user', () => {
         usersPerPage,
         loadMoreUsersFlag,
         hasMoreFlag,
+        wasGlobalFlag
     }
 })

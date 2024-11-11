@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
             if (e.response && e.response.status === 400){
                 error.value = e.response.data.message || e.response.data.error;
             }else{
-                error.value = "Произошла ошибка, попробуйте позже"
+                error.value = "Произошла ошибка при авторизации, попробуйте позже"
             }
             console.error(e);
         }finally {
@@ -69,12 +69,12 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null;
 
         try {
-            await apiAuth.post('auth/logout', {}, { withCredentials: true });
+            await apiAuth.get('auth/logout', { withCredentials: true });
             localStorage.removeItem('access_token');
             localStorage.removeItem('device_info')
             await router.push('/login');
         } catch (e: any) {
-            error.value = "Произошла ошибка при разлогинивании";
+            error.value = "Произошла ошибка при выходе, попробуйте позже";
             console.error(e);
         } finally {
             pending.value = false;

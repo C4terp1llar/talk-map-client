@@ -6,6 +6,7 @@ import {useFindFriendFilterStore} from "@/stores/findFriendFilter";
 import {onBeforeUnmount, onMounted} from "vue";
 import {useNotificationStore} from "@/stores/notifications";
 import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
+import type { SearchFoundFriend} from "@/helpers/interfaces";
 
 const userStore = useUserStore();
 const filterStore = useFindFriendFilterStore();
@@ -23,6 +24,7 @@ const handleScroll = async () => {
 
 const handleUpgradeList = async () => {
   await userStore.findUsers({
+    globalSearch: filterStore.globalSearch,
     cityFilter: filterStore.cityFilter,
     minAgeFilter: filterStore.minAgeFilter,
     maxAgeFilter: filterStore.maxAgeFilter,

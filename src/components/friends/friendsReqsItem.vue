@@ -4,6 +4,7 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {useRouter} from "vue-router";
 import FriendsReqsActions from "@/components/friends/friendsReqsActions.vue";
 import {format} from 'date-fns';
+import FriendsMutual from "@/components/friends/friendsMutual.vue";
 
 interface Props {
   mode: 'incoming' | 'outgoing',
@@ -87,8 +88,14 @@ const getSendTime = (sendTime: Date, mode: 'time' | 'date') => {
         <span class="flag-txt">{{ `${props.request.address.city}, ${props.request.address.country}` }}</span>
       </div>
 
-      <button class="abs-select-btn"
-              @click="handleSubmit(props.request.recipient_id, props.request.sender_id)"></button>
+      <div class="mutual-wrapper" v-if="props.request.mutual.amount">
+        <friends-mutual :mutual="props.request.mutual" :uid="props.mode === 'incoming' ? props.request.sender_id : props.request.recipient_id"/>
+      </div>
+
+      <button
+          class="abs-select-btn"
+          @click="handleSubmit(props.request.recipient_id, props.request.sender_id)"
+      ></button>
     </div>
   </div>
 </template>
