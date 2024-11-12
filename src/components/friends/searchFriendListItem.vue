@@ -6,6 +6,7 @@ import {useUserStore} from "@/stores/user";
 import {useExternalUserStore} from "@/stores/externalUser";
 import {useRouter} from "vue-router";
 import FriendsMutual from "@/components/friends/friendsMutual.vue";
+import FriendsReqsActions from "@/components/friends/friendsReqsActions.vue";
 
 const router = useRouter();
 
@@ -23,15 +24,29 @@ const getUserAge = (bDate: Date) => {
 const handleSubmit = (uid: string) => {
   router.push({ name: 'friends-user', params: { id: uid } })
 }
+
+const getReqMode = (user: SearchFoundFriend) => {
+  if (user.isOutgoing && !user.isIncoming) return 'outgoing'
+  else if (!user.isOutgoing && user.isIncoming) return 'incoming'
+  else if (!user.isOutgoing && !user.isIncoming && !userStore.wasGlobalFlag) return 'friends'
+  else return ''
+}
+
+const getReq= () => {
+  if (props.user.isIncoming) {
+    return { recipient: userStore.mainUserInfo?._id, sender: props.user._id}
+  }
+  else {
+    return { recipient: props.user._id, sender: userStore.mainUserInfo?._id}
+  }
+}
 </script>
 
 <template>
   <div class="search-friend-list-item">
-    <div class="search-friend-list-item__info-status" v-if="(props.user.isOutgoing || props.user.isIncoming) && userStore.wasGlobalFlag">
-      <v-icon color="warning" :size="28">mdi-account-badge-outline</v-icon>
-    </div>
-    <div class="search-friend-list-item__info-status" v-if="!userStore.wasGlobalFlag">
-      <v-icon color="green" :size="28">mdi-account-check-outline</v-icon>
+
+    <div class="search-friend-list-item__info-status">
+      <friends-reqs-actions :mode="getReqMode(props.user)" data_mode="user" :req="getReq()"/>
     </div>
 
     <div class="search-friend-list-item__avatar">

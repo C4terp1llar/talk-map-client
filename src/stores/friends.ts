@@ -120,6 +120,31 @@ export const useFriendsStore = defineStore('friends', () => {
         }
     }
 
+
+    const oneUserPending = ref<boolean>(false);
+    const oneUserError = ref<string | null>(null);
+
+    const getOneUser = async (targetUid: string, needMutual: boolean) => {
+        oneUserPending.value = true;
+        oneUserError.value = null;
+
+        try {
+            const response = await apiAuth.post('user/getOneFriend',{
+                targetUid,
+                needMutual
+            })
+
+            if (response.status === 200 && response.data){
+                return response.data.user
+            }
+        } catch (e: any) {
+            oneUserError.value = "Произошла ошибка при получении информации, попробуйте позже";
+            console.error(e);
+        } finally {
+            oneUserPending.value = false;
+        }
+    }
+
     return{
         pending,
         error,
@@ -141,5 +166,9 @@ export const useFriendsStore = defineStore('friends', () => {
         currentPageMutual,
         getMutualFriends,
         mutualClear,
+
+        oneUserPending,
+        oneUserError,
+        getOneUser,
     }
 })

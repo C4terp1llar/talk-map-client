@@ -8,6 +8,11 @@ import {useNotificationStore} from "@/stores/notifications";
 import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
 import type { SearchFoundFriend} from "@/helpers/interfaces";
 
+interface Props {
+  mode: 'friends-preload' | 'not-preload__search'
+}
+const props = defineProps<Props>()
+
 const userStore = useUserStore();
 const filterStore = useFindFriendFilterStore();
 const notificationsStore = useNotificationStore();
@@ -23,8 +28,9 @@ const handleScroll = async () => {
 };
 
 const handleUpgradeList = async () => {
+
   await userStore.findUsers({
-    globalSearch: filterStore.globalSearch,
+    globalSearch: props.mode === 'not-preload__search' ? filterStore.globalSearch : false,
     cityFilter: filterStore.cityFilter,
     minAgeFilter: filterStore.minAgeFilter,
     maxAgeFilter: filterStore.maxAgeFilter,
@@ -52,10 +58,12 @@ onBeforeUnmount(() => {
     <lazy-placeholder-loader v-if="userStore.findUserPending"/>
 
     <div v-else>
-      <h6 v-if="!userStore.foundUsers">тут будет картинка которая предлагает начать поиск людей</h6>
+      <h6 v-if="!userStore.foundUsers && props.mode === 'not-preload__search'">тут будет картинка которая предлагает начать поиск людей</h6>
 
       <div class="search-friend-list-item__wrapper">
-        <h6 v-if="userStore.foundUsers && !userStore.foundUsers.length">тут будет картинка 'не найдено'</h6>
+        <h6 v-if="userStore.foundUsers && !userStore.foundUsers.length">
+          {{ props.mode === 'friends-preload' ? 'картинка что друзей пока нет' : 'тут будет картинка не найдено' }}
+        </h6>
         <search-friend-list-item v-for="user in userStore.foundUsers" :key="user._id" :user="user" v-else/>
       </div>
     </div>

@@ -42,6 +42,7 @@ const getSendTime = (sendTime: Date, mode: 'time' | 'date') => {
 
     <div class="friends-reqs-list-item__actions">
       <friends-reqs-actions :mode="props.mode"
+                            :data_mode="'req'"
                             :req="{recipient: props.request.recipient_id, sender: props.request.sender_id}"/>
     </div>
 

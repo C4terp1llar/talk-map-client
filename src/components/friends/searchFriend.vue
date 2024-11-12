@@ -24,7 +24,7 @@ onUnmounted(() => {
     <v-divider class="ma-0"/>
     <search-friend-sub-bar/>
 
-    <search-friend-list/>
+    <search-friend-list mode="not-preload__search"/>
   </div>
 </template>
 
