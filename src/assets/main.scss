@@ -164,6 +164,24 @@ body{
 }
 
 
+.load-more-btn__link {
+  text-decoration: none !important;
+  padding: 1px 5px;
+  transition: .3s;
+  border-radius: 5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: fit-content;
+  color: #4CAF50;
+
+  &:hover {
+    background-color: rgba(211, 211, 211, 0.25);
+  }
+}
+
 
 
 

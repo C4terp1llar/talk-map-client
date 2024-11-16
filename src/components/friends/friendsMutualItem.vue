@@ -52,8 +52,13 @@ const props = defineProps<Props>()
   max-width: 120px;
 
   &.__short {
-    min-width: 95px;
-    max-width: 95px;
+    min-width: 100px;
+    max-width: 100px;
+
+    @media screen and (max-width: 768px) {
+      min-width: 80px;
+      min-height: 80px;
+    }
 
     .nickname-txt{
       font-size: 14px;

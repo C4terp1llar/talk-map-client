@@ -1,11 +1,17 @@
 <script setup lang="ts">
 
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
+
+interface Props {
+  isShort?: boolean
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>
   <div class="mutual-friends-popup__list_item">
-    <div class="mutual-friends-popup__list_item__avatar">
+    <div :class="['mutual-friends-popup__list_item__avatar', props.isShort ? '__short' : '']">
       <skeleton-loader/>
     </div>
     <div class="mutual-friends-popup__list_item__nickname position-relative">
@@ -32,6 +38,15 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
     min-width: 100px;
     min-height: 100px;
     border-radius: 50%;
+
+    &.__short{
+      min-width: 75px !important;
+      min-height: 75px !important;
+      @media screen and (max-width: 768px) {
+        min-width: 60px;
+        min-height: 60px;
+      }
+    }
 
     @media screen and (max-width: 768px) {
       min-width: 80px;

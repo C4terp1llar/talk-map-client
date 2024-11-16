@@ -126,28 +126,30 @@ const deleteFriend = async () => {
 </script>
 
 <template>
-  <div class="friends-reqs-list-item__actions_menu" v-if="props.mode === 'incoming'">
-    <button :disabled="externalStore.friendReqPending" @click="handleSubmitReq">
-      <circular-loader :size="24" v-if="pending === props.req.recipient"/>
-      <v-icon color="green" v-else>mdi-account-check-outline</v-icon>
-    </button>
-    <button :disabled="externalStore.friendReqPending" @click="handleDeclineReq">
-      <circular-loader :size="24" v-if="pending === props.req.sender"/>
-      <v-icon color="red" :size="24" v-else>mdi-close-octagon-outline</v-icon>
-    </button>
-  </div>
-  <div class="friends-reqs-list-item__actions_menu" v-else-if="props.mode === 'outgoing'">
-    <button :disabled="externalStore.friendReqPending" @click="handleCancelReq">
-      <circular-loader :size="24" v-if="pending === props.req.recipient"/>
-      <v-icon color="red" :size="24" v-else>mdi-trash-can-outline</v-icon>
-    </button>
-  </div>
-  <div class="friends-reqs-list-item__actions_menu" v-else-if="props.mode === 'friends'">
-    <button :disabled="externalStore.friendReqPending" @click="deleteFriend">
-      <circular-loader :size="24" v-if="pending === props.req.recipient"/>
-      <v-icon color="red" :size="24" v-else>mdi-account-remove-outline</v-icon>
-    </button>
-  </div>
+
+    <div class="friends-reqs-list-item__actions_menu" v-if="props.mode === 'incoming'">
+      <button :disabled="externalStore.friendReqPending" @click="handleSubmitReq">
+        <circular-loader :size="24" v-if="pending === props.req.recipient"/>
+        <v-icon color="green" v-else>mdi-account-check-outline</v-icon>
+      </button>
+      <button :disabled="externalStore.friendReqPending" @click="handleDeclineReq">
+        <circular-loader :size="24" v-if="pending === props.req.sender"/>
+        <v-icon color="red" :size="24" v-else>mdi-close-octagon-outline</v-icon>
+      </button>
+    </div>
+    <div class="friends-reqs-list-item__actions_menu" v-else-if="props.mode === 'outgoing'">
+      <button :disabled="externalStore.friendReqPending" @click="handleCancelReq">
+        <circular-loader :size="24" v-if="pending === props.req.recipient"/>
+        <v-icon color="red" :size="24" v-else>mdi-trash-can-outline</v-icon>
+      </button>
+    </div>
+    <div class="friends-reqs-list-item__actions_menu" v-else-if="props.mode === 'friends'">
+      <button :disabled="externalStore.friendReqPending" @click="deleteFriend">
+        <circular-loader :size="24" v-if="pending === props.req.recipient"/>
+        <v-icon color="red" :size="24" v-else>mdi-account-remove-outline</v-icon>
+      </button>
+    </div>
+
 </template>
 
 <style scoped lang="scss">
