@@ -3,6 +3,8 @@ import Wallpaper from "@/components/home/wallpaper.vue";
 import WallpaperAvatar from "@/components/home/wallpaperAvatar.vue";
 import TagsHome from "@/components/home/tagsHome.vue";
 import {useWsStore} from "@/stores/wsStore";
+import FriendsList from "@/components/friends/friendsList.vue";
+import ShortFriends from "@/components/home/shortFriends.vue";
 
 
 </script>
@@ -14,6 +16,8 @@ import {useWsStore} from "@/stores/wsStore";
     </wallpaper>
 
     <tags-home/>
+
+    <short-friends/>
 
   </div>
 

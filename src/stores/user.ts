@@ -279,7 +279,7 @@ export const useUserStore = defineStore('user', () => {
     const hasMoreFlag = ref<boolean | null>(null);
     const wasGlobalFlag = ref<boolean | null>(null);
 
-    const findUsers = async (filter: SearchFriendFilter, mode: 'load' | 'load-more') => {
+    const findUsers = async (filter: SearchFriendFilter, mode: 'load' | 'load-more', limit?: number) => {
 
         let currentPending = mode === 'load' ? findUserPending : loadMoreUsersFlag;
 
@@ -299,7 +299,7 @@ export const useUserStore = defineStore('user', () => {
             const response = await apiAuth.post('user/findUsers', {
                 ...filter,
                 page: currentPage.value,
-                limit: usersPerPage.value,
+                limit: limit || usersPerPage.value,
             });
 
             if (response && response.data.users) {
