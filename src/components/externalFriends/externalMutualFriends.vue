@@ -3,24 +3,33 @@ import {useRoute, useRouter} from "vue-router";
 import {useUserStore} from "@/stores/user";
 import {useFindFriendFilterStore} from "@/stores/findFriendFilter";
 import {useNotificationStore} from "@/stores/notifications";
-import {computed, onMounted, onUnmounted} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
 import type {ShortMutualUserFriend} from "@/helpers/interfaces";
 import {useFriendsStore} from "@/stores/friends";
 import {useExternalUserStore} from "@/stores/externalUser";
 import FriendsMutual from "@/components/friends/friendsMutual.vue";
+import TextDivider from "@/components/common/textDivider.vue";
+import FriendsMutualItem from "@/components/friends/friendsMutualItem.vue";
+import ShortHomeBlockSkeleton from "@/components/skeletons/shortHomeBlockSkeleton.vue";
+import FriendsMutualFull from "@/components/friends/friendsMutualFull.vue";
 
 const router = useRouter();
 
-const userStore = useUserStore();
 const friendStore = useFriendsStore();
-const filterStore = useFindFriendFilterStore();
 const notificationsStore = useNotificationStore();
 const externalStore = useExternalUserStore()
 
 const route = useRoute();
+const showFullMutual = ref<boolean>(false);
+
+const handleClose = () => {
+  setTimeout(() => {
+    showFullMutual.value = false;
+  }, 0)
+}
 
 onUnmounted(() => {
-  friendStore.unmountClear();
+
 })
 
 onMounted(async () => {
@@ -33,31 +42,57 @@ onMounted(async () => {
   }
 })
 
-const shortFiends = computed((): ShortMutualUserFriend[] | void => {
-  if (!userStore.foundUsers) return;
+const shortMutual = computed((): ShortMutualUserFriend[] | void => {
+  if (!friendStore.foundMutual) return;
 
-  return userStore.foundUsers.map(user => {
-    return {
-      _id: user._id,
-      nickname: user.nickname,
-      nickname_color: user.nickname_color || null,
-      avatar: {
-        asset_url: user.avatar.asset_url
-      },
-    }
-  })
+  return friendStore.foundMutual.slice(0, 3)
 })
 </script>
 
 <template>
-  <div class="external-mutual-friends__wrapper">
+  <div class="external-mutual-friends__wrapper" v-if="!friendStore.mutualPending && !externalStore.pending">
+    <text-divider text="Общие друзья"/>
 
+    <div class="external-mutual-friends__items" v-if="shortMutual && shortMutual.length">
+      <friends-mutual-item v-for="friend in shortMutual" :mutual="friend" :is-short="true"/>
+    </div>
+    <div class="d-flex flex-column align-items-center __no-friends" v-if="!shortMutual || !shortMutual.length">
+      <h6 class="text-center">Нет общих друзей</h6>
+    </div>
+
+    <button class="load-more-btn__link m-auto" v-if="friendStore.foundMutual && friendStore.foundMutual.length > 3" @click="showFullMutual = true">
+      <v-icon>mdi-dots-horizontal</v-icon>
+    </button>
 
   </div>
+  <short-home-block-skeleton :is-short="true" v-if="friendStore.mutualPending || externalStore.pending"/>
+  <friends-mutual-full @close="handleClose" v-if="showFullMutual"
+                       :id="route.params.id && typeof route.params.id === 'string' ? route.params.id : ''"
+                       mode="mutual"/>
 </template>
 
 <style scoped lang="scss">
-.external-mutual-friends__wrapper{
+.__no-friends {
+  padding: 10px 15px;
+  gap: 5px;
+}
 
+.external-mutual-friends__wrapper {
+  height:  fit-content;
+  width: fit-content;
+  box-shadow: 0 1px 10px currentColor;
+  border-radius: 15px;
+  padding: 10px;
+  background: rgb(var(--v-theme-background));
+
+  @media screen and (max-width: 450px) {
+    width: 100%;
+  }
+
+  .external-mutual-friends__items {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 }
 </style>

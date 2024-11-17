@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {useRoute, useRouter} from "vue-router";
+import {onBeforeRouteUpdate, useRoute, useRouter} from "vue-router";
 import {useExternalUserStore} from "@/stores/externalUser";
-import {onBeforeMount} from "vue";
+import {onBeforeMount, onUpdated, watch} from "vue";
 import {useNotificationStore} from "@/stores/notifications";
 import ExternalWallpaper from "@/components/externalFriends/externalWallpaper.vue";
 import ExternalWallpaperAvatar from "@/components/externalFriends/externalWallpaperAvatar.vue";
@@ -21,13 +21,26 @@ const notificationStore = useNotificationStore();
 const friendStore = useFriendsStore();
 
 onBeforeMount(async () => {
+  await beforeLoad()
+})
+
+watch(
+    () => route.params.id,
+    async (newId) => {
+      if (newId) {
+        await beforeLoad()
+      }
+    }
+);
+
+const beforeLoad = async () => {
   const userId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id;
   await externalUserStore.isUserExist(userId);
 
   if (externalUserStore.existFlag) {
     await getExternalUserInfo(userId);
   }
-})
+}
 
 const getExternalUserInfo = async (userId: string) => {
 
@@ -64,27 +77,38 @@ const getExternalUserInfo = async (userId: string) => {
 </script>
 
 <template>
-  <div class="friends-user-wrapper" v-if="externalUserStore.existFlag || externalUserStore.pending">
-    <external-wallpaper>
+  <div :key="Date.now()" class="friends-user-wrapper" v-if="externalUserStore.existFlag || externalUserStore.pending">
+    <external-wallpaper >
       <external-wallpaper-avatar/>
     </external-wallpaper>
 
-    <external-tags/>
+    <external-tags />
 
-    <short-friends mode="external"/>
-
-    <external-mutual-friends/>
+    <div class="friends-user__content">
+      <short-friends mode="external" />
+      <external-mutual-friends />
+    </div>
   </div>
-  <div class="friends-user-not-found " v-if="!externalUserStore.existFlag && !externalUserStore.pending">
+
+  <div class="friends-user-not-found" v-if="!externalUserStore.existFlag && !externalUserStore.pending">
     <search-friend-not-found/>
   </div>
 </template>
 
 <style scoped lang="scss">
 .friends-user-wrapper {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 15px;
+
+  .friends-user__content {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
 }
 
 .friends-user-not-found {

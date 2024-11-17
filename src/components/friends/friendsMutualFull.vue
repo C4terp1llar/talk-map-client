@@ -33,7 +33,7 @@ onMounted(async () => {
       maxAgeFilter: 100,
       genderFilter: "any",
       nicknameFilter: null
-    }, 'load')
+    }, 'load', undefined, props.id)
   }else{
     await friendsStore.getMutualFriends('load', props.id)
   }
@@ -50,12 +50,12 @@ onMounted(async () => {
 onUnmounted(() => {
   popupStore.unlockScroll();
 
-  if (props.mode === 'friends'){
-    userStore.currentPage = 1;
-    userStore.foundUsers = null;
-  }else{
-    friendsStore.unmountClear();
-  }
+  // if (props.mode === 'friends'){
+  //   userStore.currentPage = 1;
+  //   userStore.foundUsers = null;
+  // }else{
+  //   friendsStore.unmountClear();
+  // }
 })
 
 

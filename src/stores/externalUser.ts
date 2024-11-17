@@ -66,6 +66,12 @@ export const useExternalUserStore = defineStore('externalUser', () => {
         }
     }
 
+    const clearMain = () => {
+        main.value = null
+        address.value = null
+        existFlag.value = false
+    }
+
     const friendReqPending = ref<boolean>(false);
     const friendReqError = ref<string | null>(null);
 
@@ -157,6 +163,7 @@ export const useExternalUserStore = defineStore('externalUser', () => {
         getExternalMainUserInfo,
         existFlag,
         isUserExist,
+        clearMain,
         isOutgoing,
         isIncoming,
         isFriendship,

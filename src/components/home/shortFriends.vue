@@ -10,6 +10,7 @@ import {useRoute, useRouter} from "vue-router";
 import ShortHomeBlockSkeleton from "@/components/skeletons/shortHomeBlockSkeleton.vue";
 import {useFriendsStore} from "@/stores/friends";
 import FriendsMutualFull from "@/components/friends/friendsMutualFull.vue";
+import {useExternalUserStore} from "@/stores/externalUser";
 
 interface Props {
   mode: 'external' | 'internal',
@@ -32,15 +33,12 @@ const friendsStore = useFriendsStore();
 const userStore = useUserStore();
 const filterStore = useFindFriendFilterStore();
 const notificationsStore = useNotificationStore();
+const externalUserStore = useExternalUserStore();
 
 onUnmounted(() => {
-  if (props.mode === 'internal'){
     userStore.currentPage = 1;
     filterStore.clearAll();
     userStore.foundUsers = null;
-  }else{
-    friendsStore.unmountClear();
-  }
 })
 
 onMounted(async () => {
@@ -63,7 +61,7 @@ onMounted(async () => {
 const shortFiends = computed((): ShortMutualUserFriend[] | void => {
   if (!userStore.foundUsers) return;
 
-  return userStore.foundUsers.map(user => {
+  return userStore.foundUsers.slice(0, 3).map(user => {
     return {
       _id: user._id,
       nickname: user.nickname,
@@ -74,33 +72,36 @@ const shortFiends = computed((): ShortMutualUserFriend[] | void => {
     }
   })
 })
+
+const show = computed(() => props.mode === 'internal' ? !userStore.findUserPending : (!userStore.findUserPending && !externalUserStore.pending))
 </script>
 
 <template>
-  <div class="short-friends__wrapper" v-if="!userStore.findUserPending">
+  <div class="short-friends__wrapper" v-if="show">
     <text-divider text="Друзья"/>
 
     <div class="short-friends__items" v-if="shortFiends && shortFiends.length">
       <friends-mutual-item v-for="friend in shortFiends" :mutual="friend" :is-short="true"/>
     </div>
-    <div class="d-flex flex-column align-items-center __no-friends" v-if="!(shortFiends && shortFiends.length) && props.mode === 'internal'">
+    <div class="d-flex flex-column align-items-center __no-friends" v-else>
       <h6 class="text-center">{{ props.mode === 'internal' ? 'Друзей пока нет 🥺' : 'У пользователя пока нет друзей 🥺'}}</h6>
       <v-btn class="text-none" v-if="props.mode === 'internal'" @click="router.push({ name: 'friends', query: { tab: 'search' } })">Найти</v-btn>
     </div>
 
-    <div class="short-friends__action" v-if="userStore.hasMoreFlag">
+    <div class="short-friends__action" v-if="userStore.foundUsers && (userStore.foundUsers.length > 3 || userStore.hasMoreFlag)">
       <router-link class="load-more-btn__link m-auto" :to="{ name: 'friends', query: { tab: 'friends' } }" v-if="props.mode === 'internal'">
         <v-icon>mdi-dots-horizontal</v-icon>
       </router-link>
 
-      <button class="load-more-btn__link m-auto" v-else>
+      <button class="load-more-btn__link m-auto" @click="showFullFriends = true" v-else>
         <v-icon>mdi-dots-horizontal</v-icon>
       </button>
     </div>
 
-    <friends-mutual-full @close="handleClose" v-if="showFullFriends" :id="route.params.id && typeof route.params.id === 'string' ? route.params.id : ''" mode="friends"/>
   </div>
   <short-home-block-skeleton :is-short="true" v-else/>
+  <friends-mutual-full @close="handleClose" v-if="showFullFriends" :id="route.params.id && typeof route.params.id === 'string' ? route.params.id : ''" mode="friends"/>
+
 </template>
 
 <style scoped lang="scss">
@@ -110,6 +111,7 @@ const shortFiends = computed((): ShortMutualUserFriend[] | void => {
 }
 
 .short-friends__wrapper {
+  height:  fit-content;
   width: fit-content;
   box-shadow: 0 1px 10px currentColor;
   border-radius: 15px;
