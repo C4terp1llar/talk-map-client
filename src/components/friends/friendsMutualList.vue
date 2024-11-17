@@ -7,7 +7,8 @@ import FriendsMutualItem from "@/components/friends/friendsMutualItem.vue";
 import MutalItemSkeleton from "@/components/skeletons/mutalItemSkeleton.vue";
 
 interface Props {
-  id: string;
+  id: string,
+  mode: 'friends' | 'mutual'
 }
 
 const props = defineProps<Props>();

@@ -279,7 +279,7 @@ export const useUserStore = defineStore('user', () => {
     const hasMoreFlag = ref<boolean | null>(null);
     const wasGlobalFlag = ref<boolean | null>(null);
 
-    const findUsers = async (filter: SearchFriendFilter, mode: 'load' | 'load-more', limit?: number) => {
+    const findUsers = async (filter: SearchFriendFilter, mode: 'load' | 'load-more', limit?: number, requester?: string) => {
 
         let currentPending = mode === 'load' ? findUserPending : loadMoreUsersFlag;
 
@@ -300,6 +300,7 @@ export const useUserStore = defineStore('user', () => {
                 ...filter,
                 page: currentPage.value,
                 limit: limit || usersPerPage.value,
+                requester
             });
 
             if (response && response.data.users) {

@@ -56,7 +56,7 @@ const props = defineProps<Props>();
       <v-icon color="green">mdi-dots-horizontal</v-icon>
     </button>
 
-    <friends-mutual-full @close="handleClose" :id="props.uid" v-if="showFullMutual"/>
+    <friends-mutual-full mode="mutual" @close="handleClose" :id="props.uid" v-if="showFullMutual"/>
   </div>
 </template>
 

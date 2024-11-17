@@ -8,13 +8,16 @@ import {useImagePopupStore} from "@/stores/imagePopup";
 import FriendsMutualList from "@/components/friends/friendsMutualList.vue";
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 import MutalItemSkeleton from "@/components/skeletons/mutalItemSkeleton.vue";
+import {useUserStore} from "@/stores/user";
 
 interface Props {
   id: string;
+  mode: 'friends' | 'mutual'
 }
 
 const props = defineProps<Props>();
 
+const userStore = useUserStore();
 const friendsStore = useFriendsStore();
 const popupStore = useImagePopupStore();
 const notificationsStore = useNotificationStore();
@@ -22,16 +25,37 @@ const notificationsStore = useNotificationStore();
 onMounted(async () => {
   popupStore.lockScroll();
 
-  await friendsStore.getMutualFriends('load', props.id)
+  if (props.mode === 'friends'){
+    await userStore.findUsers({
+      globalSearch: false,
+      cityFilter: null,
+      minAgeFilter: 14,
+      maxAgeFilter: 100,
+      genderFilter: "any",
+      nicknameFilter: null
+    }, 'load')
+  }else{
+    await friendsStore.getMutualFriends('load', props.id)
+  }
 
   if (friendsStore.mutualError) {
     notificationsStore.addNotification('error', friendsStore.mutualError, 3000);
+  }
+
+  if (userStore.findUserError) {
+    notificationsStore.addNotification('error', userStore.findUserError, 3000)
   }
 })
 
 onUnmounted(() => {
   popupStore.unlockScroll();
-  friendsStore.mutualClear();
+
+  if (props.mode === 'friends'){
+    userStore.currentPage = 1;
+    userStore.foundUsers = null;
+  }else{
+    friendsStore.unmountClear();
+  }
 })
 
 
@@ -49,7 +73,7 @@ onClickOutside(mutualFriendsRef, clickOutside);
     <div class="mutual-friends-popup__wrapper">
 
       <div class="mutual-friends-popup__content styled-scroll" ref="mutualFriendsRef">
-        <friends-mutual-list :id="props.id"/>
+        <friends-mutual-list :mode="props.mode" :id="props.id"/>
 
         <button @click="clickOutside">
           <v-icon>mdi-close</v-icon>

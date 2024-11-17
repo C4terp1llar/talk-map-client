@@ -10,6 +10,7 @@ import SearchFriendNotFound from "@/components/friends/searchFriendNotFound.vue"
 import {useUserStore} from "@/stores/user";
 import ExternalMutualFriends from "@/components/externalFriends/externalMutualFriends.vue";
 import {useFriendsStore} from "@/stores/friends";
+import ShortFriends from "@/components/home/shortFriends.vue";
 
 const route = useRoute()
 const router = useRouter()
@@ -32,7 +33,15 @@ const getExternalUserInfo = async (userId: string) => {
 
   await Promise.all([
     friendStore.getMutualFriends('load', userId),
-    externalUserStore.getExternalMainUserInfo(userId)
+    externalUserStore.getExternalMainUserInfo(userId),
+    userStore.findUsers({
+      globalSearch: false,
+      cityFilter: null,
+      minAgeFilter: 14,
+      maxAgeFilter: 100,
+      genderFilter: "any",
+      nicknameFilter: null
+    }, 'load', 3, userId)
   ])
 
   if (userId === userStore.mainUserInfo?._id) {
@@ -47,6 +56,10 @@ const getExternalUserInfo = async (userId: string) => {
   if (externalUserStore.error) {
     notificationStore.addNotification('error', externalUserStore.error, 3000)
   }
+
+  if (userStore.findUserError) {
+    notificationStore.addNotification('error', userStore.findUserError, 3000)
+  }
 }
 </script>
 
@@ -57,6 +70,8 @@ const getExternalUserInfo = async (userId: string) => {
     </external-wallpaper>
 
     <external-tags/>
+
+    <short-friends mode="external"/>
 
     <external-mutual-friends/>
   </div>

@@ -17,7 +17,7 @@ import ShortFriends from "@/components/home/shortFriends.vue";
 
     <tags-home/>
 
-    <short-friends/>
+    <short-friends mode="internal"/>
 
   </div>
 
