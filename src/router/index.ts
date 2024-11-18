@@ -54,14 +54,14 @@ const router = createRouter({
                     component: Home
                 },
                 {
-                    path: '/app/map',
-                    name: 'map',
-                    component: () => import('../views/map.vue')
+                    path: '/app/communications',
+                    name: 'communications',
+                    component: () => import('../views/communications.vue')
                 },
                 {
-                    path: '/app/messenger',
-                    name: 'messenger',
-                    component: () => import('../views/messenger.vue')
+                    path: '/app/photos',
+                    name: 'photos',
+                    component: () => import('../views/photos.vue')
                 },
                 {
                     path: '/app/friends',

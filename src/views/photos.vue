@@ -3,10 +3,9 @@
 </script>
 
 <template>
-<h1>map</h1>
-
+<h2>Фото</h2>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>

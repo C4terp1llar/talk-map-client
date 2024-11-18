@@ -18,24 +18,22 @@ const isActive = (path: string) => computed(() => route.path.includes(`/app/${pa
         <span>Главная</span>
       </li>
 
-      <li :class="{ active: isActive('map').value }">
-        <RouterLink to="/app/map"/>
-        <v-icon>mdi-map-outline</v-icon>
-        <span>Карта</span>
-      </li>
-
-      <li :class="{ active: isActive('messenger').value }">
-        <RouterLink to="/app/messenger"/>
+      <li :class="{ active: isActive('communications').value }">
+        <RouterLink to="/app/communications"/>
         <v-icon>mdi-message-outline</v-icon>
-        <span>Мессенджер</span>
-
+        <span>Общение</span>
       </li>
 
       <li :class="{ active: isActive('friends').value }">
         <RouterLink :to="{name: 'friends',  query: { tab: 'friends' }}"/>
         <v-icon>mdi-account-multiple-outline</v-icon>
         <span>Друзья</span>
+      </li>
 
+      <li :class="{ active: isActive('photos').value }">
+        <RouterLink to="/app/photos"/>
+        <v-icon>mdi-image-multiple-outline</v-icon>
+        <span>Фотографии</span>
       </li>
 
       <li :class="['mt-auto',{ active: isActive('settings').value}]">
