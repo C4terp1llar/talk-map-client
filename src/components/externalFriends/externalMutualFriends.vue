@@ -29,7 +29,7 @@ const handleClose = () => {
 }
 
 onUnmounted(() => {
-
+  friendStore.foundMutual = null;
 })
 
 onMounted(async () => {
