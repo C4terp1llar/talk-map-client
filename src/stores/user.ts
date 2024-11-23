@@ -263,9 +263,6 @@ export const useUserStore = defineStore('user', () => {
     }
 
 
-
-
-
     const findUserPending = ref<boolean>(false);
     const findUserError = ref<string | null>(null);
 

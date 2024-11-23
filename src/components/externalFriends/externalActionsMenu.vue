@@ -3,6 +3,9 @@ import { ref, computed } from "vue";
 import { useNotificationStore } from "@/stores/notifications";
 import { useExternalUserStore } from "@/stores/externalUser";
 import { onClickOutside } from "@vueuse/core";
+import {useUserStore} from "@/stores/user";
+import {useRoute} from "vue-router";
+import {useFriendsStore} from "@/stores/friends";
 
 interface Action {
   label: string,
@@ -15,6 +18,10 @@ const emit = defineEmits();
 const menuRef = ref<HTMLElement | null>(null);
 const externalStore = useExternalUserStore();
 const notificationStore = useNotificationStore();
+
+const friendStore = useFriendsStore();
+const userStore = useUserStore();
+const route = useRoute();
 
 const actions = computed(() => {
   const commonAction = {
@@ -128,6 +135,8 @@ const handleSubmitReq = async () => {
 
   await externalStore.submitFriendRequest(externalStore.main?._id);
 
+  await meInFriends('set')
+
   if (externalStore.friendReqError) {
     notificationStore.addNotification('error', externalStore.friendReqError, 3000);
   } else {
@@ -144,11 +153,28 @@ const deleteFriend = async () => {
 
   await externalStore.deleteFriendship(externalStore.main?._id);
 
+  await meInFriends('delete')
+
   if (externalStore.friendReqError) {
     notificationStore.addNotification('error', externalStore.friendReqError, 3000);
   } else {
     externalStore.isFriendship = false;
     notificationStore.addNotification('success', 'Больше вы не друзья :(', 5000);
+  }
+}
+
+const meInFriends = async (mode: 'set' | 'delete') => {
+  if (route.name !== 'friends-user' || !userStore.mainUserInfo || !userStore.foundUsers) return;
+
+  if (mode === 'set'){
+    userStore.foundUsers.unshift(...await friendStore.getOneUser(userStore.mainUserInfo._id, false));
+  }else{
+    //@ts-ignore
+    const userIndex = userStore.foundUsers.findIndex(item => item._id === userStore.mainUserInfo._id);
+
+    if (userIndex !== -1) {
+      userStore.foundUsers.splice(userIndex, 1);
+    }
   }
 }
 

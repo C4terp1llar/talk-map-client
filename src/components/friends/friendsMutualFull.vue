@@ -1,14 +1,9 @@
 <script setup lang="ts">
-import {useFriendsStore} from "@/stores/friends";
-import {useNotificationStore} from "@/stores/notifications";
 import {onMounted, onUnmounted, ref} from "vue";
-import type {ShortMutualUserFriend} from "@/helpers/interfaces";
 import {onClickOutside} from "@vueuse/core";
 import {useImagePopupStore} from "@/stores/imagePopup";
 import FriendsMutualList from "@/components/friends/friendsMutualList.vue";
-import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
-import MutalItemSkeleton from "@/components/skeletons/mutalItemSkeleton.vue";
-import {useUserStore} from "@/stores/user";
+import {useFullPopupData} from "@/stores/fullPopupData";
 
 interface Props {
   id: string;
@@ -17,47 +12,18 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const userStore = useUserStore();
-const friendsStore = useFriendsStore();
 const popupStore = useImagePopupStore();
-const notificationsStore = useNotificationStore();
 
-onMounted(async () => {
+const fullPopup = useFullPopupData();
+
+onMounted( () => {
   popupStore.lockScroll();
-
-  if (props.mode === 'friends'){
-    await userStore.findUsers({
-      globalSearch: false,
-      cityFilter: null,
-      minAgeFilter: 14,
-      maxAgeFilter: 100,
-      genderFilter: "any",
-      nicknameFilter: null
-    }, 'load', undefined, props.id)
-  }else{
-    await friendsStore.getMutualFriends('load', props.id)
-  }
-
-  if (friendsStore.mutualError) {
-    notificationsStore.addNotification('error', friendsStore.mutualError, 3000);
-  }
-
-  if (userStore.findUserError) {
-    notificationsStore.addNotification('error', userStore.findUserError, 3000)
-  }
 })
 
 onUnmounted(() => {
   popupStore.unlockScroll();
-
-  // if (props.mode === 'friends'){
-  //   userStore.currentPage = 1;
-  //   userStore.foundUsers = null;
-  // }else{
-  //   friendsStore.unmountClear();
-  // }
+  fullPopup.fullMutualClear();
 })
-
 
 const emit = defineEmits(['close']);
 
@@ -73,13 +39,14 @@ onClickOutside(mutualFriendsRef, clickOutside);
     <div class="mutual-friends-popup__wrapper">
 
       <div class="mutual-friends-popup__content styled-scroll" ref="mutualFriendsRef">
+
         <friends-mutual-list :mode="props.mode" :id="props.id"/>
 
         <button @click="clickOutside">
           <v-icon>mdi-close</v-icon>
         </button>
-      </div>
 
+      </div>
     </div>
 </template>
 

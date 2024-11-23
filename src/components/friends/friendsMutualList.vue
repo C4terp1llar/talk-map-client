@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import {useFriendsStore} from "@/stores/friends";
-import {useNotificationStore} from "@/stores/notifications";
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
 import FriendsMutualItem from "@/components/friends/friendsMutualItem.vue";
 import MutalItemSkeleton from "@/components/skeletons/mutalItemSkeleton.vue";
-import {useUserStore} from "@/stores/user";
-import type {ShortMutualUserFriend} from "@/helpers/interfaces";
+import type {SearchFoundFriend, ShortMutualUserFriend} from "@/helpers/interfaces";
+import {useFullPopupData} from "@/stores/fullPopupData";
 
 interface Props {
   id: string,
@@ -15,62 +13,43 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const friendsStore = useFriendsStore();
-const userStore = useUserStore();
-const notificationsStore = useNotificationStore();
+const fullPopup = useFullPopupData();
+
+const fullData = ref<ShortMutualUserFriend[] | SearchFoundFriend[] | null>(null)
 
 const loadMoreFlag = computed(() => {
-
-  if (props.mode === 'friends') {
-    return (
-        userStore.foundUsers &&
-        userStore.foundUsers.length === userStore.usersPerPage * userStore.currentPage &&
-        userStore.hasMoreFlag
-    )
-  } else {
-    return (
-        friendsStore.foundMutual &&
-        friendsStore.foundMutual.length === friendsStore.perPage * friendsStore.currentPageMutual &&
-        friendsStore.hasMoreMutual
-    )
-  }
+  return (
+      fullData.value &&
+      fullData.value.length === fullPopup.perPage * fullPopup.currentPage &&
+      fullPopup.hasMore &&
+      !fullPopup.pending &&
+      !fullPopup.morePending
+  )
 })
 
-const handleUpgradeList = async () => {
-  if (!loadMoreFlag.value) return;
+const uploadData = async (mode: 'load' | 'load-more') => {
+  if (!loadMoreFlag.value && mode === 'load-more') return;
 
-  localMorePending.value = true
+  let data;
+
   if (props.mode === 'friends'){
-    await userStore.findUsers({
-      globalSearch: false,
-      cityFilter: null,
-      minAgeFilter: 14,
-      maxAgeFilter: 100,
-      genderFilter: "any",
-      nicknameFilter: null
-    }, 'load-more', undefined, props.id)
+    data = await fullPopup.findFriends(mode, undefined, props.id);
   }else{
-    await friendsStore.getMutualFriends('load-more', props.id)
-  }
-  localMorePending.value = false
-
-  if (friendsStore.mutualError) {
-    notificationsStore.addNotification('error', friendsStore.mutualError, 3000)
+    data = await fullPopup.getMutualFriends(mode, props.id);
   }
 
-  if (userStore.findUserError) {
-    notificationsStore.addNotification('error', userStore.findUserError, 3000)
+  if (mode === 'load' ){
+    fullData.value = data
+  }else if (fullData.value && mode === 'load-more'){
+    fullData.value.push(...data)
   }
 }
 
-const mutualFriendsRef = ref<HTMLElement | null>(null);
-
-const localMorePending = ref<boolean>(false)
 
 const shortFiends = computed((): ShortMutualUserFriend[] | void => {
-  if (!userStore.foundUsers || props.mode !== 'friends') return;
+  if (!fullData.value || props.mode !== 'friends') return;
 
-  return userStore.foundUsers.map(user => {
+  return fullData.value.map(user => {
     return {
       _id: user._id,
       nickname: user.nickname,
@@ -81,6 +60,10 @@ const shortFiends = computed((): ShortMutualUserFriend[] | void => {
     }
   })
 })
+
+onMounted(async () => {
+  await uploadData('load')
+})
 </script>
 
 <template>
@@ -89,26 +72,28 @@ const shortFiends = computed((): ShortMutualUserFriend[] | void => {
     <h5 class="text-center align-self-center">{{props.mode === 'mutual' ? 'Общие друзья' : 'Друзья'}}</h5>
 
     <div class="mutual-friends-popup__content-list__items">
-      <mutal-item-skeleton v-for="i in 5" :key="i" v-if="props.mode === 'mutual' ? friendsStore.mutualPending : userStore.findUserPending"/>
-      <friends-mutual-item v-for="mutual in props.mode === 'friends' ? shortFiends : friendsStore.foundMutual" :mutual="mutual" v-else/>
+      <mutal-item-skeleton v-for="i in 5" :key="i" v-if="fullPopup.pending"/>
+      <friends-mutual-item v-for="mutual in props.mode === 'friends' ? shortFiends : fullData" :mutual="mutual" v-else/>
 
       <h4
           class="text-center"
-          v-if="friendsStore.foundMutual && !friendsStore.foundMutual.length"
-      >Общих друзей нет :(</h4>
+          v-if="fullData && !fullData.length && !fullPopup.pending && !fullPopup.morePending"
+      >
+        {{ props.mode === 'friends' ? 'Друзей нет :(' : 'Общих друзей нет :('}}
+      </h4>
     </div>
 
     <v-btn
         color="green"
         class="text-none w-100"
         variant="text"
-        @click="handleUpgradeList"
-        v-if="loadMoreFlag && !localMorePending"
+        @click="uploadData('load-more')"
+        v-if="loadMoreFlag && !fullPopup.pending && !fullPopup.morePending"
     >
       Еще
     </v-btn>
 
-    <pagination-dot-loader v-if="localMorePending"/>
+    <pagination-dot-loader v-if="fullPopup.morePending"/>
   </div>
 </template>
 
