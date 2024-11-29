@@ -23,7 +23,7 @@ onClickOutside(refAvatarMenu, e => clickOutside())
 </script>
 
 <template>
-  <div class="avatar-menu" ref="refAvatarMenu">
+  <div class="avatar-menu avatar-menu__exact-btn" ref="refAvatarMenu">
 
     <div class="avatar-block" @click="isMenuVisible = !isMenuVisible">
       <v-avatar class="avatar">
