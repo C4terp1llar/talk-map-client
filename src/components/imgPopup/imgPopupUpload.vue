@@ -139,7 +139,7 @@ const handleSubmitUpload = async () => {
         Готово
       </v-btn>
       <v-btn
-          class="text-none w-100 mt-1"
+          class="close-upload-modal__btn text-none w-100 mt-1"
           variant="plain"
           color="green"
           @click="imagePopupStore.closePopup"

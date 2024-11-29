@@ -63,7 +63,7 @@ const handleRefreshWallpaper = async () => {
         <v-btn
             @click="handleChangeWallpaper"
             variant="text"
-            class="text-none w-100 justify-content-start"
+            class="change-wallpaper-menu__exact-change text-none w-100 justify-content-start"
             prepend-icon="mdi-pencil-outline"
         >
           Изменить

@@ -10,7 +10,7 @@ const imagePopupStore = useImagePopupStore();
   <div class="modal-img-upload-wrapper" v-if="imagePopupStore.isPopupVisible">
 
 
-      <img-popup-upload v-if="imagePopupStore.actionType === 'upload'"/>
+      <img-popup-upload class="modal-img-upload-wrapper__upload" v-if="imagePopupStore.actionType === 'upload'"/>
 
       <img-popup-cropper v-if="imagePopupStore.actionType === 'crop' && imagePopupStore.cropImageData.length"/>
 

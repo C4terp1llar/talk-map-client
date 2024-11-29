@@ -39,6 +39,7 @@ const handleSubmit = async () => {
       <div class="field">
         <label class="inp-default-label">Email:</label>
         <v-text-field
+            id="login__email"
             v-model="email"
             :rules="[rules.required,rules.fieldSymbols(email), rules.email]"
             class="w-100"
@@ -53,6 +54,7 @@ const handleSubmit = async () => {
       <div class="field">
         <label class="inp-default-label">Пароль:</label>
         <v-text-field
+            id="login__password"
             v-model="password"
             :rules="[rules.fieldSymbols(password), rules.required]"
             variant="outlined"
@@ -65,6 +67,7 @@ const handleSubmit = async () => {
       </div>
 
       <v-btn
+          id="login__enter-btn"
           type="submit"
           class="align-self-center text-none w-100"
           variant="outlined"
@@ -92,6 +95,7 @@ const handleSubmit = async () => {
       </div>
 
       <v-btn
+          id="reg__redirect-btn"
           class="text-none w-100"
           @click="router.push('/registration')"
           variant="outlined"
