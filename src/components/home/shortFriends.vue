@@ -85,8 +85,7 @@ const show = computed(() => props.mode === 'internal' ? !userStore.findUserPendi
       <friends-mutual-item v-for="friend in shortFiends" :mutual="friend" :is-short="true"/>
     </div>
     <div class="d-flex flex-column align-items-center __no-friends" v-else>
-      <h6 class="text-center">
-        {{ props.mode === 'internal' ? 'Друзей пока нет 🥺' : 'У пользователя пока нет друзей 🥺' }}</h6>
+      <h6 class="text-center">Друзей пока нет 😢</h6>
       <v-btn class="text-none" v-if="props.mode === 'internal'"
              @click="router.push({ name: 'friends', query: { tab: 'search' } })">Найти
       </v-btn>
@@ -119,15 +118,17 @@ const show = computed(() => props.mode === 'internal' ? !userStore.findUserPendi
 
 .short-friends__wrapper {
   height: fit-content;
-  width: fit-content;
+  width: 100%;
   box-shadow: 0 1px 10px currentColor;
   border-radius: 15px;
   padding: 10px;
   background: rgb(var(--v-theme-background));
 
-  @media screen and (max-width: 450px) {
+  @media screen and (max-width: 1370px){
     width: 100%;
   }
+
+
 
   .short-friends__items {
     display: flex;

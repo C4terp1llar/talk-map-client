@@ -57,7 +57,7 @@ const shortMutual = computed((): ShortMutualUserFriend[] | void => {
       <friends-mutual-item v-for="friend in shortMutual" :mutual="friend" :is-short="true"/>
     </div>
     <div class="d-flex flex-column align-items-center __no-friends" v-if="!shortMutual || !shortMutual.length">
-      <h6 class="text-center">Нет общих друзей</h6>
+      <h6 class="text-center">Общих друзей нет 🧑‍🤝‍🧑</h6>
     </div>
 
     <button class="load-more-btn__link m-auto" v-if="friendStore.foundMutual && friendStore.foundMutual.length > 3" @click="showFullMutual = true">
@@ -79,15 +79,17 @@ const shortMutual = computed((): ShortMutualUserFriend[] | void => {
 
 .external-mutual-friends__wrapper {
   height:  fit-content;
-  width: fit-content;
+  width: 100%;
   box-shadow: 0 1px 10px currentColor;
   border-radius: 15px;
   padding: 10px;
   background: rgb(var(--v-theme-background));
 
-  @media screen and (max-width: 450px) {
+  @media screen and (max-width: 1370px){
     width: 100%;
   }
+
+
 
   .external-mutual-friends__items {
     display: flex;

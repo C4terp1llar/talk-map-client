@@ -15,7 +15,7 @@ const props = defineProps<Props>()
       <skeleton-loader/>
     </div>
     <div class="mutual-friends-popup__list_item__nickname position-relative">
-      <span>nickname</span>
+      <span>nicknam</span>
       <skeleton-loader/>
     </div>
   </div>
@@ -31,6 +31,11 @@ const props = defineProps<Props>()
   padding: 10px;
   color: rgb(var(--v-theme-background));
 
+  .mutual-friends-popup__list_item__nickname{
+    @media screen and (max-width: 1050px) {
+      font-size: 12px;
+    }
+  }
 
   .mutual-friends-popup__list_item__avatar {
     position: relative;
@@ -40,17 +45,22 @@ const props = defineProps<Props>()
     border-radius: 50%;
 
     &.__short{
-      min-width: 75px !important;
-      min-height: 75px !important;
-      @media screen and (max-width: 768px) {
-        min-width: 60px;
-        min-height: 60px;
+      min-width: 70px !important;
+      min-height: 70px !important;
+      @media screen and (max-width: 1050px) {
+        min-width: 55px !important;
+        min-height: 55px !important;
       }
     }
 
-    @media screen and (max-width: 768px) {
-      min-width: 80px;
-      min-height: 80px;
+    @media screen and (max-width: 1050px) {
+      min-width: 65px;
+      min-height: 65px;
+    }
+
+    @media screen and (max-width: 900px) {
+      min-width: 50px;
+      min-height: 50px;
     }
   }
 }

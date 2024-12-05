@@ -55,9 +55,10 @@ const props = defineProps<Props>()
     min-width: 100px;
     max-width: 100px;
 
-    @media screen and (max-width: 768px) {
-      min-width: 80px;
-      min-height: 80px;
+    @media screen and (max-width: 1050px) {
+      min-width: 82px !important;
+      max-width: 82px !important;
+      gap: 2px !important;
     }
 
     .nickname-txt{
@@ -72,6 +73,15 @@ const props = defineProps<Props>()
       max-width: 100%;
       word-break: break-word;
       overflow-wrap: break-word;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      line-height: 1.2em;
+
+      @media screen and (max-width: 1050px) {
+        font-size: 13px;
+      }
     }
   }
 
@@ -83,7 +93,7 @@ const props = defineProps<Props>()
       min-width: 100px;
       min-height: 100px;
 
-      @media screen and (max-width: 768px) {
+      @media screen and (max-width: 1050px) {
         min-width: 80px;
         min-height: 80px;
       }
@@ -92,7 +102,7 @@ const props = defineProps<Props>()
         min-width: 75px;
         min-height: 75px;
 
-        @media screen and (max-width: 768px) {
+        @media screen and (max-width: 1050px) {
           min-width: 60px;
           min-height: 60px;
         }

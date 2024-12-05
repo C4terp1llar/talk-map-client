@@ -33,14 +33,14 @@ const props = defineProps<Props>()
 
 .short-friends__wrapper {
   overflow: hidden;
-  width: fit-content;
+  width: 100%;
   box-shadow: 0 1px 10px currentColor;
   border-radius: 15px;
   padding: 10px;
   background: rgb(var(--v-theme-background));
   position: relative;
 
-  @media screen and (max-width: 450px) {
+  @media screen and (max-width: 1370px){
     width: 100%;
   }
 

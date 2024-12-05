@@ -11,6 +11,7 @@ import {useUserStore} from "@/stores/user";
 import ExternalMutualFriends from "@/components/externalFriends/externalMutualFriends.vue";
 import {useFriendsStore} from "@/stores/friends";
 import ShortFriends from "@/components/home/shortFriends.vue";
+import ShortUserRelations from "@/components/externalFriends/shortUserRelations.vue";
 
 const route = useRoute()
 const router = useRouter()
@@ -85,9 +86,11 @@ const getExternalUserInfo = async (userId: string) => {
 
     <external-tags />
 
-    <div class="friends-user__content">
-      <short-friends mode="external" />
-      <external-mutual-friends />
+    <div class="friends-user__relations-section">
+      <div class="smth">
+        тут мб шорт фото, оно по высоте фит контент будет и ниже посты
+      </div>
+      <short-user-relations/>
     </div>
   </div>
 
@@ -104,11 +107,30 @@ const getExternalUserInfo = async (userId: string) => {
   flex-direction: column;
   gap: 15px;
 
-  .friends-user__content {
+  .friends-user__relations-section{
     width: 100%;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: auto;
+    grid-auto-flow: dense;
     gap: 15px;
+
+    .smth{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 10px currentColor;
+      border-radius: 15px;
+      padding: 10px;
+      background: rgb(var(--v-theme-background));
+      text-align: center;
+
+      grid-column: span 7;
+
+      @media screen and (max-width: 1370px){
+        grid-column: span 10;
+      }
+    }
   }
 }
 
