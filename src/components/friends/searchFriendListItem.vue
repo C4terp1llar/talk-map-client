@@ -45,7 +45,7 @@ const getReq= () => {
 <template>
   <div class="search-friend-list-item">
 
-    <div class="search-friend-list-item__info-status" v-if="!userStore.findUserPending && !userStore.loadMoreUsersFlag">
+    <div class="search-friend-list-item__info-status">
       <friends-reqs-actions :mode="getReqMode(props.user)" data_mode="user" :req="getReq()"/>
     </div>
 

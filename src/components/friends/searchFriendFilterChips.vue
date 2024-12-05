@@ -8,14 +8,29 @@ const filterStore = useFindFriendFilterStore();
 const userStore = useUserStore();
 
 const disableChips = computed(() => userStore.findUserPending || userStore.loadMoreUsersFlag)
+
+const clearAgeSort = () => {
+  filterStore.sortStr = filterStore.sortStr.replace(/age_(asc|desc)/, '').trim();
+};
 </script>
 
 <template>
   <div class="search-filter-chips-wrapper"
-       v-if="filterStore.cityFilter || (filterStore.minAgeFilter != 14 || filterStore.maxAgeFilter != 100) || (filterStore.genderFilter && filterStore.genderFilter !== 'any')"
+       v-if="filterStore.sortStr || filterStore.cityFilter || (filterStore.minAgeFilter != 14 || filterStore.maxAgeFilter != 100) || (filterStore.genderFilter && filterStore.genderFilter !== 'any')"
   >
     <scrollable-container mode="filter">
       <div class="search-filter-chips-wrapper__content">
+
+        <v-fade-transition>
+          <div class="chip __city" v-if="filterStore.sortStr.includes('age_')">
+            <v-icon :size="20">mdi-sort-alphabetical-variant</v-icon>
+            <span class="ml-2">{{ filterStore.sortStr.includes('age_asc') ? 'Сначала моложе' : 'Сначала старше'}}</span>
+            <button class="delete-btn" @click="clearAgeSort" :disabled="disableChips">
+              <v-icon size="small" color="red">mdi-trash-can-outline</v-icon>
+            </button>
+          </div>
+        </v-fade-transition>
+
         <v-fade-transition>
           <div class="chip __city" v-if="filterStore.cityFilter">
             <span>Город: {{ filterStore.cityFilter }}</span>

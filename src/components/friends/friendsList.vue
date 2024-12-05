@@ -22,7 +22,8 @@ onMounted( async () => {
     minAgeFilter: 14,
     maxAgeFilter: 100,
     genderFilter: "any",
-    nicknameFilter: null
+    nicknameFilter: null,
+    sortStr: ''
   }, 'load')
 
   if (userStore.findUserError) {

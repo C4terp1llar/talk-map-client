@@ -30,7 +30,8 @@ const handleSubmit = async () => {
     minAgeFilter: filterStore.minAgeFilter,
     maxAgeFilter: filterStore.maxAgeFilter,
     genderFilter: filterStore.genderFilter,
-    nicknameFilter: filterStore.nickFilter
+    nicknameFilter: filterStore.nickFilter,
+    sortStr: filterStore.sortStr
   }, 'load')
 
   if (userStore.findUserError) {

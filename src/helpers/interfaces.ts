@@ -29,6 +29,7 @@ export interface ShortAddress {
 
 export interface SearchFriendFilter {
     globalSearch: boolean,
+    sortStr: string,
     cityFilter: string | null,
     minAgeFilter: number,
     maxAgeFilter: number,

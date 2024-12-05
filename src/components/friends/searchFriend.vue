@@ -4,7 +4,7 @@ import SearchFriendBar from "@/components/friends/searchFriendBar.vue";
 import {vAutoAnimate} from '@formkit/auto-animate/vue'
 import SearchFriendList from "@/components/friends/searchFriendList.vue";
 import {useUserStore} from "@/stores/user";
-import {onUnmounted} from "vue";
+import {onMounted, onUnmounted} from "vue";
 import {useFindFriendFilterStore} from "@/stores/findFriendFilter";
 import SearchFriendSubBar from "@/components/friends/searchFriendSubBar.vue";
 
@@ -16,6 +16,8 @@ onUnmounted(() => {
   userStore.currentPage = 1;
   filterStore.clearAll();
 })
+
+
 </script>
 
 <template>

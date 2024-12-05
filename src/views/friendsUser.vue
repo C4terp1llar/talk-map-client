@@ -53,7 +53,8 @@ const getExternalUserInfo = async (userId: string) => {
       minAgeFilter: 14,
       maxAgeFilter: 100,
       genderFilter: "any",
-      nicknameFilter: null
+      nicknameFilter: null,
+      sortStr: ''
     }, 'load', 3, userId)
   ])
 

@@ -35,7 +35,8 @@ const handleUpgradeList = async () => {
     minAgeFilter: filterStore.minAgeFilter,
     maxAgeFilter: filterStore.maxAgeFilter,
     genderFilter: filterStore.genderFilter,
-    nicknameFilter: filterStore.nickFilter
+    nicknameFilter: filterStore.nickFilter,
+    sortStr: filterStore.sortStr
   }, 'load-more')
 
   if (userStore.findUserError) {
