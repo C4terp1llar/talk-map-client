@@ -2,8 +2,12 @@ import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
 import type {ExternalUserInfoAddress, ExternalUserInfoMain} from "@/helpers/interfaces";
+import {useUserStore} from "@/stores/user";
+
 
 export const useExternalUserStore = defineStore('externalUser', () => {
+    const userStore = useUserStore();
+
     const pending = ref<boolean>(false);
     const error = ref<string | null>(null);
 
@@ -115,6 +119,10 @@ export const useExternalUserStore = defineStore('externalUser', () => {
             await apiAuth.post('user/declineFriendRequest', {
                 sender_id: sender
             });
+
+            if (userStore.rsAmount){
+                userStore.rsAmount -= 1;
+            }
         } catch (e: any) {
             friendReqError.value = "Произошла ошибка при отклонении заявки, попробуйте позже";
             console.error(e);
@@ -131,6 +139,10 @@ export const useExternalUserStore = defineStore('externalUser', () => {
             await apiAuth.post('user/submitFriendRequest', {
                 sender_id: sender
             });
+
+            if (userStore.rsAmount){
+                userStore.rsAmount -= 1;
+            }
         } catch (e: any) {
             friendReqError.value = "Произошла ошибка при подтверждении заявки, попробуйте позже";
             console.error(e);
@@ -155,6 +167,19 @@ export const useExternalUserStore = defineStore('externalUser', () => {
         }
     }
 
+    const getReqsAmount = async () => {
+        try {
+            const response = await apiAuth.get('user/friendsReqsAmount')
+
+            if (response.status === 200 && response.data){
+                userStore.rsAmount = response.data.amount
+            }
+        } catch (e: any) {
+            friendReqError.value = "Произошла ошибка при получении количества заявок в друзья, попробуйте позже";
+            console.error(e);
+        }
+    }
+
     return {
         pending,
         error,
@@ -173,6 +198,7 @@ export const useExternalUserStore = defineStore('externalUser', () => {
         cancelFriendRequest,
         declineFriendRequest,
         submitFriendRequest,
-        deleteFriendship
+        deleteFriendship,
+        getReqsAmount
     }
 })

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {useRoute} from 'vue-router';
 import {computed} from 'vue';
+import ShortCounter from "@/components/common/shortCounter.vue";
 
 const route = useRoute();
 
@@ -28,6 +29,7 @@ const isActive = (path: string) => computed(() => route.path.includes(`/app/${pa
         <RouterLink :to="{name: 'friends',  query: { tab: 'friends' }}"/>
         <v-icon>mdi-account-multiple-outline</v-icon>
         <span>Друзья</span>
+        <short-counter mode="friends"/>
       </li>
 
       <li :class="{ active: isActive('photos').value }">

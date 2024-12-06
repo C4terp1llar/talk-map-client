@@ -11,6 +11,8 @@ export const useUserStore = defineStore('user', () => {
     const mainUserInfo = ref< MainUserInfo | null>(null)
     const userAddressInfo = ref< Address | null>(null)
 
+    const rsAmount = ref<number | null>(null);
+
     const getMainUserInfo = async () => {
         pending.value = true;
         error.value = null;
@@ -21,9 +23,10 @@ export const useUserStore = defineStore('user', () => {
         try {
             const response = await apiAuth.get('user/getUserMainInfo');
 
-            if (response && response.data.main && response.data.address){
+            if (response.status === 200 && response.data) {
                 mainUserInfo.value = response.data.main;
                 userAddressInfo.value = response.data.address;
+                rsAmount.value = response.data.rsAmount;
             }
         } catch (e: any) {
             error.value = "Произошла ошибка при получении информации о пользователе, попробуйте позже";
@@ -325,6 +328,7 @@ export const useUserStore = defineStore('user', () => {
         getMainUserInfo,
         mainUserInfo,
         userAddressInfo,
+        rsAmount,
 
         wallpaperPending,
         wallpaperError,

@@ -5,15 +5,21 @@ import type {FriendRequest} from "@/helpers/interfaces";
 import {ref} from "vue";
 import {useUserStore} from "@/stores/user";
 import {useRoute} from "vue-router";
+import {useSoundsStore} from "@/stores/sounds";
+import {useNotificationStore} from "@/stores/notifications";
 
 export const useWsAddStore = defineStore('wsAdd', () => {
 
     const externalStore = useExternalUserStore()
     const friendStore = useFriendsStore()
     const userStore = useUserStore();
-    const route = useRoute()
+    const soundStore = useSoundsStore();
+    const notificationStore = useNotificationStore();
 
-    const receiveFriendReq = (req: FriendRequest) => {
+    const route = useRoute();
+
+
+    const receiveFriendReq = async (req: FriendRequest) => {
         console.log('заявка в друзья от ', req.sender_id);
 
         if (friendStore.viewMode === 'incoming' && friendStore.foundRequests){
@@ -28,11 +34,17 @@ export const useWsAddStore = defineStore('wsAdd', () => {
             }
         }
 
+        soundStore.addSound({soundType: 'default', soundCaller: 'receiveFriendReq'})
+
+        notifyWithoutPreload('receive', req);
+
+        await externalStore.getReqsAmount();
+
         if (externalStore.main?._id !== req.sender_id) return;
         externalStore.isIncoming = true;
     }
 
-    const abortFriendReq = (req: FriendRequest) => {
+    const abortFriendReq = async (req: FriendRequest) => {
         console.log('отмена заявки от ', req.sender_id);
 
         if (friendStore.viewMode === 'incoming' && friendStore.foundRequests){
@@ -47,11 +59,17 @@ export const useWsAddStore = defineStore('wsAdd', () => {
             }
         }
 
+        soundStore.addSound({soundType: 'default', soundCaller: 'abortFriendReq'})
+
+        notifyWithoutPreload('abort', req)
+
+        await externalStore.getReqsAmount();
+
         if (externalStore.main?._id !== req.sender_id) return;
         externalStore.isIncoming = false;
     }
 
-    const declineFriendReq = (req: FriendRequest) => {
+    const declineFriendReq = async (req: FriendRequest) => {
         console.log('отклонение заявки от ', req.recipient_id);
 
         if (friendStore.viewMode === 'outgoing' && friendStore.foundRequests){
@@ -65,6 +83,10 @@ export const useWsAddStore = defineStore('wsAdd', () => {
                 foundUser.isOutgoing = false;
             }
         }
+
+        soundStore.addSound({soundType: 'default', soundCaller: 'declineFriendReq'})
+
+        await notifyWithPreload('decline', '', {recipient_id: req.recipient_id, sender_id: req.sender_id})
 
         if (externalStore.main?._id !== req.recipient_id) return;
         externalStore.isOutgoing = false;
@@ -95,6 +117,9 @@ export const useWsAddStore = defineStore('wsAdd', () => {
             userStore.foundUsers.unshift(...await friendStore.getOneUser(target, false))
         }
 
+        soundStore.addSound({soundType: 'default', soundCaller: 'submitFriendReq'})
+
+        await notifyWithPreload('submit', '', {recipient_id: req.recipient_id, sender_id: req.sender_id})
 
         if (externalStore.main?._id !== req.recipient_id) return;
         externalStore.isOutgoing = false;
@@ -102,7 +127,7 @@ export const useWsAddStore = defineStore('wsAdd', () => {
         externalStore.isFriendship = true;
     }
 
-    const deleteFriendship = (id: string) => {
+    const deleteFriendship = async (id: string) => {
         console.log('удаление из друзей от ', id);
 
         if (userStore.foundUsers && userStore.wasGlobalFlag === false){
@@ -121,10 +146,54 @@ export const useWsAddStore = defineStore('wsAdd', () => {
             }
         }
 
+        soundStore.addSound({soundType: 'default', soundCaller: 'deleteFriendship'})
+
+        await notifyWithPreload('delete', id)
+
         if (externalStore.main?._id !== id) return;
         externalStore.isOutgoing = false;
         externalStore.isIncoming = false;
         externalStore.isFriendship = false;
+    }
+
+    const notifyWithPreload = async (type: 'submit' | 'decline' | 'delete', uid: string, req?: {recipient_id: string, sender_id: string}) => {
+        if (userStore.mainUserInfo && (req || uid)){
+
+            let target = uid;
+
+            if (req){
+                target = req.sender_id === userStore.mainUserInfo._id ? req.recipient_id : req.sender_id;
+            }
+
+            const user = await friendStore.getOneUser(target, false);
+
+            notificationStore.addFrNotification({
+                id: Date.now() + Math.random(),
+                type: type,
+                message: type,
+                timeout: 15000,
+                detail: {
+                    ...user[0]
+                }
+            })
+        }
+    }
+
+    const notifyWithoutPreload = (type: 'receive' | 'abort', req: FriendRequest) => {
+        notificationStore.addFrNotification({
+            id: Date.now() + Math.random(),
+            type: type,
+            message: type,
+            timeout: 15000,
+            detail: {
+                _id: req.sender_id,
+                nickname: req.userInfo.nickname,
+                nickname_color: req.userInfo.nickname_color,
+                avatar: {
+                    asset_url: req.avatar.asset_url
+                },
+            }
+        })
     }
 
     return {

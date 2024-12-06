@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useNotificationStore } from "@/stores/notifications";
-
+import FriendsMutualItem from "@/components/friends/friendsMutualItem.vue";
 
 const store = useNotificationStore();
 
@@ -14,10 +14,26 @@ const notificationMap = new Map([
 const getIcon = (type: string) => {
   return notificationMap.get(type)
 };
+
+const frMap = new Map([
+  ['receive', 'Решил(а) добавить вас в друзья. Примем вызов? 💡'],
+  ['abort', 'Отменил(а) свою заявку в друзья. Что-то пошло не так... 🤔'],
+  ['decline', 'Отклонил(а) вашу заявку в друзья. Возможно, в другой раз? 😟'],
+  ['submit', 'Принял(а) вашу заявку в друзья. Время праздновать! 🎉'],
+  ['delete', 'Удалил(а) вас из друзей. Вспомним лучшие времена... 💔']
+]);
+
+const getFrLink = (type: string) => {
+  if (type === 'submit' || type === 'delete') return 'friends'
+  return 'incoming'
+}
 </script>
 
 <template>
-  <div v-if="store.notifications.length" class="notification-container">
+
+  <div v-if="store.notifications.length || store.notificationsFr.length" class="notification-container">
+    <!-- обычные   -->
+
     <div
         v-for="notification in store.notifications"
         :key="notification.id"
@@ -32,10 +48,48 @@ const getIcon = (type: string) => {
           @click="store.removeNotification(notification.id)"
       />
     </div>
+
+    <!-- друзья   -->
+    <div
+        v-for="n in store.notificationsFr"
+        :key="n.id"
+        class="notification __fr-ntf"
+        @click="store.removeNotification(n.id, 'Fr')"
+    >
+
+      <friends-mutual-item class="notification__avatar" :mutual="n.detail" :is-short="true" :is-without-nick="true"/>
+
+      <div class="notification-details">
+        <div class="notification-details__nick">
+          <router-link
+              :style="{color: n.detail.nickname_color ? n.detail.nickname_color : 'currentColor'}"
+              class="notification__nick"
+              :to="{ name: 'friends-user', params: { id: n.detail._id } }"
+          >{{ n.detail.nickname }}
+          </router-link>
+        </div>
+
+        <div class="notification-details__message">
+          {{ frMap.get(n.type)}}
+          <router-link class="hide__link" :to="{ name: 'friends', query: { tab: getFrLink(n.type) } }"/>
+        </div>
+      </div>
+
+      <router-link class="hide__link" :to="{ name: 'friends', query: { tab: getFrLink(n.type) } }"/>
+
+      <v-btn
+          class="ml-auto notification__btn"
+          variant="plain"
+          icon="mdi-close"
+          @click="store.removeNotification(n.id, 'Fr')"
+      />
+    </div>
   </div>
+
 </template>
 
 <style scoped>
+
 .notification-container {
   position: fixed;
   bottom: 0;
@@ -47,8 +101,46 @@ const getIcon = (type: string) => {
     bottom: unset;
     top: 0;
     width: 100%;
+    max-width: unset;
   }
 }
+
+.__fr-ntf{
+  padding: 0 !important;
+  position: relative;
+
+  .notification__avatar{
+    z-index: 10006;
+  }
+
+  .notification-details{
+    display: flex;
+    flex-direction: column;
+
+    .notification-details__nick{
+      width: fit-content;
+      z-index: 10006;
+      font-weight: 600;
+    }
+
+    .notification-details__message{
+      position: relative;
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 650px) {
+    padding: 5px !important;
+  }
+}
+
+.hide__link{
+  position: absolute;
+  inset: 0;
+}
+
+
+
 
 .icon-type {
   outline: 2px solid currentColor;
@@ -68,6 +160,17 @@ const getIcon = (type: string) => {
   display: flex;
   gap: 5px;
   align-items: center;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeIn 0.3s ease forwards;
+}
+
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .notification.success {

@@ -2,6 +2,7 @@
 import {useRoute, useRouter} from "vue-router";
 import {computed, ref} from "vue";
 import ScrollableContainer from "@/components/common/scrollableContainer.vue";
+import ShortCounter from "@/components/common/shortCounter.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -35,12 +36,13 @@ const activeTab = computed(() => route.query.tab as Tab | 'friends')
       </v-tab>
 
       <v-tab
-          class="text-none"
+          class="text-none d-flex align-items-center"
           prepend-icon="mdi-arrow-down-bold-outline"
           value="incoming"
           @click="router.push({ path: route.path, query: { tab: 'incoming' } })"
       >
         Входящие
+        <short-counter class="ml-1" mode="friends" :is-friends-tab="true"/>
       </v-tab>
 
       <v-tab

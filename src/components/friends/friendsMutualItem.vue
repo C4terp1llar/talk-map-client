@@ -7,7 +7,8 @@ const router = useRouter();
 
 interface Props {
   mutual: ShortMutualUserFriend,
-  isShort?: boolean
+  isShort?: boolean,
+  isWithoutNick?: boolean
 }
 
 const props = defineProps<Props>()
@@ -30,7 +31,7 @@ const props = defineProps<Props>()
         <router-link :to="{ name: 'friends-user', params: { id: props.mutual._id } }"/>
       </v-avatar>
     </div>
-    <div class="mutual-friends-popup__list_item__nickname">
+    <div class="mutual-friends-popup__list_item__nickname" v-if="!isWithoutNick">
       <router-link
           :style="{color: props.mutual.nickname_color ? props.mutual.nickname_color : 'currentColor'}"
           class="nickname-txt"
