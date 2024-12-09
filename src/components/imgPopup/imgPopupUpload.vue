@@ -100,15 +100,6 @@ const handleSubmitUpload = async () => {
   }
 }
 
-// await setWallpaper(data)
-
-// const setWallpaper = async (data: (string | ArrayBuffer)[]) => {
-//   await userStore.setUserWallpaper(data)
-//
-//   if (userStore.wallpaperError){
-//     notificationStore.addNotification('error', userStore.wallpaperError, 3000)
-//   }
-// }
 </script>
 
 <template>

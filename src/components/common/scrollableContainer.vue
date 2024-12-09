@@ -4,6 +4,7 @@ import { ref, computed, onMounted, onBeforeUnmount, withDefaults } from 'vue';
 interface Props {
   mode: 'tags' | 'filter';
   useResizeObserver?: boolean;
+  useScrollBar?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -47,18 +48,19 @@ onBeforeUnmount(() => {
   }
 });
 
+let scroll = props.useScrollBar ? 220 : 150;
 
 const scrollLeft = () => {
   const container = contentRef.value;
   if (container) {
-    container.scrollBy({ left: -150, behavior: 'smooth' });
+    container.scrollBy({ left: -scroll, behavior: 'smooth' });
   }
 };
 
 const scrollRight = () => {
   const container = contentRef.value;
   if (container) {
-    container.scrollBy({ left: 150, behavior: 'smooth' });
+    container.scrollBy({ left: scroll, behavior: 'smooth' });
   }
 };
 </script>
@@ -69,7 +71,7 @@ const scrollRight = () => {
       <v-icon>mdi-chevron-left</v-icon>
     </button>
 
-    <div class="scrollable-content" ref="contentRef">
+    <div :class="['scrollable-content', props.useScrollBar ? '__scroll-bar' : '']" ref="contentRef">
       <slot></slot>
     </div>
 
@@ -108,6 +110,44 @@ const scrollRight = () => {
 
   -ms-overflow-style: none;
   scrollbar-width: none;
+  &.__scroll-bar{
+    -ms-overflow-style: auto !important;
+    scrollbar-width: auto!important;
+  }
+  &.__scroll-bar::-webkit-scrollbar {
+    width: 8px; /* Ширина скроллбара */
+    margin-right: 5px;
+  }
+
+  &.__scroll-bar::-webkit-scrollbar-thumb {
+    background-color: #c4c4c4;
+    border-radius: 15px;
+  }
+
+  &.__scroll-bar::-webkit-scrollbar-track {
+    margin: 10px;
+    background: #777777;
+    border-radius: 15px;
+  }
+}
+.__scroll-bar{
+  -ms-overflow-style: auto !important;
+  scrollbar-width: auto!important;
+}
+.__scroll-bar::-webkit-scrollbar {
+  width: 8px; /* Ширина скроллбара */
+  margin-right: 5px;
+}
+
+.__scroll-bar::-webkit-scrollbar-thumb {
+  background-color: #c4c4c4;
+  border-radius: 15px;
+}
+
+.__scroll-bar::-webkit-scrollbar-track {
+  margin: 10px;
+  background: #777777;
+  border-radius: 15px;
 }
 
 .scrollable-content::-webkit-scrollbar {

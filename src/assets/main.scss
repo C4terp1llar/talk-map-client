@@ -145,6 +145,12 @@ body{
   }
 }
 
+.btn__control-upper{
+  z-index: 5;
+}
+.btn__control-lower{
+  z-index: 1;
+}
 
 
 .styled-scroll::-webkit-scrollbar {
