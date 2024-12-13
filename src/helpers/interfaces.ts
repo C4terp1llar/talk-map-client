@@ -118,6 +118,18 @@ export interface FriendRequest {
     }
 }
 
+export interface Photo {
+    _id: string,
+    user_id: string,
+    media_id: string,
+    url: string,
+    media: {
+        client_filename: string,
+        client_file_type: string,
+        client_file_size: Number,
+        createdAt: Date
+    }
+}
 
 
 

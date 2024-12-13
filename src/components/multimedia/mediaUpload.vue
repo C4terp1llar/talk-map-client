@@ -5,9 +5,21 @@ import {useNotificationStore} from "@/stores/notifications";
 import MultimediaControlList from "@/components/multimedia/multimediaControlList.vue";
 import {useMultimediaStore} from "@/stores/multimedia";
 import MultimediaItem from "@/components/multimedia/multimediaItem.vue";
+import CircularLoader from "@/components/common/circularLoader.vue";
+import {usePhotoStore} from "@/stores/photo";
+
+interface Props {
+  sender: 'photo' | 'post' | 'message'
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits(['slPhoto'])
 
 const notificationStore = useNotificationStore();
 const multimediaStore = useMultimediaStore();
+
+const photoStore = usePhotoStore();
 
 const files = ref<{ id: string, file: File, previewUrl?: string, type: string }[]>([]);
 
@@ -23,6 +35,16 @@ const handleFileUpload = (event: DragEvent | Event) => {
   }
 
   if (filesList && filesList.length > 0) {
+
+    if (props.sender === 'photo') {
+      for (const file of Array.from(filesList)) {
+        if (!file.type.startsWith('image/')) {
+          notificationStore.addNotification('warning', 'Вы можете загрузить только изображения', 3000);
+          return;
+        }
+      }
+    }
+
     const availableSlots = 16 - files.value.length < 0 || 16 - (files.value.length + filesList.length) < 0;
     if (availableSlots) {
       notificationStore.addNotification('warning', 'Вы можете загрузить не более 16 файлов!', 3000)
@@ -31,7 +53,6 @@ const handleFileUpload = (event: DragEvent | Event) => {
 
     Array.from(filesList).forEach(file => {
       const isDuplicate = files.value.some(existingFile => existingFile.file.name === file.name);
-
       if (!isDuplicate) {
         const fileType = file.type.split('/')[0];
         const uniqueId = `${file.name}-${Date.now()}-${Math.random()}`;
@@ -71,8 +92,23 @@ const uploadFiles = async () => {
     formData.append(fileEntry.file.name, fileEntry.file);
   });
 
-  // аплоад на s3
-  await multimediaStore.upload(formData);
+  if (props.sender === 'photo') {
+    emit('slPhoto', [formData, [{key: 'sender', value: props.sender}]])
+    files.value = [];
+    isMenuVisible.value = false
+    selectedList.value = []
+    return;
+  }
+
+  // await multimediaStore.upload(formData, [{key: 'sender', value: props.sender}]);
+  //
+  // if (!multimediaStore.error){
+  //   files.value = [];
+  //   isMenuVisible.value = false
+  //   selectedList.value = []
+  // }else{
+  //   notificationStore.addNotification('error', multimediaStore.error, 3000)
+  // }
 };
 
 const isMenuVisible = ref<boolean>(false);
@@ -98,7 +134,7 @@ const deleteFile = (id: string) => {
   <div class="modal-block" @dragover.prevent @drop="handleFileUpload">
 
     <div class="file-drop-area" @click="openFileDialog">
-      <input ref="fileInput" type="file" @change="handleFileUpload" multiple class="file-input"/>
+      <input :accept="props.sender === 'photo' ? 'image/*' : ''"  ref="fileInput" type="file" @change="handleFileUpload" :disabled="multimediaStore.pending || photoStore.pending" multiple class="file-input"/>
       <span class="file-drop-text">Перетащите файлы сюда или нажмите, чтобы выбрать</span>
     </div>
 
@@ -109,9 +145,9 @@ const deleteFile = (id: string) => {
     </scrollable-container>
 
     <div class="controls" v-if="files.length">
-      <hr />
-      <div v-if="!isMenuVisible" class="d-flex align-items-center justify-content-between position-relative">
-        <span>{{ `Добавлено ${files.length} из 16` }}</span>
+      <hr>
+      <div v-if="!isMenuVisible" class="head-controls d-flex align-items-center justify-content-between position-relative">
+        <span>{{ `Добавлено ${files.length}` }}</span>
         <v-icon color="green">mdi-chevron-down</v-icon>
         <button @click="isMenuVisible = true" class="btn__control-lower position-absolute top-0 right-0 left-0 bottom-0"></button>
       </div>
@@ -119,7 +155,7 @@ const deleteFile = (id: string) => {
       <div v-else class="d-flex align-items-center justify-content-between position-relative flex-wrap collapsed-control__menu">
         <span>{{ `Выбрано ${selectedList.length} из ${files.length}` }}</span>
         <div class="d-flex align-items-center flex-wrap collapsed-control__menu-sub">
-          <v-btn icon size="medium" v-if="selectedList.length" color="red" variant="text" class="text-none btn__control-upper" @click="filterAll">
+          <v-btn :disabled="multimediaStore.pending" icon size="medium" v-if="selectedList.length" color="red" variant="text" class="text-none btn__control-upper" @click="filterAll">
             <v-icon color="red">mdi-delete-variant</v-icon>
           </v-btn>
           <v-checkbox-btn class="btn__control-upper" @click="selectAll" :model-value="selectedList.length === files.length" />
@@ -137,18 +173,30 @@ const deleteFile = (id: string) => {
     </div>
 
     <div class="actions">
-      <v-btn @click="uploadFiles" class="text-none w-100">
-        Загрузить файлы
+      <v-btn variant="outlined" @click="uploadFiles" :disabled="multimediaStore.pending || photoStore.pending" class="text-none w-100">
+        <template v-if="!multimediaStore.pending && !photoStore.pending">
+          Готово
+        </template>
+        <template v-else>
+          <circular-loader :size="20"/>
+        </template>
       </v-btn>
-    </div>
-
-    <div v-if="multimediaStore.pending">
-      {{multimediaStore.progress}}
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+.head-controls{
+  height: 40px;
+}
+
+.file-drop-text{
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+  transition: color 0.3s;
+}
+
 .modal-block {
   box-shadow: 0 1px 10px currentColor;
   background: rgb(var(--v-theme-background));

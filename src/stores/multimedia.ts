@@ -7,10 +7,16 @@ export const useMultimediaStore = defineStore('multimedia', () => {
     const error = ref<string | null>(null);
     const progress = ref<number>(0);
 
-    const upload = async (formData: FormData) => {
+    const isMenuOpen = ref<boolean>(false);
+
+    const upload = async (formData: FormData, info: {key: string, value: any}[]) => {
         pending.value = true;
         error.value = null;
         progress.value = 0;
+
+        info.forEach(entry => {
+            formData.append(entry.key, entry.value);
+        });
 
         try {
             const response = await apiAuth.post("user/uploadMedia", formData, {
@@ -42,6 +48,7 @@ export const useMultimediaStore = defineStore('multimedia', () => {
         pending,
         error,
         progress,
+        isMenuOpen,
         upload,
     };
 });

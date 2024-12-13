@@ -41,7 +41,7 @@ const emit = defineEmits(['handle-delete'])
   <div v-for="fileEntry in props.files" :key="fileEntry.id" class="file-preview">
 
     <div class="file-preview__img" v-if="fileEntry.type === 'image'" >
-      <img :src="fileEntry.previewUrl" alt="Превью изображения" class="image-preview" />
+      <v-img :src="fileEntry.previewUrl" alt="Превью изображения" class="image-preview" cover/>
       <span class="file__name">{{ fileEntry.file.name }}</span>
     </div>
 
