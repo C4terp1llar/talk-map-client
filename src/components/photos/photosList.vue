@@ -44,11 +44,11 @@ const uploadData = async (mode: 'load' | 'load-more') => {
 </script>
 
 <template>
-  <div class="photos-list__wrapper" v-if="photoStore.photos">
+  <div class="photos-list__wrapper">
     <lazy-placeholder-loader v-if="photoStore.loadPending"/>
 
 
-    <div class="photos-list__content-wrapper" v-if="!photoStore.loadPending && photoStore.photos.length">
+    <div class="photos-list__content-wrapper" v-if="!photoStore.loadPending && photoStore.photos && photoStore.photos.length">
 
       <div class="photos-list__content">
         <photos-list-item :photos="photoStore.photos"/>
@@ -71,7 +71,7 @@ const uploadData = async (mode: 'load' | 'load-more') => {
       <pagination-dot-loader class="mt-1" v-if="photoStore.loaMorePending"/>
     </div>
 
-    <photos-not-found class="align-self-center" v-if="!photoStore.loadPending && !photoStore.photos.length"/>
+    <photos-not-found class="align-self-center" v-if="!photoStore.loadPending && photoStore.photos && !photoStore.photos.length"/>
 
   </div>
 </template>

@@ -4,6 +4,7 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {usePhotoStore} from "@/stores/photo";
 import {useNotificationStore} from "@/stores/notifications";
 import CircularLoader from "@/components/common/circularLoader.vue";
+import {ref} from "vue";
 
 interface Props {
   photos: Photo[]
@@ -14,7 +15,10 @@ const props = defineProps<Props>()
 const photoStore = usePhotoStore()
 const notificationStore = useNotificationStore()
 
+const currentDeletePending = ref<string>('')
+
 const handleDelete = async (id: string) => {
+  currentDeletePending.value = id
   await photoStore.deletePhoto(id);
 
   if (photoStore.deleteError) {
@@ -22,6 +26,7 @@ const handleDelete = async (id: string) => {
   } else {
     await photoStore.getPhotos('load', undefined, undefined, true);
   }
+  currentDeletePending.value = ''
 }
 </script>
 
@@ -34,8 +39,8 @@ const handleDelete = async (id: string) => {
     </v-img>
     <div class="photos-list__content-controls">
       <button @click="handleDelete(p._id)" class="delete-img">
-        <v-icon v-if="!photoStore.deletePending" color="red">mdi-trash-can-outline</v-icon>
-        <circular-loader :size="20" v-if="photoStore.deletePending"/>
+        <v-icon v-if="currentDeletePending !== p._id" color="red">mdi-trash-can-outline</v-icon>
+        <circular-loader :size="20" v-if="currentDeletePending === p._id"/>
       </button>
     </div>
     <button @click="console.log('open')" class="photos-list__content-action"></button>
