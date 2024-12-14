@@ -5,8 +5,14 @@ import Notification from "@/components/common/notification.vue";
 import GlobalLoader from "@/components/globalLoader.vue";
 import {pending} from "@/utils/refreshStore";
 import ImgPopup from "@/components/imgPopup/imgPopup.vue";
+import GlobalMedia from "@/components/common/globalMedia.vue";
+import {useRoute} from "vue-router";
+import {computed} from "vue";
+
+const route = useRoute()
 
 const appThemeStore = useAppThemeStore()
+const isMediaModalVisible = computed(() => route.query.r && route.query.s);
 </script>
 
 <template>
@@ -19,6 +25,8 @@ const appThemeStore = useAppThemeStore()
     <v-dialog-transition>
       <img-popup/>
     </v-dialog-transition>
+
+    <global-media v-if="isMediaModalVisible"/>
   </v-app>
 </template>
 

@@ -10,7 +10,7 @@ const photoStore = usePhotoStore()
 <template>
   <div class="photos-page__wrapper">
     <photos-controls/>
-    <photos-list/>
+    <photos-list mode="internal"/>
   </div>
 </template>
 

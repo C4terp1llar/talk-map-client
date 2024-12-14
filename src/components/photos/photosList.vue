@@ -7,6 +7,12 @@ import {useNotificationStore} from "@/stores/notifications";
 import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
 import PhotosNotFound from "@/components/photos/photosNotFound.vue";
 import PhotosListItem from "@/components/photos/photosListItem.vue";
+import type {Photo} from "@/helpers/interfaces";
+
+interface Props {
+  mode: 'internal' | 'external'
+}
+const props = defineProps<Props>()
 
 const photoStore = usePhotoStore()
 const notificationStore = useNotificationStore()

@@ -44,6 +44,7 @@ export const useMultimediaStore = defineStore('multimedia', () => {
         }
     };
 
+
     return {
         pending,
         error,

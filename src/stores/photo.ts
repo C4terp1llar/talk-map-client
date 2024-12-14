@@ -115,6 +115,33 @@ export const usePhotoStore = defineStore('photo', () => {
         }
     };
 
+    const existPending = ref<boolean>(false);
+    const existError = ref<string | null>(null);
+
+    const isPhotoExists = async (phId: string, uid: string) => {
+        existPending.value = true;
+        existError.value = null;
+
+        try {
+            const response = await apiAuth.get('user/gMedia', {
+                params: {
+                    photoId: phId,
+                    userId: uid
+                }
+            });
+
+            if (response.data && response.status === 200) {
+                console.log(response.data);
+                return response.data.photo
+            }
+        } catch (e: any) {
+            existError.value = "Произошла ошибка при получении фотографии, попробуйте позже";
+            console.error(e);
+        } finally {
+            existPending.value = false;
+        }
+    };
+
     return {
         pending,
         error,
@@ -132,5 +159,9 @@ export const usePhotoStore = defineStore('photo', () => {
         deletePending,
         deleteError,
         deletePhoto,
+
+        existPending,
+        existError,
+        isPhotoExists,
     };
 });
