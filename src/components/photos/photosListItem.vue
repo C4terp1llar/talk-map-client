@@ -36,8 +36,7 @@ const handleDelete = async (id: string) => {
 }
 
 const handleOpenMedia = (id: string) => {
-  router.push({query: {r: id, s: userStore.mainUserInfo?._id}})
-  lockScroll();
+  router.push({query: {r: id, u: userStore.mainUserInfo?._id}})
 }
 </script>
 
@@ -68,8 +67,8 @@ const handleOpenMedia = (id: string) => {
   position: relative;
 
   .photos-list__item-img {
-    width: 250px;
-    height: 250px;
+    width:inherit;
+    height:inherit;
   }
 
   .photos-list__content-controls {

@@ -5,6 +5,9 @@ import './assets/main.scss';
 import './assets/map.scss'
 import './assets/cropper.scss'
 import 'leaflet/dist/leaflet.css'
+import "viewerjs/dist/viewer.css";
+
+import Viewer from "v-viewer";
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -37,4 +40,5 @@ app.use(createPinia())
 app.use(router)
 app.use(vuetify)
 app.use(autoAnimatePlugin)
+app.use(Viewer)
 app.mount('#app')

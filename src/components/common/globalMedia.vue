@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import GlobalMediaContent from "@/components/common/globalMediaContent.vue";
+import {onMounted, onUnmounted} from "vue";
+import {lockScroll, unlockScroll} from "@/helpers/popup";
+
+onMounted(() => lockScroll())
+onUnmounted(() => unlockScroll())
 
 </script>
 

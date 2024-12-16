@@ -191,6 +191,15 @@ body{
 
 
 
+
+
+
+.viewer-prev,.viewer-play,.viewer-large,.viewer-next{
+  display: none !important;
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 input[type="date"]::-webkit-calendar-picker-indicator {
   display: none;
