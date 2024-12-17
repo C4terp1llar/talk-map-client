@@ -9,6 +9,7 @@ const photoStore = usePhotoStore()
 
 <template>
   <div class="photos-page__wrapper">
+    <h5 class="align-self-center ma-0">Ваши фотографии</h5>
     <photos-controls/>
     <photos-list mode="internal"/>
   </div>
@@ -19,6 +20,6 @@ const photoStore = usePhotoStore()
   display: flex;
   flex-direction: column;
   height: 100%;
-  gap: 15px;
+  gap: 10px;
 }
 </style>

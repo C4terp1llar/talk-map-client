@@ -11,7 +11,8 @@ import {useImagePopupStore} from "@/stores/imagePopup";
 import {lockScroll} from "@/helpers/popup";
 
 interface Props {
-  photos: Photo[]
+  photos: Photo[],
+  mode: 'internal' | 'external'
 }
 
 const props = defineProps<Props>()
@@ -47,9 +48,9 @@ const handleOpenMedia = (id: string) => {
         <skeleton-loader/>
       </template>
     </v-img>
-    <div class="photos-list__content-controls">
+    <div class="photos-list__content-controls" v-if="props.mode === 'internal'">
       <button @click="handleDelete(p._id)" class="delete-img">
-        <v-icon v-if="currentDeletePending !== p._id" color="red">mdi-trash-can-outline</v-icon>
+        <v-icon :size="20" v-if="currentDeletePending !== p._id" color="red">mdi-trash-can-outline</v-icon>
         <circular-loader :size="20" v-if="currentDeletePending === p._id"/>
       </button>
     </div>
@@ -66,19 +67,42 @@ const handleOpenMedia = (id: string) => {
   border: 2px solid currentColor;
   position: relative;
 
+  @media (max-width: 1400px) {
+    width: 230px;
+    height: 230px;
+  }
+  @media (max-width: 1270px) {
+    width: 200px;
+    height: 200px;
+  }
+
+  @media (max-width: 650px) {
+    width: 150px;
+    height: 150px;
+  }
+
+  @media (max-width: 400px) {
+    width: 120px;
+    height: 120px;
+  }
+
   .photos-list__item-img {
-    width:inherit;
-    height:inherit;
+    width: inherit;
+    height: inherit;
   }
 
   .photos-list__content-controls {
     z-index: 10;
     position: absolute;
-    padding: 5px 5px;
+    padding: 5px;
     border-radius: 5px;
     background-color: rgba(211, 211, 211, 0.25);
     top: 5px;
     right: 5px;
+
+    @media (max-width: 650px){
+      padding: 2px;
+    }
   }
 
   .photos-list__content-action {

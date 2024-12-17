@@ -27,6 +27,7 @@ export const useExternalUserStore = defineStore('externalUser', () => {
 
             if (response.data && response.status === 200) {
                 existFlag.value = response.data.isExist;
+                return response.data.match
             }
         } catch (e: any) {
             error.value = "Произошла ошибка при получении информации о стороннем пользователе, попробуйте позже";

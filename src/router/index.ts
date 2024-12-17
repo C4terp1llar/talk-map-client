@@ -64,6 +64,11 @@ const router = createRouter({
                     component: () => import('../views/photos.vue')
                 },
                 {
+                    path: '/app/photos/:uid',
+                    name: 'photos-user',
+                    component: () => import('../views/photosUser.vue')
+                },
+                {
                     path: '/app/friends',
                     name: 'friends',
                     component: () => import('../views/friends.vue')

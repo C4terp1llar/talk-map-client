@@ -61,17 +61,32 @@ const handleFileUpload = (event: DragEvent | Event) => {
           id: uniqueId,
           file,
           type: fileType,
+          previewUrl: ''
         };
 
         if (fileType === 'image' || fileType === 'audio' || fileType === 'video') {
           const reader = new FileReader();
+
           reader.onload = () => {
-            fileEntry.previewUrl = reader.result as string;
-            files.value.push(fileEntry);
+            if (fileType === 'image' && props.sender === 'photo') {
+              const img = new Image();
+              img.src = reader.result as string;
+
+              img.onload = () => {
+                if (img.width < 300 || img.height < 300) {
+                  notificationStore.addNotification('warning', `Минимальное разрешение для фотографии 300x300 пикселей`, 3000);
+                  return;
+                } else {
+                  fileEntry.previewUrl = reader.result as string;
+                  files.value.push(fileEntry);
+                }
+              };
+            } else {
+              fileEntry.previewUrl = reader.result as string;
+              files.value.push(fileEntry);
+            }
           };
           reader.readAsDataURL(file);
-        } else {
-          files.value.push(fileEntry);
         }
       }
     });

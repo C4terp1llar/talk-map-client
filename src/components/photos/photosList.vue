@@ -10,7 +10,8 @@ import PhotosListItem from "@/components/photos/photosListItem.vue";
 import type {Photo} from "@/helpers/interfaces";
 
 interface Props {
-  mode: 'internal' | 'external'
+  mode: 'internal' | 'external',
+  uid?: string
 }
 const props = defineProps<Props>()
 
@@ -40,7 +41,13 @@ const moreFlag = computed(() => {
 const uploadData = async (mode: 'load' | 'load-more') => {
   if (!moreFlag && mode === 'load-more') return
 
-  await photoStore.getPhotos(mode)
+  let requester
+
+  if (props.mode == 'external' && props.uid) {
+    requester = props.uid
+  }
+
+  await photoStore.getPhotos(mode, undefined, requester)
 
   if (photoStore.photoError) {
     notificationStore.addNotification('error', photoStore.photoError, 3000)
@@ -57,7 +64,7 @@ const uploadData = async (mode: 'load' | 'load-more') => {
     <div class="photos-list__content-wrapper" v-if="!photoStore.loadPending && photoStore.photos && photoStore.photos.length">
 
       <div class="photos-list__content">
-        <photos-list-item :photos="photoStore.photos"/>
+        <photos-list-item :mode="props.mode" :photos="photoStore.photos"/>
       </div>
 
 
@@ -98,7 +105,7 @@ const uploadData = async (mode: 'load' | 'load-more') => {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px;
+    gap: 10px;
   }
 }
 </style>

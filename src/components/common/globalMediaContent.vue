@@ -5,6 +5,8 @@ import {useRoute, useRouter} from "vue-router";
 import {usePhotoStore} from "@/stores/photo";
 import {useNotificationStore} from "@/stores/notifications";
 import {component as Viewer} from 'v-viewer'
+import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
+import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 
 const phStore = usePhotoStore();
 const ntfStore = useNotificationStore();
@@ -39,11 +41,20 @@ const opts = {
 
 <template>
   <div class="media-content__wrapper" ref="mediaContentRef">
+    <button @click="handleClose" class="close__btn">
+      <v-icon class="desktop_icon" :size="24" >mdi-close</v-icon>
+      <div class="mobile_icon">
+        <v-icon :size="24" color="green">mdi-arrow-left-bold-outline</v-icon>
+        <span>Назад</span>
+      </div>
+    </button>
 
     <div class="media-content__img">
 
-      <viewer class="viewer" v-if="ph" :options="opts">
-        <img class="img" v-if="ph" :src="ph.url" />
+      <skeleton-loader v-if="phStore.existPending"/>
+
+      <viewer class="viewer" v-if="ph && !phStore.existPending" :options="opts">
+        <img class="img" :src="ph.url" />
       </viewer>
 
     </div>
@@ -59,11 +70,14 @@ const opts = {
   box-shadow: 0 1px 10px currentColor;
   background: rgb(var(--v-theme-background));
   border-radius: 15px;
-  padding: 15px;
+  padding: 25px 10px 10px 10px;
+
+  position: relative;
 
   @media screen and (max-width: 650px) {
-    width: 100%;
+    width: calc(100% - 10px);
     height: calc(100% - 10px);
+    padding: 5px;
   }
 
   .media-content__img{
@@ -77,6 +91,12 @@ const opts = {
     border-radius: 15px;
     padding: 15px;
     overflow: hidden;
+    position: relative;
+
+    @media screen and (max-width: 650px) {
+      height: auto;
+      min-height: 50vh !important;
+    }
 
     .img{
       opacity: 0;
@@ -86,5 +106,37 @@ const opts = {
   }
 }
 
+.close__btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  opacity: .7;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+
+  @media (max-width: 650px) {
+    position: relative;
+    width: 100%;
+    display: block;
+    padding: 5px;
+    top: unset;
+    right: unset;
+    .desktop_icon{
+      display: none;
+    }
+    .mobile_icon{
+      display: flex !important;
+    }
+  }
+  .mobile_icon{
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+  }
+  &:hover {
+    opacity: 1;
+  }
+}
 
 </style>
