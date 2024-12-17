@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import GlobalMediaContent from "@/components/common/globalMediaContent.vue";
-import {onMounted, onUnmounted} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import {lockScroll, unlockScroll} from "@/helpers/popup";
+import {usePhotoStore} from "@/stores/photo";
 
-onMounted(() => lockScroll())
+const phStore = usePhotoStore();
+
+const mediaExist = ref<boolean>(false)
+
+onMounted(async () => {
+  lockScroll()
+})
 onUnmounted(() => unlockScroll())
 
 </script>

@@ -174,7 +174,8 @@ export const useWsAddStore = defineStore('wsAdd', () => {
                 timeout: 15000,
                 detail: {
                     ...user[0]
-                }
+                },
+                actionType: 'friends'
             })
         }
     }
@@ -192,7 +193,8 @@ export const useWsAddStore = defineStore('wsAdd', () => {
                 avatar: {
                     asset_url: req.avatar.asset_url
                 },
-            }
+            },
+            actionType: 'friends'
         })
     }
 

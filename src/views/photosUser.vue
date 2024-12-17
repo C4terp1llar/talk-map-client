@@ -14,20 +14,20 @@ const router = useRouter()
 const externalUserStore = useExternalUserStore();
 const notificationStore = useNotificationStore();
 
-onUnmounted(()=> externalUserStore.clearMain())
+onUnmounted(() => externalUserStore.clearMain())
 
 onMounted(async () => {
   await beforeLoad()
 })
 
-watch(
-    () => route.params.uid,
-    async (newId) => {
-      if (newId) {
-        await beforeLoad()
-      }
-    }
-);
+// watch(
+//     () => route.params.uid,
+//     async (newId) => {
+//       if (newId) {
+//         await beforeLoad()
+//       }
+//     }
+// );
 
 const beforeLoad = async () => {
   const userId = Array.isArray(route.params.uid) ? route.params.id[0] : route.params.uid;
@@ -47,7 +47,7 @@ const beforeLoad = async () => {
 </script>
 
 <template>
-  <div :key="Date.now()" class="photos-page__wrapper"  v-if="externalUserStore.existFlag || externalUserStore.pending">
+  <div class="photos-page__wrapper"  v-if="externalUserStore.existFlag || externalUserStore.pending">
     <lazy-placeholder-loader v-if="externalUserStore.pending"/>
 
     <external-photo-info v-if="!externalUserStore.pending && externalUserStore.existFlag" />

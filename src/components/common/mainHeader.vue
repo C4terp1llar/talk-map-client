@@ -5,9 +5,11 @@ import AvatarMenu from "@/components/avatarMenu.vue";
 
 <template>
 <div class="header">
-  <v-icon size="large" color="green-darken-2">
-    mdi-map-marker-radius-outline
-  </v-icon>
+  <div class="header__logo">
+    <img class="logo-lr" src="/logo/logo-lr.png">
+    <img class="logo-sm" src="/logo/logo-sm.png">
+    <router-link class="header__logo-link" :to="{name: 'home'}"/>
+  </div>
   <avatar-menu/>
 </div>
 </template>
@@ -24,5 +26,31 @@ import AvatarMenu from "@/components/avatarMenu.vue";
   border-radius: 15px;
   box-shadow: 0 1px 10px currentColor;
   backdrop-filter: blur(10px);
+
+  .header__logo{
+    position: relative;
+    display: flex;
+    align-items: center;
+    .logo-lr, .logo-sm{
+      object-fit: cover;
+      filter: drop-shadow(0 0 2px currentColor);
+      max-height: 28px;
+    }
+    .logo-lr{
+      @media (max-width: 650px){
+        display: none;
+      }
+    }
+    .logo-sm{
+      display: none;
+      @media (max-width: 650px){
+        display: block;
+      }
+    }
+    .header__logo-link{
+      position: absolute;
+      inset: 0;
+    }
+  }
 }
 </style>

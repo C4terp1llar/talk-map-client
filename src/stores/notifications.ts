@@ -1,21 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { ShortMutualUserFriend } from "@/helpers/interfaces";
-
-interface Notification {
-    id: number;
-    type: 'success' | 'error' | 'info' | 'warning';
-    message: string;
-    timeout: number;
-}
-
-interface FrNotification {
-    id: number;
-    type: 'receive' | 'abort' | 'decline' | 'submit' | 'delete';
-    message: string;
-    timeout: number;
-    detail: ShortMutualUserFriend;
-}
+import type {FrNotification, Notification} from "@/helpers/interfaces";
 
 export const useNotificationStore = defineStore('notification', () => {
 
@@ -37,7 +22,6 @@ export const useNotificationStore = defineStore('notification', () => {
     };
 
     const addFrNotification = (payload: FrNotification) => {
-
         notificationsFr.value.push(payload);
 
         setTimeout(() => {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useNotificationStore } from "@/stores/notifications";
 import FriendsMutualItem from "@/components/friends/friendsMutualItem.vue";
+import type {FrNotification} from "@/helpers/interfaces";
 
 const store = useNotificationStore();
 
@@ -20,12 +21,37 @@ const frMap = new Map([
   ['abort', 'Отменил(а) свою заявку в друзья. Что-то пошло не так... 🤔'],
   ['decline', 'Отклонил(а) вашу заявку в друзья. Возможно, в другой раз? 😟'],
   ['submit', 'Принял(а) вашу заявку в друзья. Время праздновать! 🎉'],
-  ['delete', 'Удалил(а) вас из друзей. Вспомним лучшие времена... 💔']
+  ['delete', 'Удалил(а) вас из друзей. Вспомним лучшие времена... 💔'],
+  ['react_Photo', 'Оценил(а) вашу фоточку. Сильно впечатлен(а)! 💖'],
+  ['react_Post', 'Оценил(а) ваш пост. Ну ты даешь! 🌟'],
+  ['publish_Photo', 'Опубликовал(а) свою фотку. Просто огонь! 🔥'],
+  ['publish_many_Photo', 'Опубликовал(а) несколько фотографий. Настоящий фото-арт! 📸✨'],
+  ['publish_Post', 'Опубликовал(а) свой пост. Это будет бомба! 💥'],
 ]);
 
 const getFrLink = (type: string) => {
   if (type === 'submit' || type === 'delete') return 'friends'
   return 'incoming'
+}
+
+const getFrPageLink = (n: FrNotification) => {
+  if (['receive', 'abort', 'decline', 'submit', 'delete'].includes(n.type)) {
+    return { name: 'friends', query: { tab: getFrLink(n.type) } };
+  }
+
+  switch (n.type) {
+    case 'react_Photo':
+      return n.phId ? { name: 'photos', query: { r: n.phId } } : { name: 'photos' };
+    case 'publish_Photo':
+      return n.phId ? { name: 'photos-user', params: { uid: n.detail._id }, query: { r: n.phId } } : { name: 'photos-user', params: { uid: n.detail._id } };
+    case 'publish_many_Photo':
+      return { name: 'photos-user', params: { uid: n.detail._id }};
+    case 'react_Post':
+    case 'publish_Post':
+      return { name: 'photos' };
+    default:
+      return { name: 'photos' };
+  }
 }
 </script>
 
@@ -49,7 +75,7 @@ const getFrLink = (type: string) => {
       />
     </div>
 
-    <!-- друзья   -->
+    <!-- друзья - медиа   -->
     <div
         v-for="n in store.notificationsFr"
         :key="n.id"
@@ -71,11 +97,11 @@ const getFrLink = (type: string) => {
 
         <div class="notification-details__message">
           {{ frMap.get(n.type)}}
-          <router-link class="hide__link" :to="{ name: 'friends', query: { tab: getFrLink(n.type) } }"/>
+          <router-link class="hide__link" :to="getFrPageLink(n)"/>
         </div>
       </div>
 
-      <router-link class="hide__link" :to="{ name: 'friends', query: { tab: getFrLink(n.type) } }"/>
+      <router-link class="hide__link" :to="getFrPageLink(n)"/>
 
       <v-btn
           class="ml-auto notification__btn"

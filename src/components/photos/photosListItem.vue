@@ -6,9 +6,7 @@ import {useNotificationStore} from "@/stores/notifications";
 import CircularLoader from "@/components/common/circularLoader.vue";
 import {ref} from "vue";
 import {useRouter} from "vue-router";
-import {useUserStore} from "@/stores/user";
-import {useImagePopupStore} from "@/stores/imagePopup";
-import {lockScroll} from "@/helpers/popup";
+
 
 interface Props {
   photos: Photo[],
@@ -20,7 +18,6 @@ const router = useRouter();
 
 const photoStore = usePhotoStore()
 const notificationStore = useNotificationStore()
-const userStore = useUserStore();
 
 const currentDeletePending = ref<string>('')
 
@@ -37,7 +34,7 @@ const handleDelete = async (id: string) => {
 }
 
 const handleOpenMedia = (id: string) => {
-  router.push({query: {r: id, u: userStore.mainUserInfo?._id}})
+  router.push({query: {r: id}})
 }
 </script>
 

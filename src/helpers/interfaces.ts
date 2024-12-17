@@ -1,3 +1,22 @@
+export interface Notification {
+    id: number;
+    type: 'success' | 'error' | 'info' | 'warning';
+    message: string;
+    timeout: number;
+}
+
+export interface FrNotification {
+    id: number;
+    type: 'receive' | 'abort' | 'decline' | 'submit' | 'delete' | 'react_Photo' | 'react_Post' | 'publish_Photo' | 'publish_many_Photo' | 'publish_Post';
+    message: string;
+    timeout: number;
+    detail: ShortMutualUserFriend;
+    actionType: 'friends' | 'media' | 'communications';
+    phId?: string
+}
+
+
+
 export interface Address {
     display_name: string;
     lat: number;
@@ -124,12 +143,21 @@ export interface Photo {
     media_id: string,
     url: string,
     media: {
-        client_filename: string,
-        client_file_type: string,
-        client_file_size: Number,
         createdAt: Date
     }
 }
 
+export interface PhotoG {
+    _id: string,
+    user_id: string,
+    media_id: string,
+    url: string,
+    mode: 'internal' | 'external',
+    createdAt: Date,
+    nickname: string,
+    nickname_color: string | null,
+    likesCount: number,
+    liked: boolean,
+}
 
 

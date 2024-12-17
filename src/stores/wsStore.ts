@@ -6,11 +6,13 @@ import { checkTokenValidity, refreshToken } from "@/stores/sync";
 import {attachBaseWsHandlers} from "@/utils/wsBaseHandlers";
 import {useWsAddStore} from "@/stores/wsAddHandlers";
 import type {FriendRequest} from "@/helpers/interfaces";
+import {useWsMdStore} from "@/stores/wsMediaHandlers";
 
 type UserSocket = Socket | null;
 
 export const useWsStore = defineStore('ws', () => {
     const wsAdd = useWsAddStore()
+    const wsMd = useWsMdStore()
 
     const userSocket: Ref<UserSocket> = ref(null);
 
@@ -41,7 +43,9 @@ export const useWsStore = defineStore('ws', () => {
         userSocket.value = socket;
 
         attachBaseWsHandlers(userSocket.value)
-        attachAddWsHandlers();
+
+        await attachAddWsHandlers();
+        await attachMediaWsHandlers();
 
         socket.on("tokenError", async () => {
             console.log('токен истек, реконнект')
@@ -49,7 +53,7 @@ export const useWsStore = defineStore('ws', () => {
         });
     };
 
-    const attachAddWsHandlers = () => {
+    const attachAddWsHandlers = async () => {
         if (!userSocket.value) return;
 
         userSocket.value.on('receive_friend_request', (payload: { wsFriendRequestSnap: FriendRequest }) => {
@@ -70,6 +74,22 @@ export const useWsStore = defineStore('ws', () => {
 
         userSocket.value.on('delete_friendship', (payload) => {
             wsAdd.deleteFriendship(payload.sender_id)
+        })
+    }
+
+    const attachMediaWsHandlers = async () => {
+        if (!userSocket.value) return;
+
+        userSocket.value.on('publish_photo', (payload: { uid: string, phId: string }) => {
+            wsMd.publish_photo(payload)
+        })
+
+        userSocket.value.on('publish_many_photo', (payload: { uid: string}) => {
+            wsMd.publish_many_photo(payload)
+        })
+
+        userSocket.value.on('react_photo', (payload: { uid: string, phId: string, wasLike: boolean }) => {
+            wsMd.react_photo(payload)
         })
     }
 

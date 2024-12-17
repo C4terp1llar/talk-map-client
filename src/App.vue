@@ -12,7 +12,7 @@ import {computed} from "vue";
 const route = useRoute()
 
 const appThemeStore = useAppThemeStore()
-const isMediaModalVisible = computed(() => route.query.r && route.query.u);
+const isMediaModalVisible = computed(() => route.query.r);
 </script>
 
 <template>

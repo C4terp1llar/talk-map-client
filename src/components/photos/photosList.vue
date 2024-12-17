@@ -2,12 +2,10 @@
 import {computed, onMounted, onUnmounted} from "vue";
 import {usePhotoStore} from "@/stores/photo";
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
-import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {useNotificationStore} from "@/stores/notifications";
 import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
 import PhotosNotFound from "@/components/photos/photosNotFound.vue";
 import PhotosListItem from "@/components/photos/photosListItem.vue";
-import type {Photo} from "@/helpers/interfaces";
 
 interface Props {
   mode: 'internal' | 'external',

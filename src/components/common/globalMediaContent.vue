@@ -4,9 +4,13 @@ import {onClickOutside} from "@vueuse/core";
 import {useRoute, useRouter} from "vue-router";
 import {usePhotoStore} from "@/stores/photo";
 import {useNotificationStore} from "@/stores/notifications";
-import {component as Viewer} from 'v-viewer'
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
+import GPhotoContentSkeleton from "@/components/skeletons/gPhotoContentSkeleton.vue";
+import PhotoNotFound from "@/components/photos/photoNotFound.vue";
+import PhotoImage from "@/components/photos/photoImage.vue";
+import PhotoHeading from "@/components/photos/photoHeading.vue";
+import PhotoReactions from "@/components/photos/photoReactions.vue";
 
 const phStore = usePhotoStore();
 const ntfStore = useNotificationStore();
@@ -18,29 +22,26 @@ const mediaContentRef = ref<HTMLElement | null>(null);
 
 onClickOutside(mediaContentRef, e => handleClose())
 const handleClose = () => {
-  router.push({query: {r: undefined, u: undefined}});
+  router.push({query: {r: undefined}});
 }
 
-const ph = ref<any | null>(null)
-
 onMounted(async () => {
-  if (!route.query.r || !route.query.u || typeof route.query.r !== 'string' || typeof route.query.u !== 'string') return
+  if (!route.query.r || typeof route.query.r !== 'string') return
 
-  ph.value = await phStore.isPhotoExists(route.query.r, route.query.u)
+  await phStore.getPhoto(route.query.r)
 
-  if (phStore.existError) {
-    ntfStore.addNotification('error', phStore.existError, 3000)
+  if (phStore.phError) {
+    ntfStore.addNotification('error', phStore.phError, 3000)
   }
 })
 
-const opts = {
-  "inline": true, "button": false, "navbar": false, "title": false, "toolbar": true, "tooltip": false, "movable": true, "zoomable": true, "rotatable": false, "scalable": true, "transition": false, "fullscreen": false, "keyboard": true
-}
+
 
 </script>
 
 <template>
   <div class="media-content__wrapper" ref="mediaContentRef">
+
     <button @click="handleClose" class="close__btn">
       <v-icon class="desktop_icon" :size="24" >mdi-close</v-icon>
       <div class="mobile_icon">
@@ -49,16 +50,15 @@ const opts = {
       </div>
     </button>
 
-    <div class="media-content__img">
-
-      <skeleton-loader v-if="phStore.existPending"/>
-
-      <viewer class="viewer" v-if="ph && !phStore.existPending" :options="opts">
-        <img class="img" :src="ph.url" />
-      </viewer>
-
+    <div class="media-content" v-if="phStore.currentPhoto && !phStore.phPending">
+      <photo-heading :photo="phStore.currentPhoto"/>
+      <photo-image :url="phStore.currentPhoto.url"/>
+      <photo-reactions :photo="phStore.currentPhoto"/>
     </div>
 
+    <photo-not-found class="m-auto" v-if="!phStore.currentPhoto && !phStore.phPending"/>
+
+    <g-photo-content-skeleton v-if="phStore.phPending"/>
   </div>
 </template>
 
@@ -70,46 +70,31 @@ const opts = {
   box-shadow: 0 1px 10px currentColor;
   background: rgb(var(--v-theme-background));
   border-radius: 15px;
-  padding: 25px 10px 10px 10px;
+  padding: 10px;
 
   position: relative;
+  display: flex;
+  flex-direction: column;
+
+  .media-content{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
   @media screen and (max-width: 650px) {
     width: calc(100% - 10px);
     height: calc(100% - 10px);
     padding: 5px;
   }
-
-  .media-content__img{
-    height: 90%;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 2px solid currentColor;
-    border-radius: 15px;
-    padding: 15px;
-    overflow: hidden;
-    position: relative;
-
-    @media screen and (max-width: 650px) {
-      height: auto;
-      min-height: 50vh !important;
-    }
-
-    .img{
-      opacity: 0;
-      max-height: 100%;
-      max-width: 100%;
-    }
-  }
 }
 
 .close__btn {
   position: absolute;
-  top: 2px;
-  right: 2px;
+  top: 5px;
+  right: 5px;
   opacity: .7;
   transition: 0.3s;
   display: flex;

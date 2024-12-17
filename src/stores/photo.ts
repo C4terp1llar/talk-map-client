@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import apiAuth from "@/utils/apiAuth";
 import { ref } from "vue";
-import type {Photo} from "@/helpers/interfaces";
+import type {Photo, PhotoG} from "@/helpers/interfaces";
 
 export const usePhotoStore = defineStore('photo', () => {
     const pending = ref<boolean>(false);
@@ -115,30 +115,48 @@ export const usePhotoStore = defineStore('photo', () => {
         }
     };
 
-    const existPending = ref<boolean>(false);
-    const existError = ref<string | null>(null);
+    const phPending = ref<boolean>(false);
+    const currentPhoto = ref<PhotoG | null>(null);
+    const phError = ref<string | null>(null);
 
-    const isPhotoExists = async (phId: string, uid: string) => {
-        existPending.value = true;
-        existError.value = null;
+    const getPhoto = async (phId: string) => {
+        phPending.value = true;
+        phError.value = null;
+        currentPhoto.value = null;
 
         try {
-            const response = await apiAuth.get('user/gMedia', {
-                params: {
-                    photoId: phId,
-                    userId: uid
-                }
-            });
+            const response = await apiAuth.get(`user/photo/${phId}`);
 
             if (response.data && response.status === 200) {
-                console.log(response.data);
-                return response.data.photo
+                currentPhoto.value = response.data.photo
             }
         } catch (e: any) {
-            existError.value = "Произошла ошибка при получении фотографии, попробуйте позже";
+            phError.value = "Произошла ошибка при получении фотографии, попробуйте позже";
             console.error(e);
         } finally {
-            existPending.value = false;
+            phPending.value = false;
+        }
+    };
+
+    const reactPending = ref<boolean>(false);
+    const reactError = ref<string | null>(null);
+
+    const reactAction = async (entityType: 'Photo' | 'Post' | 'Comment', entityId: string, userId: string) => {
+        reactPending.value = true;
+        reactError.value = null;
+
+        try {
+            await apiAuth.post('user/reaction', {
+                entityType,
+                entityId,
+                userId
+            });
+
+        } catch (e: any) {
+            reactError.value = "Произошла ошибка при отставлении реакции, попробуйте позже";
+            console.error(e);
+        } finally {
+            reactPending.value = false;
         }
     };
 
@@ -160,8 +178,13 @@ export const usePhotoStore = defineStore('photo', () => {
         deleteError,
         deletePhoto,
 
-        existPending,
-        existError,
-        isPhotoExists,
+        phPending,
+        phError,
+        currentPhoto,
+        getPhoto,
+
+        reactPending,
+        reactError,
+        reactAction,
     };
 });
