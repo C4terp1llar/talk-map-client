@@ -22,8 +22,10 @@ const externalStore = useExternalUserStore();
     <external-actions/>
 
     <div class="wallpaper-img-block">
+      <skeleton-loader v-if="externalStore.pending"/>
+
       <v-img
-          v-if="externalStore.main?.wallpaper"
+          v-else-if="externalStore.main?.wallpaper && !externalStore.pending"
           :src="externalStore.main?.wallpaper"
           class="wallpaper-img"
           alt="wallpaper"
@@ -34,9 +36,7 @@ const externalStore = useExternalUserStore();
         </template>
       </v-img>
 
-      <div class="without-wallpaper" v-else-if="!externalStore.main?.wallpaper"></div>
-
-      <skeleton-loader v-if="externalStore.pending"/>
+      <div class="without-wallpaper" v-else-if="!externalStore.main?.wallpaper && !externalStore.pending"></div>
     </div>
 
 
@@ -49,7 +49,7 @@ const externalStore = useExternalUserStore();
       <div class="wallpaper-avatar-block-relative-mask"></div>
 
 
-      <div class="bottom-wallpaper-block-content" v-if="!externalStore.pending">
+      <div class="bottom-wallpaper-block-content" v-if="!externalStore.pending && externalStore.main && externalStore.address">
 
         <div class="info-block">
           <h4
@@ -70,7 +70,6 @@ const externalStore = useExternalUserStore();
       </div>
 
       <wallpaper-bottom-content-skeleton :is-external="true" v-else/>
-
     </div>
   </div>
 </template>

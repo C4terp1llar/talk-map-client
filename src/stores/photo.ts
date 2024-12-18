@@ -128,7 +128,8 @@ export const usePhotoStore = defineStore('photo', () => {
             const response = await apiAuth.get(`user/photo/${phId}`);
 
             if (response.data && response.status === 200) {
-                currentPhoto.value = response.data.photo
+                currentPhoto.value = response.data.photo;
+                calcGListCurrent();
             }
         } catch (e: any) {
             phError.value = "Произошла ошибка при получении фотографии, попробуйте позже";
@@ -137,6 +138,65 @@ export const usePhotoStore = defineStore('photo', () => {
             phPending.value = false;
         }
     };
+
+    const phGList = ref<string[] | null>(null);
+    // const gPending = ref<boolean>(false);
+    // const gError = ref<string | null>(null);
+
+    const getPhotoGList = async (phId: string) => {
+        phPending.value = true;
+        phError.value = null;
+        phGList.value = null;
+
+        try {
+            const response = await apiAuth.get(`user/gPhoto`, {
+                params: {
+                    id: phId
+                }
+            });
+
+            if (response.data && response.status === 200) {
+                phGList.value = response.data.gList;
+                calcGListCurrent();
+            }
+        } catch (e: any) {
+            phError.value = "Произошла ошибка при получении списка фотографий, попробуйте позже";
+            console.error(e);
+        } finally {
+            phPending.value = false;
+        }
+    };
+
+    const currentGListIndex = ref<number | null>(null)
+
+    const calcGListCurrent = () => {
+        if (phGList.value && phGList.value.length && currentPhoto.value){
+            currentGListIndex.value = phGList.value.indexOf(currentPhoto.value?._id);
+        }
+    }
+
+    const prevGPhoto = async () => {
+        if (!phGList.value || !phGList.value.length || typeof currentGListIndex.value !== 'number') return
+
+        if (currentGListIndex.value > 0) {
+            currentGListIndex.value--;
+        } else {
+            currentGListIndex.value = phGList.value.length - 1;
+        }
+        await getPhoto(phGList.value[currentGListIndex.value])
+    };
+
+    const nextGPhoto = async () => {
+        if (!phGList.value || !phGList.value.length || typeof currentGListIndex.value !== 'number') return
+
+        if (currentGListIndex.value< phGList.value.length - 1) {
+            currentGListIndex.value++;
+        } else {
+            currentGListIndex.value = 0;
+        }
+        await getPhoto(phGList.value[currentGListIndex.value])
+    };
+
 
     const reactPending = ref<boolean>(false);
     const reactError = ref<string | null>(null);
@@ -182,6 +242,12 @@ export const usePhotoStore = defineStore('photo', () => {
         phError,
         currentPhoto,
         getPhoto,
+
+        phGList,
+        currentGListIndex,
+        prevGPhoto,
+        nextGPhoto,
+        getPhotoGList,
 
         reactPending,
         reactError,

@@ -10,7 +10,9 @@ import {useRouter} from "vue-router";
 
 interface Props {
   photos: Photo[],
-  mode: 'internal' | 'external'
+  mode: 'internal' | 'external',
+  short?: boolean,
+  withoutActions?: boolean
 }
 
 const props = defineProps<Props>()
@@ -39,13 +41,13 @@ const handleOpenMedia = (id: string) => {
 </script>
 
 <template>
-  <div class="photos-list__item" v-for="p in props.photos" :key="p._id">
+  <div :class="['photos-list__item', props.short ? '__short' : '']" v-for="p in props.photos" :key="p._id">
     <v-img class="photos-list__item-img" :src="p.url" cover>
       <template v-slot:placeholder>
         <skeleton-loader/>
       </template>
     </v-img>
-    <div class="photos-list__content-controls" v-if="props.mode === 'internal'">
+    <div class="photos-list__content-controls" v-if="props.mode === 'internal' && !props.withoutActions">
       <button @click="handleDelete(p._id)" class="delete-img">
         <v-icon :size="20" v-if="currentDeletePending !== p._id" color="red">mdi-trash-can-outline</v-icon>
         <circular-loader :size="20" v-if="currentDeletePending === p._id"/>
@@ -64,23 +66,9 @@ const handleOpenMedia = (id: string) => {
   border: 2px solid currentColor;
   position: relative;
 
-  @media (max-width: 1400px) {
-    width: 230px;
-    height: 230px;
-  }
-  @media (max-width: 1270px) {
-    width: 200px;
-    height: 200px;
-  }
-
-  @media (max-width: 650px) {
-    width: 150px;
-    height: 150px;
-  }
-
-  @media (max-width: 400px) {
-    width: 120px;
-    height: 120px;
+  &.__short{
+    width: 85px;
+    height: 85px;
   }
 
   .photos-list__item-img {
@@ -118,6 +106,27 @@ const handleOpenMedia = (id: string) => {
 
   &:hover {
     opacity: 1;
+  }
+}
+
+.photos-list__item:not(.__short){
+  @media (max-width: 1400px) {
+    width: 230px;
+    height: 230px;
+  }
+  @media (max-width: 1270px) {
+    width: 200px;
+    height: 200px;
+  }
+
+  @media (max-width: 650px) {
+    width: 150px;
+    height: 150px;
+  }
+
+  @media (max-width: 400px) {
+    width: 120px;
+    height: 120px;
   }
 }
 </style>

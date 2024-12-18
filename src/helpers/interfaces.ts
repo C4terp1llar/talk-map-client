@@ -142,9 +142,7 @@ export interface Photo {
     user_id: string,
     media_id: string,
     url: string,
-    media: {
-        createdAt: Date
-    }
+    createdAt: Date
 }
 
 export interface PhotoG {

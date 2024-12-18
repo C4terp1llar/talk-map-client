@@ -5,9 +5,6 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 
 <template>
   <div class="media-content__wrapper-sk">
-    <div class="photo-head position-relative">
-      <skeleton-loader/>
-    </div>
     <div class="photo position-relative">
       <skeleton-loader/>
     </div>
@@ -20,7 +17,7 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 <style scoped lang="scss">
 .media-content__wrapper-sk {
   display: grid;
-  grid-template-rows: repeat(10, 1fr);
+  grid-template-rows: repeat(12, 1fr);
   height: inherit;
   gap: 10px;
   padding-top: 20px;
@@ -32,11 +29,8 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
     width: 100%;
     border-radius: 15px;
   }
-  .photo-head{
-    grid-row: span 1;
-  }
   .photo {
-    grid-row: span 8;
+    grid-row: span 11;
   }
   .content {
     grid-row: span 1;

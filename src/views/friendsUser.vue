@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {onBeforeRouteUpdate, useRoute, useRouter} from "vue-router";
 import {useExternalUserStore} from "@/stores/externalUser";
-import {onBeforeMount, onUpdated, watch} from "vue";
+import {onBeforeMount, onMounted, onUnmounted, onUpdated, watch} from "vue";
 import {useNotificationStore} from "@/stores/notifications";
 import ExternalWallpaper from "@/components/externalFriends/externalWallpaper.vue";
 import ExternalWallpaperAvatar from "@/components/externalFriends/externalWallpaperAvatar.vue";
@@ -12,6 +12,8 @@ import ExternalMutualFriends from "@/components/externalFriends/externalMutualFr
 import {useFriendsStore} from "@/stores/friends";
 import ShortFriends from "@/components/home/shortFriends.vue";
 import ShortUserRelations from "@/components/externalFriends/shortUserRelations.vue";
+import {usePhotoStore} from "@/stores/photo";
+import ShortPhotosExternal from "@/components/photos/shortPhotosExternal.vue";
 
 const route = useRoute()
 const router = useRouter()
@@ -20,8 +22,11 @@ const externalUserStore = useExternalUserStore();
 const userStore = useUserStore();
 const notificationStore = useNotificationStore();
 const friendStore = useFriendsStore();
+const phStore = usePhotoStore();
 
-onBeforeMount(async () => {
+onUnmounted(() => phStore.photos = null)
+
+onMounted(async () => {
   await beforeLoad()
 })
 
@@ -36,7 +41,13 @@ watch(
 
 const beforeLoad = async () => {
   const userId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id;
-  await externalUserStore.isUserExist(userId);
+
+  const match = await externalUserStore.isUserExist(userId);
+
+  if (match) {
+    await router.push({name: 'home'});
+    return
+  }
 
   if (externalUserStore.existFlag) {
     await getExternalUserInfo(userId);
@@ -46,8 +57,9 @@ const beforeLoad = async () => {
 const getExternalUserInfo = async (userId: string) => {
 
   await Promise.all([
-    friendStore.getMutualFriends('load', userId),
     externalUserStore.getExternalMainUserInfo(userId),
+    phStore.getPhotos('load', 5, userId),
+    friendStore.getMutualFriends('load', userId),
     userStore.findUsers({
       globalSearch: false,
       cityFilter: null,
@@ -58,11 +70,6 @@ const getExternalUserInfo = async (userId: string) => {
       sortStr: ''
     }, 'load', 3, userId)
   ])
-
-  if (userId === userStore.mainUserInfo?._id) {
-    await router.push({name: 'home'});
-    return
-  }
 
   if (friendStore.mutualError) {
     notificationStore.addNotification('error', friendStore.mutualError, 3000)
@@ -75,11 +82,15 @@ const getExternalUserInfo = async (userId: string) => {
   if (userStore.findUserError) {
     notificationStore.addNotification('error', userStore.findUserError, 3000)
   }
+
+  if (phStore.phError) {
+    notificationStore.addNotification('error', phStore.phError, 3000)
+  }
 }
 </script>
 
 <template>
-  <div :key="Date.now()" class="friends-user-wrapper" v-if="externalUserStore.existFlag || externalUserStore.pending">
+  <div class="friends-user-wrapper" v-if="externalUserStore.existFlag || externalUserStore.pending">
     <external-wallpaper >
       <external-wallpaper-avatar/>
     </external-wallpaper>
@@ -87,8 +98,8 @@ const getExternalUserInfo = async (userId: string) => {
     <external-tags />
 
     <div class="friends-user__relations-section">
-      <div class="smth">
-        тут мб шорт фото, оно по высоте фит контент будет и ниже посты
+      <div class="photos">
+        <short-photos-external :mode="'external'" :short="true"/>
       </div>
       <short-user-relations/>
     </div>
@@ -115,7 +126,7 @@ const getExternalUserInfo = async (userId: string) => {
     grid-auto-flow: dense;
     gap: 15px;
 
-    .smth{
+    .photos{
       display: flex;
       align-items: center;
       justify-content: center;
@@ -124,6 +135,7 @@ const getExternalUserInfo = async (userId: string) => {
       padding: 10px;
       background: rgb(var(--v-theme-background));
       text-align: center;
+      height: fit-content;
 
       grid-column: span 7;
 

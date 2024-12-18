@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
 import {onClickOutside} from "@vueuse/core";
 import {useRoute, useRouter} from "vue-router";
 import {usePhotoStore} from "@/stores/photo";
 import {useNotificationStore} from "@/stores/notifications";
-import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
-import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import GPhotoContentSkeleton from "@/components/skeletons/gPhotoContentSkeleton.vue";
 import PhotoNotFound from "@/components/photos/photoNotFound.vue";
 import PhotoImage from "@/components/photos/photoImage.vue";
 import PhotoHeading from "@/components/photos/photoHeading.vue";
 import PhotoReactions from "@/components/photos/photoReactions.vue";
+import PhotoFooter from "@/components/photos/photoFooter.vue";
+import GlobalMediaContentItem from "@/components/common/globalMediaContentItem.vue";
 
 const phStore = usePhotoStore();
 const ntfStore = useNotificationStore();
@@ -35,8 +35,7 @@ onMounted(async () => {
   }
 })
 
-
-
+onUnmounted(() => phStore.currentPhoto = null)
 </script>
 
 <template>
@@ -50,13 +49,9 @@ onMounted(async () => {
       </div>
     </button>
 
-    <div class="media-content" v-if="phStore.currentPhoto && !phStore.phPending">
-      <photo-heading :photo="phStore.currentPhoto"/>
-      <photo-image :url="phStore.currentPhoto.url"/>
-      <photo-reactions :photo="phStore.currentPhoto"/>
-    </div>
+    <global-media-content-item v-if="phStore.currentPhoto && typeof phStore.currentGListIndex === 'number' && phStore.phGList?.length && !phStore.phPending"/>
 
-    <photo-not-found class="m-auto" v-if="!phStore.currentPhoto && !phStore.phPending"/>
+    <photo-not-found class="m-auto" v-if="!phStore.currentPhoto && !phStore.phGList?.length && !phStore.phPending"/>
 
     <g-photo-content-skeleton v-if="phStore.phPending"/>
   </div>
@@ -77,11 +72,11 @@ onMounted(async () => {
   flex-direction: column;
 
   .media-content{
+    position: relative;
     height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
   }
 
   @media screen and (max-width: 650px) {

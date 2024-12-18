@@ -3,15 +3,30 @@ import GlobalMediaContent from "@/components/common/globalMediaContent.vue";
 import {onMounted, onUnmounted, ref} from "vue";
 import {lockScroll, unlockScroll} from "@/helpers/popup";
 import {usePhotoStore} from "@/stores/photo";
+import {useRoute} from "vue-router";
+import {useNotificationStore} from "@/stores/notifications";
+
+const route = useRoute()
 
 const phStore = usePhotoStore();
-
-const mediaExist = ref<boolean>(false)
+const ntfStore = useNotificationStore();
 
 onMounted(async () => {
-  lockScroll()
+  lockScroll();
+  if (!route.query.r || typeof route.query.r !== 'string') return
+
+  await phStore.getPhotoGList(route.query.r)
+
+  if (phStore.phError) {
+    ntfStore.addNotification('error', phStore.phError, 3000)
+  }
 })
-onUnmounted(() => unlockScroll())
+
+onUnmounted(() => {
+  unlockScroll()
+  phStore.phGList = null;
+  phStore.currentGListIndex = null;
+})
 
 </script>
 

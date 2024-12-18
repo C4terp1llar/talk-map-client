@@ -237,3 +237,13 @@ input[type="date"]::-ms-expand {
   color: green;
 }
 
+////
+
+@keyframes loading {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}

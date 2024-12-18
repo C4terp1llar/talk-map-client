@@ -13,7 +13,11 @@ import FriendsMutualItem from "@/components/friends/friendsMutualItem.vue";
 import ShortHomeBlockSkeleton from "@/components/skeletons/shortHomeBlockSkeleton.vue";
 import FriendsMutualFull from "@/components/friends/friendsMutualFull.vue";
 
-const router = useRouter();
+interface Props {
+  withoutPreload?: boolean,
+}
+
+const props = defineProps<Props>()
 
 const friendStore = useFriendsStore();
 const notificationsStore = useNotificationStore();
@@ -33,7 +37,7 @@ onUnmounted(() => {
 })
 
 onMounted(async () => {
-  if (!externalStore.existFlag || !route.params.id || typeof route.params.id !== "string") return;
+  if (!externalStore.existFlag || !route.params.id || typeof route.params.id !== "string" || props.withoutPreload) return;
 
   await friendStore.getMutualFriends('load', route.params.id)
 
@@ -56,7 +60,7 @@ const shortMutual = computed((): ShortMutualUserFriend[] | void => {
     <div class="external-mutual-friends__items" v-if="shortMutual && shortMutual.length">
       <friends-mutual-item v-for="friend in shortMutual" :mutual="friend" :is-short="true"/>
     </div>
-    <div class="d-flex flex-column align-items-center __no-friends" v-if="!shortMutual || !shortMutual.length">
+    <div class="d-flex flex-column align-items-center mt-2 __no-friends" v-if="!shortMutual || !shortMutual.length">
       <h6 class="text-center">Общих друзей нет 🧑‍🤝‍🧑</h6>
     </div>
 
@@ -73,7 +77,7 @@ const shortMutual = computed((): ShortMutualUserFriend[] | void => {
 
 <style scoped lang="scss">
 .__no-friends {
-  padding: 10px 15px;
+  //padding: 10px 15px;
   gap: 5px;
 }
 

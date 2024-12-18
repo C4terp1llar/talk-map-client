@@ -7,7 +7,7 @@ import ShortFriends from "@/components/home/shortFriends.vue";
 <template>
   <div class="friends-user__content">
     <short-friends mode="external" />
-    <external-mutual-friends />
+    <external-mutual-friends :without-preload="true"/>
   </div>
 </template>
 

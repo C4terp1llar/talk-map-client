@@ -35,7 +35,6 @@ const getFormattedDateTime = (sendTime: Date) => format(sendTime, "HH:mm dd.MM.y
 
 <template>
   <div class="media-content__reactions">
-
     <div class="reactions-likes">
       <button
           :class="['reactions__btn', photo.mode === 'internal' ? '__non-hover' : '', { 'loading': phStore.reactPending }]"

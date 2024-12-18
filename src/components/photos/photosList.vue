@@ -9,7 +9,9 @@ import PhotosListItem from "@/components/photos/photosListItem.vue";
 
 interface Props {
   mode: 'internal' | 'external',
-  uid?: string
+  uid?: string,
+  short?: boolean,
+  withoutPreload?: boolean,
 }
 const props = defineProps<Props>()
 
@@ -17,7 +19,9 @@ const photoStore = usePhotoStore()
 const notificationStore = useNotificationStore()
 
 onMounted(async () => {
-  await uploadData('load')
+  if (!props.withoutPreload){
+    await uploadData('load')
+  }
 })
 
 onUnmounted(async () => {
@@ -45,7 +49,7 @@ const uploadData = async (mode: 'load' | 'load-more') => {
     requester = props.uid
   }
 
-  await photoStore.getPhotos(mode, undefined, requester)
+  await photoStore.getPhotos(mode, props.short ? 5 : undefined, requester)
 
   if (photoStore.photoError) {
     notificationStore.addNotification('error', photoStore.photoError, 3000)
@@ -61,8 +65,8 @@ const uploadData = async (mode: 'load' | 'load-more') => {
 
     <div class="photos-list__content-wrapper" v-if="!photoStore.loadPending && photoStore.photos && photoStore.photos.length">
 
-      <div class="photos-list__content">
-        <photos-list-item :mode="props.mode" :photos="photoStore.photos"/>
+      <div :class="['photos-list__content', props.short ? '__short' : '']">
+        <photos-list-item :mode="props.mode" :photos="photoStore.photos" :short="props.short"/>
       </div>
 
 
@@ -104,6 +108,10 @@ const uploadData = async (mode: 'load' | 'load-more') => {
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
+
+    &.__short{
+      flex-wrap: nowrap !important;
+    }
   }
 }
 </style>

@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, withDefaults } from 'vue';
 
 interface Props {
-  mode: 'tags' | 'filter';
+  mode: 'tags' | 'filter' | 'phShort';
   useResizeObserver?: boolean;
   useScrollBar?: boolean
 }
@@ -71,7 +71,7 @@ const scrollRight = () => {
       <v-icon>mdi-chevron-left</v-icon>
     </button>
 
-    <div :class="['scrollable-content', props.useScrollBar ? '__scroll-bar' : '']" ref="contentRef">
+    <div :class="['scrollable-content', props.useScrollBar ? '__scroll-bar' : '' , props.mode === 'phShort' ? '__phShort' : '']" ref="contentRef">
       <slot></slot>
     </div>
 
@@ -110,6 +110,11 @@ const scrollRight = () => {
 
   -ms-overflow-style: none;
   scrollbar-width: none;
+
+  &.__phShort{
+    gap: 10px !important;
+  }
+
   &.__scroll-bar{
     -ms-overflow-style: auto !important;
     scrollbar-width: auto!important;

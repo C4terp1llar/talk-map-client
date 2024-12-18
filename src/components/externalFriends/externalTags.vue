@@ -9,14 +9,14 @@ const externalStore = useExternalUserStore()
 </script>
 
 <template>
-  <div v-if="!externalStore.pending">
+  <div v-if="!externalStore.pending && externalStore.main?.tags && externalStore.main?.tags.length">
     <div class="tags-external-wrapper" v-if="externalStore.main?.tags && externalStore.main?.tags.length">
       <scrollable-container mode="tags" >
         <external-tags-list/>
       </scrollable-container>
     </div>
   </div>
-  <div class="tags-external-wrapper" v-else>
+  <div class="tags-external-wrapper" v-if="externalStore.pending">
     <tags-home-skeleton/>
   </div>
 </template>
