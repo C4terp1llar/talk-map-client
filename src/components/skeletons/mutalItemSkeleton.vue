@@ -10,60 +10,76 @@ const props = defineProps<Props>()
 </script>
 
 <template>
-  <div class="mutual-friends-popup__list_item">
-    <div :class="['mutual-friends-popup__list_item__avatar', props.isShort ? '__short' : '']">
-      <skeleton-loader/>
+  <div :class="['mutual-friends-popup__list_item', props.isShort ? '__short' : '']">
+    <div class="mutual-friends-popup__list_item__avatar">
+      <div :class="['avatar', props.isShort ? '__short' : '']">
+        <skeleton-loader/>
+      </div>
     </div>
+
     <div class="mutual-friends-popup__list_item__nickname position-relative">
-      <span>nicknam</span>
+      <span>nick</span>
       <skeleton-loader/>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-
 .mutual-friends-popup__list_item {
   display: flex;
   flex-direction: column;
-  align-items: center;
+
   gap: 5px;
   padding: 10px;
-  color: rgb(var(--v-theme-background));
+  width: 117px;
+  height: 117px;
 
-  .mutual-friends-popup__list_item__nickname{
-    @media screen and (max-width: 1050px) {
-      font-size: 12px;
+  &.__short {
+    padding: 0;
+    width: 82px;
+    height: 82px;
+
+    @media screen and (max-width: 550px){
+      width: 67px;
+      height: 67px;
+    }
+
+    .nickname-txt{
+      font-size: 14px;
     }
   }
+
 
   .mutual-friends-popup__list_item__avatar {
     position: relative;
     overflow: hidden;
-    min-width: 100px;
-    min-height: 100px;
-    border-radius: 50%;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-    &.__short{
-      min-width: 70px !important;
-      min-height: 70px !important;
-      @media screen and (max-width: 1050px) {
-        min-width: 55px !important;
-        min-height: 55px !important;
+    .avatar{
+      position: relative;
+      width: 67px;
+      height: 67px;
+      border-radius: 50%;
+      overflow: hidden;
+
+      &.__short{
+        width: 50px;
+        height: 50px;
+
+        @media screen and (max-width: 550px){
+          width: 38px;
+          height: 38px;
+        }
       }
     }
 
-    @media screen and (max-width: 1050px) {
-      min-width: 65px;
-      min-height: 65px;
-    }
 
-    @media screen and (max-width: 900px) {
-      min-width: 50px;
-      min-height: 50px;
-    }
+
   }
+
 }
-
-
 </style>

@@ -79,7 +79,7 @@ const show = computed(() => props.mode === 'internal' ? !userStore.findUserPendi
 
 <template>
   <div class="short-friends__wrapper" v-if="show">
-    <text-divider text="Друзья"/>
+    <text-divider class="mb-2" text="Друзья"/>
 
     <div class="short-friends__items" v-if="shortFiends && shortFiends.length">
       <friends-mutual-item v-for="friend in shortFiends" :mutual="friend" :is-short="true"/>
@@ -91,10 +91,8 @@ const show = computed(() => props.mode === 'internal' ? !userStore.findUserPendi
       </v-btn>
     </div>
 
-    <div class="short-friends__action"
-         v-if="userStore.foundUsers && (userStore.foundUsers.length > 3 || userStore.hasMoreFlag)">
-      <router-link class="load-more-btn__link m-auto" :to="{ name: 'friends', query: { tab: 'friends' } }"
-                   v-if="props.mode === 'internal'">
+    <div class="short-friends__action mt-2" v-if="userStore.foundUsers && (userStore.foundUsers.length > 3 || userStore.hasMoreFlag)">
+      <router-link class="load-more-btn__link m-auto" :to="{ name: 'friends', query: { tab: 'friends' } }" v-if="props.mode === 'internal'">
         <v-icon>mdi-dots-horizontal</v-icon>
       </router-link>
 
@@ -112,7 +110,6 @@ const show = computed(() => props.mode === 'internal' ? !userStore.findUserPendi
 
 <style scoped lang="scss">
 .__no-friends {
-  //padding: 10px 15px;
   gap: 5px;
 }
 
@@ -124,16 +121,16 @@ const show = computed(() => props.mode === 'internal' ? !userStore.findUserPendi
   padding: 10px;
   background: rgb(var(--v-theme-background));
 
-  @media screen and (max-width: 1370px){
-    width: 100%;
-  }
-
-
-
   .short-friends__items {
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
+    gap: 3px;
+    flex-wrap: nowrap;
+    width: fit-content;
+    margin: auto;
+    @media screen and (max-width: 550px){
+      flex-wrap: wrap;
+    }
   }
 }
 </style>

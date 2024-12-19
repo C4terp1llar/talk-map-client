@@ -6,6 +6,7 @@ import {useWsStore} from "@/stores/wsStore";
 import FriendsList from "@/components/friends/friendsList.vue";
 import ShortFriends from "@/components/home/shortFriends.vue";
 import ShortPhotosInternal from "@/components/photos/shortPhotosInternal.vue";
+import PostEditor from "@/components/posts/postEditor.vue";
 
 
 </script>
@@ -20,13 +21,13 @@ import ShortPhotosInternal from "@/components/photos/shortPhotosInternal.vue";
 
     <div class="home-page__relations">
       <short-photos-internal/>
-      <div class="home-page__friends-wrapper">
+      <div class="home-page__fr-wrapper">
         <short-friends mode="internal"/>
       </div>
     </div>
 
+    <post-editor/>
   </div>
-
 </template>
 
 <style scoped>
@@ -36,29 +37,17 @@ import ShortPhotosInternal from "@/components/photos/shortPhotosInternal.vue";
   gap: 15px;
   .home-page__relations{
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: auto;
-    grid-auto-flow: dense;
+    display: flex;
     gap: 15px;
 
-    .home-page__friends-wrapper{
-      width: 100%;
-      min-width: 335px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
+    @media screen and (max-width: 800px){
+      flex-direction: column;
+    }
 
-      grid-column: span 3;
-
-      @media screen and (max-width: 1000px){
-        grid-column: span 10;
-        flex-wrap: nowrap;
-      }
-
+    .home-page__fr-wrapper{
+      width: fit-content;
       @media screen and (max-width: 800px){
-        flex-wrap: wrap;
-        min-width: unset;
+        width: 100%;
       }
     }
   }

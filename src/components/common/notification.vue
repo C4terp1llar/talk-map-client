@@ -114,7 +114,7 @@ const getFrPageLink = (n: FrNotification) => {
 
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 
 .notification-container {
   position: fixed;
@@ -177,7 +177,6 @@ const getFrPageLink = (n: FrNotification) => {
 }
 
 .notification {
-  backdrop-filter: blur(15px);
   box-shadow: 0 1px 10px currentColor;
   border: 2px solid currentColor;
   border-radius: 15px;
@@ -189,6 +188,8 @@ const getFrPageLink = (n: FrNotification) => {
   opacity: 0;
   transform: translateY(20px);
   animation: fadeIn 0.3s ease forwards;
+  background: rgb(var(--v-theme-background));
+
 }
 
 
@@ -202,24 +203,24 @@ const getFrPageLink = (n: FrNotification) => {
 .notification.success {
   border-color: #4caf50;
   color: #4caf50;
-  background: linear-gradient(180deg, rgba(76, 175, 80, 0.3) 0%, rgba(76, 175, 80, 0.1) 100%);
+  //background: linear-gradient(180deg, rgba(76, 175, 80, 0.3) 0%, rgba(76, 175, 80, 0.1) 100%);
 }
 
 .notification.error {
   border-color: #f44336;
   color: #f44336;
-  background: linear-gradient(180deg, rgba(244, 67, 54, 0.3) 0%, rgba(244, 67, 54, 0.1) 100%);
+  //background: linear-gradient(180deg, rgba(244, 67, 54, 0.3) 0%, rgba(244, 67, 54, 0.1) 100%);
 }
 
 .notification.warning {
   border-color: orange;
   color: orange;
-  background: linear-gradient(180deg, rgba(255, 165, 0, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+  //background: linear-gradient(180deg, rgba(255, 165, 0, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
 }
 
 .notification.info {
   border-color: currentColor;
   color: currentColor;
-  background: linear-gradient(180deg, rgba(33, 150, 243, 0.3) 0%, rgba(33, 150, 243, 0.1) 100%);
+  //background: linear-gradient(180deg, rgba(33, 150, 243, 0.3) 0%, rgba(33, 150, 243, 0.1) 100%);
 }
 </style>

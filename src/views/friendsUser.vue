@@ -120,28 +120,21 @@ const getExternalUserInfo = async (userId: string) => {
 
   .friends-user__relations-section{
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: auto;
-    grid-auto-flow: dense;
+    display: flex;
     gap: 15px;
 
+    @media screen and (max-width: 800px){
+      flex-direction: column;
+    }
+
     .photos{
-      display: flex;
-      align-items: center;
-      justify-content: center;
       box-shadow: 0 1px 10px currentColor;
       border-radius: 15px;
       padding: 10px;
       background: rgb(var(--v-theme-background));
       text-align: center;
       height: fit-content;
-
-      grid-column: span 7;
-
-      @media screen and (max-width: 1370px){
-        grid-column: span 10;
-      }
+      width: 100%;
     }
   }
 }

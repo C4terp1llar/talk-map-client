@@ -4,7 +4,7 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 </script>
 
 <template>
-  <div class="media-content__wrapper-sk">
+  <div class="media-content__wrapper-sk mt-1">
     <div class="photo position-relative">
       <skeleton-loader/>
     </div>

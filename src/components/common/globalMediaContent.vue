@@ -94,6 +94,7 @@ onUnmounted(() => phStore.currentPhoto = null)
   transition: 0.3s;
   display: flex;
   align-items: center;
+  z-index: 5;
 
   @media (max-width: 650px) {
     position: relative;

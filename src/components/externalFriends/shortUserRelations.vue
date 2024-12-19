@@ -13,22 +13,14 @@ import ShortFriends from "@/components/home/shortFriends.vue";
 
 <style scoped lang="scss">
 .friends-user__content {
-  width: 100%;
-  min-width: 335px;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  width: fit-content;
   gap: 15px;
 
-  grid-column: span 3;
-
-  @media screen and (max-width: 1370px){
-    grid-column: span 10;
-    flex-wrap: nowrap;
-  }
-
   @media screen and (max-width: 800px){
-    flex-wrap: wrap;
-    min-width: unset;
+    width: 100%;
   }
 }
 </style>

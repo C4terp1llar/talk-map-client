@@ -57,14 +57,14 @@ const shortMutual = computed((): ShortMutualUserFriend[] | void => {
   <div class="external-mutual-friends__wrapper" v-if="!friendStore.mutualPending && !externalStore.pending">
     <text-divider text="Общие друзья"/>
 
-    <div class="external-mutual-friends__items" v-if="shortMutual && shortMutual.length">
+    <div class="external-mutual-friends__items mt-2" v-if="shortMutual && shortMutual.length">
       <friends-mutual-item v-for="friend in shortMutual" :mutual="friend" :is-short="true"/>
     </div>
     <div class="d-flex flex-column align-items-center mt-2 __no-friends" v-if="!shortMutual || !shortMutual.length">
-      <h6 class="text-center">Общих друзей нет 🧑‍🤝‍🧑</h6>
+      <h6 class="text-center text-no-wrap">Общих друзей нет 🧑‍🤝‍🧑</h6>
     </div>
 
-    <button class="load-more-btn__link m-auto" v-if="friendStore.foundMutual && friendStore.foundMutual.length > 3" @click="showFullMutual = true">
+    <button class="load-more-btn__link mt-2 m-auto" v-if="friendStore.foundMutual && friendStore.foundMutual.length > 3" @click="showFullMutual = true">
       <v-icon>mdi-dots-horizontal</v-icon>
     </button>
 
@@ -77,7 +77,6 @@ const shortMutual = computed((): ShortMutualUserFriend[] | void => {
 
 <style scoped lang="scss">
 .__no-friends {
-  //padding: 10px 15px;
   gap: 5px;
 }
 
@@ -94,11 +93,14 @@ const shortMutual = computed((): ShortMutualUserFriend[] | void => {
   }
 
 
-
   .external-mutual-friends__items {
     display: flex;
+    gap: 3px;
     justify-content: center;
     flex-wrap: wrap;
+    width: fit-content;
+    margin: auto;
+
   }
 }
 </style>

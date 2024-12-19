@@ -116,6 +116,11 @@ const getReq= () => {
   @media screen and (max-width: 450px){
     flex-direction: column;
   }
+
+  @media screen and (max-width: 800px){
+    gap: 5px;
+  }
+
   .search-friend-list-item__avatar{
     .search-friend-list-item__avatar-item{
       position: relative;
@@ -123,9 +128,14 @@ const getReq= () => {
       min-width: 100px;
       min-height: 100px;
 
-      @media screen and (max-width: 768px){
+      @media screen and (max-width: 800px){
         min-width: 80px;
         min-height: 80px;
+      }
+
+      @media screen and (max-width: 450px){
+        min-width: 65px;
+        min-height: 65px;
       }
       a{
         position: absolute;
@@ -159,6 +169,13 @@ const getReq= () => {
         cursor: pointer;
         font-weight: 500;
         font-size: 1.3rem;
+
+        @media screen and (max-width: 800px){
+          font-size: 1.1rem;
+        }
+        @media screen and (max-width: 400px){
+          font-size: 1rem;
+        }
       }
 
       @media screen and (max-width: 450px){

@@ -142,6 +142,10 @@ body{
   .flag-txt{
     font-size: 14px;
     font-weight: 500;
+
+    @media (max-width: 800px){
+      font-size: 12px;
+    }
   }
 }
 
@@ -247,3 +251,6 @@ input[type="date"]::-ms-expand {
     background-position: -200% 0;
   }
 }
+
+////
+

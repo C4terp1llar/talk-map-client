@@ -16,10 +16,11 @@ const props = defineProps<Props>()
 
 <template>
   <div :class="['mutual-friends-popup__list_item', props.isShort ? '__short' : '']">
-    <div class="mutual-friends-popup__list_item__avatar">
-      <v-avatar :class="['search-friend-list-item__avatar-item', props.isShort ? '__short' : '']">
+
+    <div :class="['mutual-friends-popup__list_item__avatar', props.isShort ? '__short' : '']">
+
+      <v-avatar :class="['avatar-block', props.isShort ? '__short' : '']">
         <v-img
-            class="avatar-img"
             :src="props.mutual.avatar.asset_url"
             alt="avatar"
             cover
@@ -27,10 +28,13 @@ const props = defineProps<Props>()
           <template v-slot:placeholder>
             <skeleton-loader/>
           </template>
+          <router-link :to="{ name: 'friends-user', params: { id: props.mutual._id } }"/>
         </v-img>
-        <router-link :to="{ name: 'friends-user', params: { id: props.mutual._id } }"/>
       </v-avatar>
+
+
     </div>
+
     <div class="mutual-friends-popup__list_item__nickname" v-if="!isWithoutNick">
       <router-link
           :style="{color: props.mutual.nickname_color ? props.mutual.nickname_color : 'currentColor'}"
@@ -46,20 +50,20 @@ const props = defineProps<Props>()
 .mutual-friends-popup__list_item {
   display: flex;
   flex-direction: column;
-  align-items: center;
+
   gap: 5px;
   padding: 10px;
-  min-width: 120px;
-  max-width: 120px;
+  width: 120px;
+  height: 120px;
 
   &.__short {
-    min-width: 100px;
-    max-width: 100px;
+    padding: 0;
+    width: 85px;
+    height: 85px;
 
-    @media screen and (max-width: 1050px) {
-      min-width: 82px !important;
-      max-width: 82px !important;
-      gap: 2px !important;
+    @media screen and (max-width: 550px){
+      width: 70px;
+      height: 70px;
     }
 
     .nickname-txt{
@@ -69,6 +73,7 @@ const props = defineProps<Props>()
 
   .mutual-friends-popup__list_item__nickname {
     text-align: center;
+    grid-row: span 1;
 
     .nickname-txt {
       max-width: 100%;
@@ -88,24 +93,26 @@ const props = defineProps<Props>()
 
 
   .mutual-friends-popup__list_item__avatar {
-    .search-friend-list-item__avatar-item {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .avatar-block{
       position: relative;
-      border: 2px solid green;
-      min-width: 100px;
-      min-height: 100px;
+      width: 75px;
+      height: 75px;
 
-      @media screen and (max-width: 1050px) {
-        min-width: 80px;
-        min-height: 80px;
-      }
+      &.__short{
+        width: 60px;
+        height: 60px;
 
-      &.__short {
-        min-width: 75px;
-        min-height: 75px;
-
-        @media screen and (max-width: 1050px) {
-          min-width: 60px;
-          min-height: 60px;
+        @media screen and (max-width: 550px){
+          width: 45px;
+          height: 45px;
         }
       }
 
@@ -113,10 +120,18 @@ const props = defineProps<Props>()
         position: absolute;
         inset: 0;
         border-radius: 50%;
+        z-index: 1 !important;
       }
     }
-  }
 
+
+    //&.__short {
+    //  width: 100%;
+    //  height: 100%;
+    //}
+
+
+  }
 
 }
 </style>

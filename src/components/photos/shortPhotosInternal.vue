@@ -62,12 +62,7 @@ onUnmounted(() => photoStore.photos = null)
   background: rgb(var(--v-theme-background));
   text-align: center;
   height: fit-content;
-
-  grid-column: span 7;
-
-  @media screen and (max-width: 1000px){
-    grid-column: span 10;
-  }
+  width: 100%;
 
   .photos-internal{
     width: 100%;

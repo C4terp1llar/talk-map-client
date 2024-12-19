@@ -109,6 +109,14 @@ const getSendTime = (sendTime: Date, mode: 'time' | 'date') => {
   }
 }
 
+.mutual-wrapper{
+  @media screen and (max-width: 450px) {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+}
+
 .friends-reqs-list-item {
   width: 100%;
   position: relative;
@@ -151,8 +159,13 @@ const getSendTime = (sendTime: Date, mode: 'time' | 'date') => {
 
   }
 
-  @media screen and (max-width: 450px) {
+
+  @media screen and (max-width: 450px){
     flex-direction: column;
+  }
+
+  @media screen and (max-width: 800px){
+    gap: 5px;
   }
 
   .friends-reqs-list-item__avatar {
@@ -162,9 +175,14 @@ const getSendTime = (sendTime: Date, mode: 'time' | 'date') => {
       min-width: 100px;
       min-height: 100px;
 
-      @media screen and (max-width: 768px) {
+      @media screen and (max-width: 800px){
         min-width: 80px;
         min-height: 80px;
+      }
+
+      @media screen and (max-width: 450px){
+        min-width: 65px;
+        min-height: 65px;
       }
 
       button {
@@ -192,6 +210,13 @@ const getSendTime = (sendTime: Date, mode: 'time' | 'date') => {
         cursor: pointer;
         font-weight: 500;
         font-size: 1.3rem;
+
+        @media screen and (max-width: 800px){
+          font-size: 1.1rem;
+        }
+        @media screen and (max-width: 400px){
+          font-size: 1rem;
+        }
       }
 
       @media screen and (max-width: 450px) {
