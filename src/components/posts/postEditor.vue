@@ -1,88 +1,102 @@
 <script setup lang="ts">
-import {ref} from 'vue';
-import {QuillEditor} from '@vueup/vue-quill'
+import PostEditorText from "@/components/posts/postEditorText.vue";
+import MediaUpload from "@/components/multimedia/mediaUpload.vue";
+import {ref} from "vue";
+import {usePostStore} from "@/stores/post";
+import {useNotificationStore} from "@/stores/notifications";
+import {onClickOutside} from "@vueuse/core";
 
-const editorContent = ref('');
+const emit = defineEmits(["close"]);
 
-const editorOptions = {
-  theme: 'snow',
-  modules: {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'blockquote', 'code-block'],
-      [{header: 1}, {header: 2}],
-      [{list: 'ordered'}, {list: 'bullet'}],
-    ],
-    clipboard: {
-      matchVisual: true
-    }
+interface PostF { id: string, file: File, previewUrl?: string, type: string }
+
+const postStore = usePostStore();
+const ntfStore = useNotificationStore();
+
+const postFiles = ref<PostF[]>([]);
+const postText = ref<string>('');
+
+const handlePost = async () => {
+  if (!postText.value.trim()) return;
+
+  let mediaData
+  if (postFiles.value.length > 0){
+    const formData = new FormData();
+    postFiles.value.forEach(fileEntry => {
+      formData.append(fileEntry.file.name, fileEntry.file);
+    });
+    mediaData = formData
+  }
+
+  emit('close');
+
+  await postStore.createPost(postText.value, mediaData, [{key: 'sender', value: 'post'}]);
+
+  if (postStore.error){
+    ntfStore.addNotification('error', postStore.error, 3000)
   }
 }
 
-const filterVal = () => {
-  if (!editorContent.value) return;
+const postEditor = ref<HTMLElement | null>(null);
 
-  let cleanedHtml = editorContent.value;
-
-  // Удаляем пустые сочетания типа <h1><br></h1>, <h2><br></h2>, и т.п.
-  cleanedHtml = cleanedHtml.replace(/<([h1-h6])>\s*<br\s*\/?>\s*<\/\1>/gi, '');
-
-  // Удаляем все пустые теги, такие как <p></p>, <ul></ul>, <ol></ol> и т.п.
-  cleanedHtml = cleanedHtml.replace(/<([a-z]+)>\s*<\/\1>/gi, '');
-
-  // Удаляем пустые <span> теги с классом "ql-cursor"
-  cleanedHtml = cleanedHtml.replace(/<span class="ql-cursor">.*?<\/span>/gi, '');
-
-  // Дополнительно фильтруем любые элементы, которые содержат только пробелы или разрывы
-  cleanedHtml = cleanedHtml.replace(/<pre class="ql-syntax"[^>]*>\s*<\/pre>/gi, '');
-
-  // Удаляем пустые заголовки, такие как <h1></h1>, <h2></h2>, и т.п.
-  cleanedHtml = cleanedHtml.replace(/<h[1-6]>\s*<\/h[1-6]>/gi, '');
-
-  // Удаляем пустые списки, такие как <ol><li><br></li></ol>
-  cleanedHtml = cleanedHtml.replace(/<([ou])l>\s*<li>\s*<\/li>\s*<\/\1>/gi, '');
-
-  // Удаляем пустые блоки <blockquote><br></blockquote>
-  cleanedHtml = cleanedHtml.replace(/<blockquote>\s*<br\s*\/?>\s*<\/blockquote>/gi, '');
-
-  editorContent.value = cleanedHtml;
-}
-
+const clickOutside = () => {
+  emit('close');
+};
+onClickOutside(postEditor, clickOutside);
 </script>
 
 <template>
-  <div class="post-editor__wrapper">
+  <div class="post-editor__gl-wrapper">
+    <div ref="postEditor" class="post-editor__wrapper">
+      <button class="close-u-m__btn">
+        <v-icon class="desktop_icon" :size="24" >mdi-close</v-icon>
+        <div class="mobile_icon">
+          <v-icon :size="24" color="green">mdi-arrow-left-bold-outline</v-icon>
+          <span>Назад</span>
+        </div>
+      </button>
 
-    <div class="post-editor__exact-wrapper">
-      <quill-editor
-          v-model:content="editorContent"
-          content-type="html"
-          :options="editorOptions"
-          placeholder="Напишите что-нибудь..."
-      />
-    </div>
+      <h6 class="text-center">Создание поста</h6>
 
-    <v-btn @click="filterVal">ok</v-btn>
+      <media-upload @sl-post-media="(m: PostF[] | []) => postFiles = m" sender="post"/>
+      <post-editor-text v-model="postText"/>
 
-    <div class="editor-preview">
-      <h6>Предросмотр:</h6>
-      <div class="editor-content" v-html="editorContent"></div>
-      {{editorContent}}
+      <div class="actions">
+        <v-btn @click="handlePost" color="green" class="text-none w-100" variant="text">Опубликовать</v-btn>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+.post-editor__gl-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 10003;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
 .post-editor__wrapper {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  position: relative;
+  box-shadow: 0 1px 10px currentColor;
+  border-radius: 15px;
+  background: rgb(var(--v-theme-background));
+  padding: 15px;
 
-  .post-editor__exact-wrapper{
-    box-shadow: 0 1px 10px currentColor;
-    background: rgb(var(--v-theme-background));
-    border-radius: 10px;
+  width: 80vw;
+
+  @media screen and (max-width: 650px) {
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    padding: 5px;
   }
 }
-
-
-
 </style>

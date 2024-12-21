@@ -4,10 +4,8 @@ import 'flag-icons/css/flag-icons.min.css';
 import './assets/main.scss';
 import './assets/map.scss'
 import './assets/cropper.scss'
-import './assets/custom-quil.scss'
 import 'leaflet/dist/leaflet.css'
 import "viewerjs/dist/viewer.css";
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 import Viewer from "v-viewer";
 

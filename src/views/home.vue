@@ -7,6 +7,7 @@ import FriendsList from "@/components/friends/friendsList.vue";
 import ShortFriends from "@/components/home/shortFriends.vue";
 import ShortPhotosInternal from "@/components/photos/shortPhotosInternal.vue";
 import PostEditor from "@/components/posts/postEditor.vue";
+import CreatePost from "@/components/posts/createPost.vue";
 
 
 </script>
@@ -26,7 +27,7 @@ import PostEditor from "@/components/posts/postEditor.vue";
       </div>
     </div>
 
-    <post-editor/>
+    <create-post/>
   </div>
 </template>
 

@@ -14,7 +14,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const emit = defineEmits(['slPhoto'])
+const emit = defineEmits(['slPhoto', 'slPostMedia'])
 
 const notificationStore = useNotificationStore();
 const multimediaStore = useMultimediaStore();
@@ -23,7 +23,15 @@ const photoStore = usePhotoStore();
 
 const files = ref<{ id: string, file: File, previewUrl?: string, type: string }[]>([]);
 
-const handleFileUpload = (event: DragEvent | Event) => {
+const slotsMap = new Map([
+  ['photo', 16],
+  ['post', 10],
+  ['message', 8]
+])
+
+const SLOTS = slotsMap.get(props.sender) || 10
+
+const handleFileUpload = async (event: DragEvent | Event) => {
   event.preventDefault();
 
   let filesList: FileList | null = null;
@@ -35,61 +43,81 @@ const handleFileUpload = (event: DragEvent | Event) => {
   }
 
   if (filesList && filesList.length > 0) {
-
     if (props.sender === 'photo') {
       for (const file of Array.from(filesList)) {
         if (!file.type.startsWith('image/')) {
-          notificationStore.addNotification('warning', 'Вы можете загрузить только изображения', 3000);
+          notificationStore.addNotification('warning', 'Вы можете загрузить только изображения', 3000); // Добавлен await
           return;
         }
       }
     }
 
-    const availableSlots = 16 - files.value.length < 0 || 16 - (files.value.length + filesList.length) < 0;
+    if (props.sender === 'post') {
+      for (const file of Array.from(filesList)) {
+        if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+          notificationStore.addNotification('warning', 'Вы можете загрузить только изображения или видео', 3000); // Добавлен await
+          return;
+        }
+      }
+    }
+
+    const availableSlots = SLOTS - files.value.length < 0 || SLOTS - (files.value.length + filesList.length) < 0;
     if (availableSlots) {
-      notificationStore.addNotification('warning', 'Вы можете загрузить не более 16 файлов!', 3000)
+      notificationStore.addNotification('warning', `Вы можете загрузить не более ${SLOTS} файлов!`, 3000); // Добавлен await
       return;
     }
 
-    Array.from(filesList).forEach(file => {
-      const isDuplicate = files.value.some(existingFile => existingFile.file.name === file.name);
-      if (!isDuplicate) {
-        const fileType = file.type.split('/')[0];
-        const uniqueId = `${file.name}-${Date.now()}-${Math.random()}`;
+    await Promise.all(
+        Array.from(filesList).map(async (file) => {
+          const isDuplicate = files.value.some(existingFile => existingFile.file.name === file.name);
+          if (!isDuplicate) {
+            const fileType = file.type.split('/')[0];
+            const uniqueId = `${file.name}-${Date.now()}-${Math.random()}`;
 
-        const fileEntry = {
-          id: uniqueId,
-          file,
-          type: fileType,
-          previewUrl: ''
-        };
+            const fileEntry = {
+              id: uniqueId,
+              file,
+              type: fileType,
+              previewUrl: ''
+            };
 
-        if (fileType === 'image' || fileType === 'audio' || fileType === 'video') {
-          const reader = new FileReader();
+            if (fileType === 'image' || fileType === 'audio' || fileType === 'video') {
+              const reader = new FileReader();
 
-          reader.onload = () => {
-            if (fileType === 'image' && props.sender === 'photo') {
-              const img = new Image();
-              img.src = reader.result as string;
+              await new Promise<void>((resolve) => { // Добавлена асинхронная обработка
+                reader.onload = async () => {
+                  if (fileType === 'image' && props.sender === 'photo') {
+                    const img = new Image();
+                    img.src = reader.result as string;
 
-              img.onload = () => {
-                if (img.width < 300 || img.height < 300) {
-                  notificationStore.addNotification('warning', `Минимальное разрешение для фотографии 300x300 пикселей`, 3000);
-                  return;
-                } else {
-                  fileEntry.previewUrl = reader.result as string;
-                  files.value.push(fileEntry);
-                }
-              };
+                    img.onload = async () => { // Добавлен await
+                      if (img.width < 300 || img.height < 300) {
+                        notificationStore.addNotification('warning', `Минимальное разрешение для фотографии 300x300 пикселей`, 3000);
+                        resolve();
+                      } else {
+                        fileEntry.previewUrl = reader.result as string;
+                        files.value.push(fileEntry);
+                        resolve();
+                      }
+                    };
+                  } else {
+                    fileEntry.previewUrl = reader.result as string;
+                    files.value.push(fileEntry);
+                    resolve();
+                  }
+                };
+                reader.readAsDataURL(file);
+              });
             } else {
-              fileEntry.previewUrl = reader.result as string;
               files.value.push(fileEntry);
             }
-          };
-          reader.readAsDataURL(file);
-        }
-      }
-    });
+          }
+        })
+    );
+
+    if (props.sender === 'post' && files.value.length) {
+      emit('slPostMedia', files.value);
+    }
   }
 };
 
@@ -115,15 +143,6 @@ const uploadFiles = async () => {
     return;
   }
 
-  // await multimediaStore.upload(formData, [{key: 'sender', value: props.sender}]);
-  //
-  // if (!multimediaStore.error){
-  //   files.value = [];
-  //   isMenuVisible.value = false
-  //   selectedList.value = []
-  // }else{
-  //   notificationStore.addNotification('error', multimediaStore.error, 3000)
-  // }
 };
 
 const isMenuVisible = ref<boolean>(false);
@@ -142,14 +161,29 @@ const filterAll = () => {
 const deleteFile = (id: string) => {
   files.value = files.value.filter((file) => file.id !== id);
   selectedList.value = selectedList.value.filter((fileId) => fileId !== id);
+
+  if (props.sender === 'post'){
+    emit('slPostMedia', files.value)
+  }
+};
+
+const getAcceptType = (sender:string) => {
+  switch (sender) {
+    case 'photo':
+      return 'image/*';
+    case 'post':
+      return 'image/*, video/*';
+    default:
+      return '';
+  }
 };
 </script>
 
 <template>
-  <div class="modal-block" @dragover.prevent @drop="handleFileUpload">
+  <div :class="['modal-block', props.sender === 'post' ? '__post' : '']" @dragover.prevent @drop="handleFileUpload">
 
     <div class="file-drop-area" @click="openFileDialog">
-      <input :accept="props.sender === 'photo' ? 'image/*' : ''"  ref="fileInput" type="file" @change="handleFileUpload" :disabled="multimediaStore.pending || photoStore.pending" multiple class="file-input"/>
+      <input :accept="getAcceptType(props.sender)"  ref="fileInput" type="file" @change="handleFileUpload" :disabled="multimediaStore.pending || photoStore.pending" multiple class="file-input"/>
       <span class="file-drop-text">Перетащите файлы сюда или нажмите, чтобы выбрать</span>
     </div>
 
@@ -159,7 +193,11 @@ const deleteFile = (id: string) => {
       </div>
     </scrollable-container>
 
-    <div class="controls" v-if="files.length">
+    <div class="post__media-counter mt-2" v-if="props.sender === 'post'">
+      <span>{{ `Добавлено ${files.length} из 10` }}</span>
+    </div>
+
+    <div class="controls" v-if="files.length && props.sender !== 'post'">
       <hr>
       <div v-if="!isMenuVisible" class="head-controls d-flex align-items-center justify-content-between position-relative">
         <span>{{ `Добавлено ${files.length}` }}</span>
@@ -187,7 +225,7 @@ const deleteFile = (id: string) => {
       />
     </div>
 
-    <div class="actions">
+    <div class="actions" v-if="props.sender !== 'post'">
       <v-btn variant="outlined" @click="uploadFiles" :disabled="multimediaStore.pending || photoStore.pending" class="text-none w-100">
         <template v-if="!multimediaStore.pending && !photoStore.pending">
           Готово
@@ -205,6 +243,15 @@ const deleteFile = (id: string) => {
   height: 40px;
 }
 
+.post__media-counter{
+  display: flex;
+  justify-content: center;
+  span{
+    font-size: 12px;
+    color: #999;
+  }
+}
+
 .file-drop-text{
   font-size: 14px;
   color: #999;
@@ -219,6 +266,11 @@ const deleteFile = (id: string) => {
   padding: 15px;
   width: 100%;
   display: grid;
+
+  &.__post{
+    padding: unset;
+    box-shadow: unset;
+  }
 }
 
 .file-drop-area {

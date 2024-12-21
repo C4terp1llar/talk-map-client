@@ -7,6 +7,7 @@ const emit = defineEmits();
 
 interface Props {
   selectMode: 'single' | 'multiple',
+  isRelative?: boolean
 }
 const props = defineProps<Props>();
 
@@ -38,7 +39,7 @@ onClickOutside(emojiWrapperRef, clickOutside);
 </script>
 
 <template>
-  <div class="emoji-wrapper" ref="emojiWrapperRef">
+  <div :class="['emoji-wrapper', props.isRelative ? '__relative' : '']" ref="emojiWrapperRef">
     <div class="emoji-wrapper__tabs">
       <div class="emoji-wrapper__tab" v-for="obj in processedEmojiData" :key="obj.slug">
         <i :class="['emoji-wrapper__tab-icon', 'mdi', obj.iconClass]"></i>
@@ -98,6 +99,16 @@ onClickOutside(emojiWrapperRef, clickOutside);
       position: absolute;
       inset: 0;
     }
+  }
+}
+
+.__relative{
+  max-width: unset !important;
+  width: 100%;
+  max-height: 100px;
+
+  .emoji-wrapper__tabs{
+    padding: 0 !important;
   }
 }
 
