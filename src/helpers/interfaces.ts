@@ -158,4 +158,13 @@ export interface PhotoG {
     liked: boolean,
 }
 
-
+export interface Post {
+    _id: string,
+    user_id: string,
+    text: string,
+    createdAt: Date,
+    likesCount: number,
+    liked: boolean,
+    mode: 'internal' | 'external',
+    media: {id: string, url: string, type: string}[] | []
+}

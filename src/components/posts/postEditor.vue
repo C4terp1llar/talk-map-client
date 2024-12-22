@@ -48,7 +48,7 @@ onClickOutside(postEditor, clickOutside);
 <template>
   <div class="post-editor__gl-wrapper">
     <div ref="postEditor" class="post-editor__wrapper">
-      <button class="close-u-m__btn">
+      <button class="close-u-m__btn" @click="emit('close')">
         <v-icon class="desktop_icon" :size="24" >mdi-close</v-icon>
         <div class="mobile_icon">
           <v-icon :size="24" color="green">mdi-arrow-left-bold-outline</v-icon>

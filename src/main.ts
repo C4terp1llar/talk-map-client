@@ -7,6 +7,7 @@ import './assets/cropper.scss'
 import 'leaflet/dist/leaflet.css'
 import "viewerjs/dist/viewer.css";
 
+import VueLazyload from 'vue3-lazyload'
 import Viewer from "v-viewer";
 
 import { createApp } from 'vue'
@@ -41,4 +42,8 @@ app.use(router)
 app.use(vuetify)
 app.use(autoAnimatePlugin)
 app.use(Viewer)
+app.use(VueLazyload, {
+    loading: '/img/load-error.gif',
+    error: '/logo/logo-lr.png',
+})
 app.mount('#app')

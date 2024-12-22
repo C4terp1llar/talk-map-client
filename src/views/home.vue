@@ -8,6 +8,7 @@ import ShortFriends from "@/components/home/shortFriends.vue";
 import ShortPhotosInternal from "@/components/photos/shortPhotosInternal.vue";
 import PostEditor from "@/components/posts/postEditor.vue";
 import CreatePost from "@/components/posts/createPost.vue";
+import PostsList from "@/components/posts/postsList.vue";
 
 
 </script>
@@ -19,6 +20,7 @@ import CreatePost from "@/components/posts/createPost.vue";
     </wallpaper>
 
     <tags-home/>
+    <create-post/>
 
     <div class="home-page__relations">
       <short-photos-internal/>
@@ -27,7 +29,8 @@ import CreatePost from "@/components/posts/createPost.vue";
       </div>
     </div>
 
-    <create-post/>
+    <posts-list mode="internal"/>
+
   </div>
 </template>
 
