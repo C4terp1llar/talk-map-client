@@ -37,6 +37,7 @@ const handleClosePicker = () => {
           rows="3"
           placeholder="Напишите что-нибудь..."
           class="custom-textarea styled-txt-scroll"
+          :maxlength="1000"
       ></textarea>
 
     </div>

@@ -256,6 +256,22 @@ body{
 }
 //
 
+// натсройки видеоплеера
+
+//.vjs_video_3-dimensions{
+//  width: 100% !important;
+//  height: inherit !important;
+//  max-width: inherit !important;
+//  max-height: inherit !important;
+//}
+.video-js{
+  //width: 100% !important;
+  //height: inherit !important;
+  background-color: rgb(var(--v-theme-background)) !important;
+}
+
+//
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 input[type="date"]::-webkit-calendar-picker-indicator {

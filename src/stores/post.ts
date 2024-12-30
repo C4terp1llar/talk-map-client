@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import apiAuth from "@/utils/apiAuth";
 import { ref } from "vue";
-import type {Photo, Post} from "@/helpers/interfaces";
+import type {Photo, Post, PostOwner} from "@/helpers/interfaces";
 
 export const usePostStore = defineStore('post', () => {
     const pending = ref<boolean>(false);
@@ -55,6 +55,7 @@ export const usePostStore = defineStore('post', () => {
     const hasMore = ref<boolean | null>(null);
 
     const posts = ref<Post[] | null>(null);
+    const postOwnerInfo = ref<PostOwner | null>(null)
 
     const getPosts = async (mode: 'load' | 'load-more', limit?: number, requester?: string, withoutPending?: boolean) => {
 
@@ -88,6 +89,7 @@ export const usePostStore = defineStore('post', () => {
 
                 if (postPage.value === 1) {
                     posts.value = response.data.posts;
+                    postOwnerInfo.value = response.data.ownerInfo;
                 } else if (postPage.value !== 1 && posts.value){
                     posts.value.push(...response.data.posts);
                 }
@@ -105,12 +107,12 @@ export const usePostStore = defineStore('post', () => {
     const delPostPending = ref<boolean>(false);
     const delPostError = ref<string | null>(null);
 
-    const deletePost = async (id: string) => {
+    const deletePost = async (postId: string) => {
         delPostPending.value = true;
         delPostError.value = null;
 
         try {
-            await apiAuth.delete(`user/post/${id}`)
+            await apiAuth.delete(`user/post/${postId}`)
 
         } catch (e: any) {
             delPostError.value = "Произошла ошибка при удалении поста, попробуйте позже";
@@ -132,6 +134,7 @@ export const usePostStore = defineStore('post', () => {
         loadMore,
         hasMore,
         posts,
+        postOwnerInfo,
         getPosts,
 
         delPostPending,

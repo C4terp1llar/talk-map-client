@@ -5,6 +5,8 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 
 const router = useRouter();
 
+const emit = defineEmits(['redirectToUser']);
+
 interface Props {
   mutual: ShortMutualUserFriend,
   isShort?: boolean,
@@ -12,6 +14,11 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const handleSelect = () => {
+  emit('redirectToUser')
+}
+
 </script>
 
 <template>
@@ -28,7 +35,7 @@ const props = defineProps<Props>()
           <template v-slot:placeholder>
             <skeleton-loader/>
           </template>
-          <router-link :to="{ name: 'friends-user', params: { id: props.mutual._id } }"/>
+          <router-link @click="handleSelect" :to="{ name: 'friends-user', params: { id: props.mutual._id } }"/>
         </v-img>
       </v-avatar>
 
@@ -37,6 +44,7 @@ const props = defineProps<Props>()
 
     <div class="mutual-friends-popup__list_item__nickname" v-if="!isWithoutNick">
       <router-link
+          @click="handleSelect"
           :style="{color: props.mutual.nickname_color ? props.mutual.nickname_color : 'currentColor'}"
           class="nickname-txt"
           :to="{ name: 'friends-user', params: { id: props.mutual._id } }"

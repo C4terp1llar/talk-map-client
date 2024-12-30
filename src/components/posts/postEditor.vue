@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import PostEditorText from "@/components/posts/postEditorText.vue";
 import MediaUpload from "@/components/multimedia/mediaUpload.vue";
-import {ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import {usePostStore} from "@/stores/post";
 import {useNotificationStore} from "@/stores/notifications";
 import {onClickOutside} from "@vueuse/core";
+import {lockScroll, unlockScroll} from "@/helpers/popup";
 
 const emit = defineEmits(["close"]);
 
@@ -17,7 +18,7 @@ const postFiles = ref<PostF[]>([]);
 const postText = ref<string>('');
 
 const handlePost = async () => {
-  if (!postText.value.trim()) return;
+  if (postText.value.trim().length <= 20) return;
 
   let mediaData
   if (postFiles.value.length > 0){
@@ -34,6 +35,9 @@ const handlePost = async () => {
 
   if (postStore.error){
     ntfStore.addNotification('error', postStore.error, 3000)
+  }else{
+    ntfStore.addNotification('success', 'Пост успешно опубликован!', 3000)
+    await postStore.getPosts('load', undefined, undefined, true)
   }
 }
 
@@ -43,6 +47,9 @@ const clickOutside = () => {
   emit('close');
 };
 onClickOutside(postEditor, clickOutside);
+
+onMounted(() => lockScroll())
+onUnmounted(() => unlockScroll())
 </script>
 
 <template>

@@ -40,7 +40,7 @@ onClickOutside(mutualFriendsRef, clickOutside);
 
       <div class="mutual-friends-popup__content styled-scroll" ref="mutualFriendsRef">
 
-        <friends-mutual-list :mode="props.mode" :id="props.id"/>
+        <friends-mutual-list @close="clickOutside" :mode="props.mode" :id="props.id"/>
 
         <button @click="clickOutside">
           <v-icon>mdi-close</v-icon>

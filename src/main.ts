@@ -7,6 +7,8 @@ import './assets/cropper.scss'
 import 'leaflet/dist/leaflet.css'
 import "viewerjs/dist/viewer.css";
 
+import VueVideoPlayer from '@videojs-player/vue'
+import 'video.js/dist/video-js.css'
 import VueLazyload from 'vue3-lazyload'
 import Viewer from "v-viewer";
 
@@ -46,4 +48,5 @@ app.use(VueLazyload, {
     loading: '/img/load-error.gif',
     error: '/logo/logo-lr.png',
 })
+app.use(VueVideoPlayer)
 app.mount('#app')

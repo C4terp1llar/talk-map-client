@@ -1,34 +1,36 @@
 <script setup lang="ts">
 import type { Post } from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
-import {onMounted, ref} from 'vue';
+import PostReactions from "@/components/posts/postReactions.vue";
+import {VideoPlayer} from "@videojs-player/vue";
+import {ref} from "vue";
+import PostItemHead from "@/components/posts/postItemHead.vue";
 
 interface Props {
-  posts: Post[];
+  p: Post;
   mode: 'internal' | 'external';
 }
 
 const props = defineProps<Props>();
 
-const activeMedia = ref(0);
+const currentMedia = ref<number>(0);
 </script>
 
 <template>
-  <div class="posts-item__wrapper" v-for="p in props.posts" :key="p._id">
+  <div class="posts-item__wrapper">
 
-    <div class="post-item__head">
-      <h6 class="text-center">Мб какой-то заголовок</h6>
-    </div>
+    <post-item-head :post="props.p" :mode="props.mode" />
 
-    <div class="post-item-media__wrapper" v-if="p.media && p.media.length">
-      <v-carousel v-model:active="activeMedia" hide-delimiters :height="300">
+    <div class="post-item-media__wrapper mt-2" v-if="p.media && p.media.length">
+      <v-carousel :show-arrows="p.media.length > 1" hide-delimiters class="media__slider" @update:model-value="i => typeof i === 'number' ? currentMedia = i : currentMedia = 0">
         <v-carousel-item
             v-for="(m, index) in p.media"
             :key="m.id"
+            :value="index"
         >
 
           <div v-if="m.type.startsWith('image/')" class="post-item-media__img">
-            <v-img :src="m.url" :alt="'Image ' + index" >
+            <v-img :src="m.url" :alt="'Image ' + index">
               <template v-slot:placeholder>
                 <skeleton-loader />
               </template>
@@ -36,18 +38,19 @@ const activeMedia = ref(0);
           </div>
 
           <div v-if="m.type.startsWith('video/')" class="post-item-media__video">
-            <video class="exact__video" controls :src="m.url" :alt="'Video ' + index" />
+            <video-player :inactivityTimeout="0" :playsinline="true" :responsive="true" :fill="true" preload="metadata" :src="m.url" controls/>
           </div>
         </v-carousel-item>
       </v-carousel>
+      <span v-if="p.media.length > 1" class="mt-1 media__counter">{{ `${currentMedia + 1} из ${p.media.length}` }}</span>
     </div>
 
-    <div class="post-item__text">
-      {{ p.text }}
+    <div class="post-item__text mt-2">
+      <h6>{{ p.text }}</h6>
     </div>
 
     <div class="post-item__reactions">
-      <!-- Реакции можно добавлять здесь -->
+      <post-reactions :post="p"/>
     </div>
   </div>
 </template>
@@ -63,18 +66,29 @@ const activeMedia = ref(0);
 
   .post-item-media__wrapper{
 
-    .post-item-media__img, .post-item-media__video{
-      width: 100%;
-      height: 300px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .post-item-media__video, .post-item-media__img{
+      height: 100%  !important;
       display: flex;
       justify-content: center;
       align-items: center;
-      img, video{
-        width: auto;
-        height: inherit;
-      }
     }
+
+    .media__slider{
+      height: 250px !important;
+    }
+
   }
 }
 
+.media__counter {
+  opacity: 0.8;
+  font-size: 12px;
+  font-weight: 500;
+  color: grey;
+}
 </style>

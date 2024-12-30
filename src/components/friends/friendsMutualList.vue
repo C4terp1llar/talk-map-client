@@ -12,6 +12,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits(['close']);
 
 const fullPopup = useFullPopupData();
 
@@ -64,6 +65,10 @@ const shortFiends = computed((): ShortMutualUserFriend[] | void => {
 onMounted(async () => {
   await uploadData('load')
 })
+
+const handleSelect = () => {
+  emit('close')
+}
 </script>
 
 <template>
@@ -73,7 +78,7 @@ onMounted(async () => {
 
     <div class="mutual-friends-popup__content-list__items">
       <mutal-item-skeleton v-for="i in 5" :key="i" v-if="fullPopup.pending"/>
-      <friends-mutual-item v-for="mutual in props.mode === 'friends' ? shortFiends : fullData" :mutual="mutual" v-else/>
+      <friends-mutual-item @redirect-to-user="handleSelect" v-for="mutual in props.mode === 'friends' ? shortFiends : fullData" :mutual="mutual" v-else/>
 
       <h4
           class="text-center"

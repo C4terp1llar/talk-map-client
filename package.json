@@ -13,6 +13,7 @@
   "dependencies": {
     "@formkit/auto-animate": "^0.8.2",
     "@mdi/font": "^7.4.47",
+    "@videojs-player/vue": "^1.0.0",
     "@vueuse/core": "^11.1.0",
     "axios": "^1.7.3",
     "bootstrap": "^5.3.3",
@@ -27,6 +28,7 @@
     "socket.io-client": "^4.8.0",
     "unicode-emoji-json": "^0.8.0",
     "v-viewer": "^3.0.21",
+    "video.js": "^8.21.0",
     "viewerjs": "^1.11.7",
     "vue": "^3.4.29",
     "vue-cropperjs": "^5.0.0",

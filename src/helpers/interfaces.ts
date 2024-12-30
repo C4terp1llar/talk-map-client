@@ -163,8 +163,16 @@ export interface Post {
     user_id: string,
     text: string,
     createdAt: Date,
-    likesCount: number,
+    likes_count: number,
     liked: boolean,
     mode: 'internal' | 'external',
     media: {id: string, url: string, type: string}[] | []
+}
+
+export interface PostOwner {
+    _id: string,
+    nickname: string,
+    nickname_color: string | null,
+    avatar: string,
+    match: boolean
 }

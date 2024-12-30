@@ -29,7 +29,14 @@ const slotsMap = new Map([
   ['message', 8]
 ])
 
-const SLOTS = slotsMap.get(props.sender) || 10
+const sizeMap = new Map([
+  ['photo', 20],
+  ['post', 150],
+  ['message', 200]
+])
+
+const SLOTS = slotsMap.get(props.sender) || 10;
+const MAX_FILE_SIZE_MB = sizeMap.get(props.sender) || 100;
 
 const handleFileUpload = async (event: DragEvent | Event) => {
   event.preventDefault();
@@ -46,7 +53,7 @@ const handleFileUpload = async (event: DragEvent | Event) => {
     if (props.sender === 'photo') {
       for (const file of Array.from(filesList)) {
         if (!file.type.startsWith('image/')) {
-          notificationStore.addNotification('warning', 'Вы можете загрузить только изображения', 3000); // Добавлен await
+          notificationStore.addNotification('warning', 'Вы можете загрузить только изображения', 3000);
           return;
         }
       }
@@ -55,15 +62,23 @@ const handleFileUpload = async (event: DragEvent | Event) => {
     if (props.sender === 'post') {
       for (const file of Array.from(filesList)) {
         if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-          notificationStore.addNotification('warning', 'Вы можете загрузить только изображения или видео', 3000); // Добавлен await
+          notificationStore.addNotification('warning', 'Вы можете загрузить только изображения или видео', 3000);
           return;
         }
       }
     }
 
+    for (const file of Array.from(filesList)) {
+      const fileSizeMB = file.size / (1024 * 1024);
+      if (fileSizeMB > MAX_FILE_SIZE_MB) {
+        notificationStore.addNotification('warning', `Максимально допустимый размер файла - ${MAX_FILE_SIZE_MB} Мб`, 3000);
+        return;
+      }
+    }
+
     const availableSlots = SLOTS - files.value.length < 0 || SLOTS - (files.value.length + filesList.length) < 0;
     if (availableSlots) {
-      notificationStore.addNotification('warning', `Вы можете загрузить не более ${SLOTS} файлов!`, 3000); // Добавлен await
+      notificationStore.addNotification('warning', `Вы можете загрузить не более ${SLOTS} файлов!`, 3000);
       return;
     }
 
@@ -84,9 +99,9 @@ const handleFileUpload = async (event: DragEvent | Event) => {
             if (fileType === 'image' || fileType === 'audio' || fileType === 'video') {
               const reader = new FileReader();
 
-              await new Promise<void>((resolve) => { // Добавлена асинхронная обработка
+              await new Promise<void>((resolve) => {
                 reader.onload = async () => {
-                  if (fileType === 'image' && props.sender === 'photo') {
+                  if (fileType === 'image' && (props.sender === 'photo' || props.sender === 'post')) {
                     const img = new Image();
                     img.src = reader.result as string;
 
