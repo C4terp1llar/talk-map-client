@@ -1,48 +1,70 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { type EmojiExt } from 'vue3-emoji-picker';
+import {ref} from 'vue';
+import {type EmojiExt} from 'vue3-emoji-picker';
 import 'vue3-emoji-picker/css';
 import V3Picker from "@/components/common/v3Picker.vue";
 import {rules} from "@/helpers/baseTextValidator";
+import {usePostStore} from "@/stores/post";
+import {useNotificationStore} from "@/stores/notifications";
 
-const emit = defineEmits(["update:modelValue"]);
 
 interface Props {
-  modelValue: string;
+  entityType: 'Publication' | 'Post' | 'Comment',
+  entityId: string,
+  mode: 'internal' | 'external',
+  parentCommentId?: string
 }
+
 const props = defineProps<Props>();
 
-const isPickerVisible = ref<boolean>(false);
+const postStore = usePostStore();
+const nthStore = useNotificationStore();
 
-const handleSelect = (emoji: EmojiExt) => {
-  emit('update:modelValue', props.modelValue + emoji.i);
-};
+const commentText = ref<string>('');
+
+const isPickerVisible = ref<boolean>(false);
 
 const handleClosePicker = () => {
   setTimeout(() => {
     isPickerVisible.value = false;
   });
 };
+
+const handleSelect = (emoji: EmojiExt) => {
+  commentText.value += emoji.i;
+};
+
+const handleComment = async () => {
+  commentText.value = commentText.value.trim();
+  if (rules.lengthComment(commentText.value) !== true) return
+
+
+}
 </script>
 
 <template>
   <div class="post-editor__text-wrapper">
 
-    <div class="post-editor__text-content">
+    <v-form validate-on="submit" @submit.prevent="handleComment" class="post-editor__text-content">
       <button class="post-editor__action-btn" @click="isPickerVisible = !isPickerVisible">
         <v-icon :size="28">mdi-sticker-emoji</v-icon>
       </button>
 
-      <textarea
-          :value="modelValue"
-          @input="emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
-          rows="3"
+      <v-textarea
+          variant="outlined"
+          v-model="commentText"
+          no-resize
+          rows="2"
           placeholder="Напишите что-нибудь..."
-          class="custom-textarea styled-txt-scroll"
           :maxlength="1000"
-      ></textarea>
+          :counter="commentText.trim()"
+          :rules="[rules.required, rules.lengthComment(commentText)]"
+      />
 
-    </div>
+      <button class="post-editor__action-btn" type="submit">
+        <v-icon :size="28">mdi-send-variant-outline</v-icon>
+      </button>
+    </v-form>
 
     <div class="emoji-picker__wrapper" v-if="isPickerVisible">
       <v3-picker :is-short="true" @close="handleClosePicker" @select="(payload: EmojiExt) => handleSelect(payload)"/>
@@ -51,7 +73,7 @@ const handleClosePicker = () => {
 </template>
 
 <style scoped lang="scss">
-.post-editor__text-wrapper{
+.post-editor__text-wrapper {
   width: 100%;
   position: relative;
   height: fit-content;
@@ -71,19 +93,6 @@ const handleClosePicker = () => {
     gap: 5px;
   }
 
-  .custom-textarea {
-    width: 100%;
-    border: 1px solid currentColor;
-    border-radius: 5px;
-    padding: 8px;
-    resize: none;
-    background: rgb(var(--v-theme-background));
-    color: currentColor;
-
-    &:focus {
-      outline: 2px solid var(--v-theme-primary);
-    }
-  }
 
   .emoji-picker__wrapper {
     position: absolute;
@@ -93,18 +102,4 @@ const handleClosePicker = () => {
 }
 
 
-.styled-txt-scroll::-webkit-scrollbar {
-  width: 8px;
-  margin-right: 5px;
-}
-
-.styled-txt-scroll::-webkit-scrollbar-thumb {
-  background-color: #c4c4c4;
-  border-radius: 15px;
-}
-
-.styled-txt-scroll::-webkit-scrollbar-track {
-  background: #777777;
-  border-radius: 15px;
-}
 </style>

@@ -122,6 +122,60 @@ export const usePostStore = defineStore('post', () => {
         }
     };
 
+
+    const commentError = ref<string | null>(null);
+
+    const getComments = async (
+        mode: 'comments' | 'replies', entityType: 'Publication' | 'Post' | 'Comment', entityId: string, page: number = 1, limit: number = 15, parentCommentId?: string
+    ) => {
+
+        if (mode === 'replies' && !parentCommentId) return;
+        commentError.value = null;
+
+        try {
+            const response = await apiAuth.get('user/comment', {
+                params: {
+                    entityType,
+                    entityId,
+                    page,
+                    limit,
+                    parentCommentId
+                }
+            });
+
+            if (response.status === 200 && response.data) {
+                return response.data
+            }
+        } catch (e: any) {
+            commentError.value = "Произошла ошибка при получении комментариев, попробуйте позже";
+            console.error(e);
+        }
+    };
+
+    const createCommPending = ref<boolean>(false);
+    const createCommError = ref<string | null>(null);
+
+    const createComment = async (entityType: 'Publication' | 'Post' | 'Comment', entityId: string, text: string, parentCommentId?: string) => {
+        createCommPending.value = true;
+        createCommError.value = null;
+
+        try {
+            await apiAuth.post(`user/comment`, {
+                entityType,
+                entityId,
+                text,
+                parentCommentId
+            })
+
+        } catch (e: any) {
+            createCommError.value = "Произошла ошибка при создании комментария, попробуйте позже";
+            console.error(e);
+        } finally {
+            createCommPending.value = false;
+        }
+    };
+
+
     return {
         pending,
         error,
@@ -141,6 +195,12 @@ export const usePostStore = defineStore('post', () => {
         delPostError,
         deletePost,
 
+        commentError,
+        getComments,
+
+        createCommPending,
+        createCommError,
+        createComment,
 
     };
 });

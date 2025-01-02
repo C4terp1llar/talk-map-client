@@ -18,7 +18,7 @@ const postFiles = ref<PostF[]>([]);
 const postText = ref<string>('');
 
 const handlePost = async () => {
-  if (postText.value.trim().length <= 20) return;
+  if (!postText.value.trim().length) return;
 
   let mediaData
   if (postFiles.value.length > 0){

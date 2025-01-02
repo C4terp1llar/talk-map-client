@@ -2,9 +2,9 @@
 import type { Post } from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import PostReactions from "@/components/posts/postReactions.vue";
-import {VideoPlayer} from "@videojs-player/vue";
 import {ref} from "vue";
 import PostItemHead from "@/components/posts/postItemHead.vue";
+import CommentsList from "@/components/posts/commentsList.vue";
 
 interface Props {
   p: Post;
@@ -14,6 +14,11 @@ interface Props {
 const props = defineProps<Props>();
 
 const currentMedia = ref<number>(0);
+
+const isCommentsVisible = ref<boolean>(false);
+const handleActComments = () => {
+  isCommentsVisible.value = !isCommentsVisible.value;
+}
 </script>
 
 <template>
@@ -22,7 +27,7 @@ const currentMedia = ref<number>(0);
     <post-item-head :post="props.p" :mode="props.mode" />
 
     <div class="post-item-media__wrapper mt-2" v-if="p.media && p.media.length">
-      <v-carousel :show-arrows="p.media.length > 1" hide-delimiters class="media__slider" @update:model-value="i => typeof i === 'number' ? currentMedia = i : currentMedia = 0">
+      <v-carousel :height="250" :show-arrows="p.media.length > 1" hide-delimiters class="media__slider" @update:model-value="i => typeof i === 'number' ? currentMedia = i : currentMedia = 0">
         <v-carousel-item
             v-for="(m, index) in p.media"
             :key="m.id"
@@ -30,7 +35,7 @@ const currentMedia = ref<number>(0);
         >
 
           <div v-if="m.type.startsWith('image/')" class="post-item-media__img">
-            <v-img :src="m.url" :alt="'Image ' + index">
+            <v-img  :src="m.url" :alt="'Image ' + index">
               <template v-slot:placeholder>
                 <skeleton-loader />
               </template>
@@ -38,7 +43,7 @@ const currentMedia = ref<number>(0);
           </div>
 
           <div v-if="m.type.startsWith('video/')" class="post-item-media__video">
-            <video-player :inactivityTimeout="0" :playsinline="true" :responsive="true" :fill="true" preload="metadata" :src="m.url" controls/>
+            <video style=" max-height: 100%; object-fit: contain;" :src="m.url" controls></video>
           </div>
         </v-carousel-item>
       </v-carousel>
@@ -50,8 +55,10 @@ const currentMedia = ref<number>(0);
     </div>
 
     <div class="post-item__reactions">
-      <post-reactions :post="p"/>
+      <post-reactions @act-comments="handleActComments" :post="p"/>
     </div>
+
+    <comments-list :mode="props.mode" :entity-id="p._id" entity-type="Post" v-if="isCommentsVisible"/>
   </div>
 </template>
 
@@ -65,24 +72,22 @@ const currentMedia = ref<number>(0);
 
 
   .post-item-media__wrapper{
-
     display: flex;
-    flex-direction: column;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
 
     .post-item-media__video, .post-item-media__img{
-      height: 100%  !important;
+      height: 100%;
+      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    .media__slider{
-      height: 250px !important;
-    }
-
   }
+
+
 }
 
 .media__counter {
@@ -90,5 +95,9 @@ const currentMedia = ref<number>(0);
   font-size: 12px;
   font-weight: 500;
   color: grey;
+}
+
+img, video{
+  border-radius: 5px !important;
 }
 </style>

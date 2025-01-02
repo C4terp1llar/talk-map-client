@@ -29,7 +29,9 @@ import PostsList from "@/components/posts/postsList.vue";
       </div>
     </div>
 
-    <posts-list mode="internal"/>
+
+    <posts-list  mode="internal"/>
+
 
   </div>
 </template>
@@ -55,5 +57,6 @@ import PostsList from "@/components/posts/postsList.vue";
       }
     }
   }
+
 }
 </style>

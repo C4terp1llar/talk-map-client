@@ -270,6 +270,29 @@ body{
   background-color: rgb(var(--v-theme-background)) !important;
 }
 
+// стиль скрола для тект ариа
+
+textarea::-webkit-scrollbar {
+  width: 8px !important;
+  margin-right: 5px !important;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: #c4c4c4 !important;
+  border-radius: 15px !important;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: #777777 !important;
+  border-radius: 15px !important;
+}
+
+.v-textarea .v-field__input{
+  mask-image: unset !important;
+  -webkit-mask-image: unset !important;
+  padding: 10px !important;
+}
+
 //
 
 

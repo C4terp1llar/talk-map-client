@@ -37,20 +37,20 @@ const deletePost = async (id: string) => {
 <template>
 <div class="post-item__head">
 
-  <div class="owner__info">
+  <div class="owner__info ">
     <v-avatar class="post-owner__avatar">
       <v-img :src="postStore.postOwnerInfo?.avatar" alt="avatar" cover>
         <template v-slot:placeholder>
           <skeleton-loader/>
         </template>
-        <router-link area-disabled :to="{ name: 'friends-user', params: { id: postStore.postOwnerInfo?._id } }"/>
+        <router-link :class="props.mode === 'internal' ? '__non-action' : ''" :to="{ name: 'friends-user', params: { id: postStore.postOwnerInfo?._id } }"/>
       </v-img>
     </v-avatar>
 
     <div class="post-owner__nickname">
       <router-link
           :style="{color: postStore.postOwnerInfo?.nickname_color ? postStore.postOwnerInfo?.nickname_color : 'currentColor'}"
-          class="nickname-txt"
+          :class="['nickname-txt', props.mode === 'internal' ? '__non-action' : '']"
           :to="{ name: 'friends-user', params: { id: postStore.postOwnerInfo?._id } }"
       >
         {{ postStore.postOwnerInfo?.nickname }}
@@ -115,5 +115,7 @@ const deletePost = async (id: string) => {
     opacity: 1;
   }
 }
-
+.__non-action{
+  pointer-events: none;
+}
 </style>
