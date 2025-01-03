@@ -173,6 +173,22 @@ body{
   border-radius: 15px;
 }
 
+//
+
+.styled-scroll__np::-webkit-scrollbar {
+  width: 8px;
+  margin-right: 5px;
+  border-radius: 5px;
+}
+.styled-scroll__np::-webkit-scrollbar-thumb {
+  background-color: #c4c4c4;
+  border-radius: 5px;
+}
+.styled-scroll__np::-webkit-scrollbar-track {
+  background: #777777;
+  margin: 3px;
+  border-radius: 5px;
+}
 
 .load-more-btn__link {
   text-decoration: none !important;
@@ -295,7 +311,27 @@ textarea::-webkit-scrollbar-track {
 
 //
 
+.blinking__pending{
+  animation: blinking .8s infinite;
+  pointer-events: none;
+}
 
+@keyframes blinking {
+  0% {
+    filter: drop-shadow(0 0 2px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+  100% {
+    filter: drop-shadow(0 0 2px currentColor);
+  }
+}
+
+
+.__not_found-icon{
+  filter: drop-shadow(0 0 2px currentColor);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 input[type="date"]::-webkit-calendar-picker-indicator {
   display: none;

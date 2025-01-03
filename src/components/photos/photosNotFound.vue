@@ -4,7 +4,7 @@
 
 <template>
   <div class="photos-list__not-found">
-    <v-icon :size="60" color="green">mdi-image-remove-outline</v-icon>
+    <v-icon class="__not_found-icon" :size="60" color="green">mdi-image-remove-outline</v-icon>
     <h6>Фотографий пока нет</h6>
   </div>
 </template>

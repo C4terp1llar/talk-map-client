@@ -1,6 +1,7 @@
 <script setup lang="ts">
 interface Props {
   size: number;
+  color?: string
 }
 const props = defineProps<Props>()
 </script>
@@ -9,7 +10,7 @@ const props = defineProps<Props>()
   <v-progress-circular
       :size="props.size"
       indeterminate
-      color="green"
+      :color="color ? color : 'green'"
   ></v-progress-circular>
 </template>
 

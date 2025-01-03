@@ -4,6 +4,7 @@ import {usePhotoStore} from "@/stores/photo";
 import {useUserStore} from "@/stores/user";
 import {useNotificationStore} from "@/stores/notifications";
 import {format} from "date-fns";
+import {formatShortDate} from "../../helpers/dateHelper";
 
 interface Props {
   post: Post,
@@ -31,8 +32,6 @@ const handleReact = async () => {
     }
   }
 }
-
-const getFormattedDateTime = (sendTime: Date) => format(sendTime, "HH:mm dd.MM.yy");
 </script>
 
 <template>
@@ -61,7 +60,7 @@ const getFormattedDateTime = (sendTime: Date) => format(sendTime, "HH:mm dd.MM.y
     </div>
 
 
-    <span class="publish__date">в {{ getFormattedDateTime(post.createdAt) }}</span>
+    <span class="publish__date">{{ formatShortDate(post.createdAt) }}</span>
   </div>
 </template>
 

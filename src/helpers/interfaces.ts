@@ -176,3 +176,21 @@ export interface PostOwner {
     avatar: string,
     match: boolean
 }
+
+export interface UserComment{
+    _id: string,
+    entityId: string,
+    entityType: 'Publication' | 'Post' | 'Comment',
+    parentCommentId: string | null,
+    text: string,
+    isEdited: boolean,
+    createdAt: Date,
+    repliesCount: number,
+    mode: 'internal' | 'external',
+    user: {
+        _id: string,
+        nickname: string,
+        nickname_color: string | null,
+        avatar: string,
+    }
+}

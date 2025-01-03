@@ -33,9 +33,6 @@ export const rules = {
     onlyNumbers: (value: string) => {
         return /^[0-9]*$/.test(value) || 'Поле может содержать только цифры';
     },
-    lengthComment: (comment: string) => {
-        return comment.trim().length >= 20 || 'Минимальная длина - 20 символов'
-    },
     lengthPost: (post: string) => {
         return post.trim().length >= 30 || 'Минимальная длина - 30 символов'
     },
