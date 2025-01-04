@@ -26,7 +26,7 @@ export const useExternalUserStore = defineStore('externalUser', () => {
             });
 
             if (response.data && response.status === 200) {
-                existFlag.value = response.data.isExist;
+                existFlag.value = response.data.match ? false : response.data.isExist;
                 return response.data.match
             }
         } catch (e: any) {

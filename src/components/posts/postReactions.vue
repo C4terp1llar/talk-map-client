@@ -26,10 +26,8 @@ const handleReact = async () => {
   if (phStore.reactError) {
     ntfStore.addNotification('error', phStore.reactError, 3000)
   } else {
-    if (phStore.currentPhoto) {
-      phStore.currentPhoto.likesCount += phStore.currentPhoto.liked ? -1 : 1;
-      phStore.currentPhoto.liked = !phStore.currentPhoto.liked;
-    }
+    props.post.likes_count += props.post.liked ? -1 : 1;
+    props.post.liked = !props.post.liked;
   }
 }
 </script>
@@ -53,7 +51,7 @@ const handleReact = async () => {
             class="reactions__btn __comment"
             @click="emit('actComments')"
         >
-          <v-icon :size="24" >mdi-comment-text-outline</v-icon>
+          <v-icon :size="24">mdi-comment-text-outline</v-icon>
         </button>
         <!--      <span class="comments__amount">{{ post.likesCount }}</span>-->
       </div>
@@ -71,7 +69,7 @@ const handleReact = async () => {
   justify-content: space-between;
   align-items: flex-end;
 
-  .post__actions{
+  .post__actions {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -81,7 +79,8 @@ const handleReact = async () => {
       display: flex;
       align-items: flex-end;
     }
-    .reactions-comments{
+
+    .reactions-comments {
 
     }
   }
@@ -100,7 +99,7 @@ const handleReact = async () => {
   border-radius: 5px;
   transition: .3s;
 
-  &.__comment{
+  &.__comment {
     padding: 5px 5px 0 5px;
   }
 
@@ -113,7 +112,7 @@ const handleReact = async () => {
     filter: drop-shadow(0 0 1px red);
   }
 
-  &.__comment:hover{
+  &.__comment:hover {
     filter: drop-shadow(0 0 1px currentColor);
   }
 }

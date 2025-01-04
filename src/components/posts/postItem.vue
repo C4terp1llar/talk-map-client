@@ -43,7 +43,7 @@ const handleActComments = () => {
           </div>
 
           <div v-if="m.type.startsWith('video/')" class="post-item-media__video">
-            <video style=" max-height: 100%; object-fit: contain;" :src="m.url" controls></video>
+            <video style="max-width: 100%; max-height: 100%; object-fit: contain;" :src="m.url" controls></video>
           </div>
         </v-carousel-item>
       </v-carousel>

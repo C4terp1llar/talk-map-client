@@ -17,9 +17,11 @@ import ShortFriends from "@/components/home/shortFriends.vue";
   flex-direction: column;
   justify-content: center;
   width: fit-content;
+  height: fit-content;
   gap: 15px;
+  grid-row: span 2;
 
-  @media screen and (max-width: 800px){
+  @media screen and (max-width: 900px){
     width: 100%;
   }
 }

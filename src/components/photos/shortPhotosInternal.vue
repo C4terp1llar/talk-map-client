@@ -63,6 +63,7 @@ onUnmounted(() => photoStore.photos = null)
   text-align: center;
   height: fit-content;
   width: 100%;
+  grid-column: span 1;
 
   .photos-internal{
     width: 100%;

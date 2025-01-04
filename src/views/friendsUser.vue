@@ -14,6 +14,7 @@ import ShortFriends from "@/components/home/shortFriends.vue";
 import ShortUserRelations from "@/components/externalFriends/shortUserRelations.vue";
 import {usePhotoStore} from "@/stores/photo";
 import ShortPhotosExternal from "@/components/photos/shortPhotosExternal.vue";
+import PostsList from "@/components/posts/postsList.vue";
 
 const route = useRoute()
 const router = useRouter()
@@ -102,7 +103,11 @@ const getExternalUserInfo = async (userId: string) => {
         <short-photos-external :mode="'external'" :short="true"/>
       </div>
       <short-user-relations/>
+      <div class="posts">
+        <posts-list v-if="externalUserStore.existFlag" mode="external" :uid="Array.isArray(route.params.id) ? route.params.id[0] : route.params.id"/>
+      </div>
     </div>
+
   </div>
 
   <div class="friends-user-not-found" v-if="!externalUserStore.existFlag && !externalUserStore.pending">
@@ -120,11 +125,14 @@ const getExternalUserInfo = async (userId: string) => {
 
   .friends-user__relations-section{
     width: 100%;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    grid-auto-flow: dense;
     gap: 15px;
 
-    @media screen and (max-width: 800px){
-      flex-direction: column;
+    @media screen and (max-width: 900px){
+      grid-template-columns: 1fr;
     }
 
     .photos{
@@ -136,6 +144,12 @@ const getExternalUserInfo = async (userId: string) => {
       height: fit-content;
       width: 100%;
     }
+
+    .posts{
+      grid-column: span 1;
+      grid-row: span 1;
+    }
+
   }
 }
 
