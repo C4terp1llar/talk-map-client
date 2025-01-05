@@ -7,12 +7,12 @@ export interface Notification {
 
 export interface FrNotification {
     id: number;
-    type: 'receive' | 'abort' | 'decline' | 'submit' | 'delete' | 'react_Photo' | 'react_Post' | 'publish_Photo' | 'publish_many_Photo' | 'publish_Post';
+    type: 'receive' | 'abort' | 'decline' | 'submit' | 'delete' | 'react_Photo' | 'react_Post' | 'react_Comment' | 'publish_Photo' | 'publish_many_Photo' | 'publish_Post';
     message: string;
     timeout: number;
     detail: ShortMutualUserFriend;
     actionType: 'friends' | 'media' | 'communications';
-    phId?: string
+    entity_id?: string
 }
 
 
@@ -164,6 +164,7 @@ export interface Post {
     text: string,
     createdAt: Date,
     likes_count: number,
+    comments_count: number,
     liked: boolean,
     mode: 'internal' | 'external',
     media: {id: string, url: string, type: string}[] | []

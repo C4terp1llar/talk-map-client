@@ -65,10 +65,10 @@ const uploadData = async (mode: 'load' | 'load-more') => {
   <div class="posts-list__wrapper">
     <post-list-skeleton v-if="postStore.load "/>
 
-    <div class="post-list__content-wrapper" v-if="!postStore.load && postStore.posts && postStore.posts.length">
+    <div class="post-list__content-wrapper" v-if="!postStore.load && postStore.posts && postStore.posts.length && postStore.postOwnerInfo">
 
       <div :class="['post-list__content', props.short ? '__short' : '']">
-        <post-item :mode="props.mode" v-for="post in postStore.posts" :key="post._id" :p="post"/>
+        <post-item :post-owner-info="postStore.postOwnerInfo" :id="post._id" :mode="props.mode" v-for="post in postStore.posts" :key="post._id" :p="post"/>
       </div>
 
       <div class="controls  mt-1 d-flex justify-content-center">

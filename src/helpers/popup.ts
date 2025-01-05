@@ -14,3 +14,4 @@ export const unlockScroll = () => {
     window.scrollTo(0, parseInt(scrollY));
     document.body.dataset.scrollY = '';
 }
+

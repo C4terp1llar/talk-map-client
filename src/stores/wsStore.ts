@@ -80,16 +80,16 @@ export const useWsStore = defineStore('ws', () => {
     const attachMediaWsHandlers = async () => {
         if (!userSocket.value) return;
 
-        userSocket.value.on('publish_photo', (payload: { uid: string, phId: string }) => {
+        userSocket.value.on('publish_Photo', (payload: { uid: string, phId: string }) => {
             wsMd.publish_photo(payload)
         })
 
-        userSocket.value.on('publish_many_photo', (payload: { uid: string}) => {
+        userSocket.value.on('publish_many_Photo', (payload: { uid: string}) => {
             wsMd.publish_many_photo(payload)
         })
 
-        userSocket.value.on('react_photo', (payload: { uid: string, phId: string, wasLike: boolean }) => {
-            wsMd.react_photo(payload)
+        userSocket.value.on('react_media', (payload: { entity: 'Photo' | 'Post' | 'Comment',  reactor: string, entity_id: string, wasLike: boolean }) => {
+            wsMd.react_media(payload)
         })
     }
 

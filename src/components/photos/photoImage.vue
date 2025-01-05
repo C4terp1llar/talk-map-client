@@ -7,7 +7,8 @@ import {usePhotoStore} from "@/stores/photo";
 import {useNotificationStore} from "@/stores/notifications";
 
 interface Props {
-  url: string
+  url: string,
+  withoutSlide?: boolean
 }
 
 const props = defineProps<Props>()
@@ -66,11 +67,11 @@ const handleSlide = async (mode: 'next' | 'prev') => {
       <img :src="imageUrl" class="img" alt="Фотография пользователя" />
     </viewer>
 
-    <v-btn size="small" icon @click="handleSlide('prev')" v-if="phStore.phGList && phStore.phGList?.length > 1" class="media-content__control control__prev">
+    <v-btn size="small" icon @click="handleSlide('prev')" v-if="!withoutSlide && phStore.phGList && phStore.phGList?.length > 1" class="media-content__control control__prev">
       <v-icon>mdi-arrow-left-bold</v-icon>
     </v-btn>
 
-    <v-btn size="small" icon @click="handleSlide('next')" v-if="phStore.phGList && phStore.phGList?.length > 1" class="media-content__control control__next">
+    <v-btn size="small" icon @click="handleSlide('next')" v-if="!withoutSlide && phStore.phGList && phStore.phGList?.length > 1" class="media-content__control control__next">
       <v-icon>mdi-arrow-right-bold</v-icon>
     </v-btn>
   </div>

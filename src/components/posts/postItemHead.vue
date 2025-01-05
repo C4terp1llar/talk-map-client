@@ -1,37 +1,19 @@
 <script setup lang="ts">
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
-import {usePostStore} from "@/stores/post";
-import CircularLoader from "@/components/common/circularLoader.vue";
-import type {Post} from "@/helpers/interfaces";
-import {ref} from "vue";
-import {useNotificationStore} from "@/stores/notifications";
+import type {Post, PostOwner} from "@/helpers/interfaces";
+import PostHeadActions from "@/components/posts/postHeadActions.vue";
+
+const emit = defineEmits(['deletePost'])
 
 interface Props {
   post: Post,
+  postOwnerInfo: PostOwner;
   mode: 'internal' | 'external';
+  isGlobal?: boolean;
 }
 
 const props = defineProps<Props>();
-const postStore = usePostStore();
-const ntfStore = useNotificationStore();
 
-const currentDeletePending = ref<string>('')
-
-const deletePost = async (id: string) => {
-  if (postStore.delPostPending) return;
-  currentDeletePending.value = id
-
-  await postStore.deletePost(id);
-
-  if (postStore.delPostError){
-    ntfStore.addNotification('error', postStore.delPostError, 3000)
-  }else{
-    ntfStore.addNotification('success', 'Пост успешно удален!', 3000)
-    await postStore.getPosts('load', undefined, undefined, true)
-  }
-
-  currentDeletePending.value = '';
-}
 </script>
 
 <template>
@@ -39,31 +21,26 @@ const deletePost = async (id: string) => {
 
   <div class="owner__info ">
     <v-avatar class="post-owner__avatar">
-      <v-img :src="postStore.postOwnerInfo?.avatar" alt="avatar" cover>
+      <v-img :src="postOwnerInfo?.avatar" alt="avatar" cover>
         <template v-slot:placeholder>
           <skeleton-loader/>
         </template>
-        <router-link :class="props.mode === 'internal' ? '__non-action' : ''" :to="{ name: 'friends-user', params: { id: postStore.postOwnerInfo?._id } }"/>
+        <router-link :class="props.mode === 'internal' ? '__non-action' : ''" :to="{ name: 'friends-user', params: { id: postOwnerInfo?._id } }"/>
       </v-img>
     </v-avatar>
 
     <div class="post-owner__nickname">
       <router-link
-          :style="{color: postStore.postOwnerInfo?.nickname_color ? postStore.postOwnerInfo?.nickname_color : 'currentColor'}"
+          :style="{color: postOwnerInfo?.nickname_color ? postOwnerInfo?.nickname_color : 'currentColor'}"
           :class="['nickname-txt', props.mode === 'internal' ? '__non-action' : '']"
-          :to="{ name: 'friends-user', params: { id: postStore.postOwnerInfo?._id } }"
+          :to="{ name: 'friends-user', params: { id: postOwnerInfo?._id } }"
       >
-        {{ postStore.postOwnerInfo?.nickname }}
+        {{ postOwnerInfo?.nickname }}
       </router-link>
     </div>
   </div>
 
-  <div class="post__actions" v-if="props.mode === 'internal' && postStore.postOwnerInfo?.match">
-    <button :disabled="postStore.delPostPending" @click="deletePost(post._id)" class="delete-img">
-      <v-icon :size="20" v-if="currentDeletePending !== post._id" color="red">mdi-trash-can-outline</v-icon>
-      <circular-loader :size="20" v-if="currentDeletePending === post._id"/>
-    </button>
-  </div>
+  <post-head-actions :mode="props.mode" :post="props.post" :post-owner-info="props.postOwnerInfo" :is-global="props.isGlobal"/>
 </div>
 </template>
 
@@ -78,11 +55,7 @@ const deletePost = async (id: string) => {
     gap: 10px;
     align-items: center;
   }
-  .post__actions{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+
 }
 
 .post-owner__avatar{
@@ -105,16 +78,8 @@ const deletePost = async (id: string) => {
   line-height: 1.2em;
 }
 
-.delete-img {
-  opacity: .7;
-  transition: 0.3s;
-  display: flex;
-  align-items: center;
 
-  &:hover {
-    opacity: 1;
-  }
-}
+
 .__non-action{
   pointer-events: none;
 }

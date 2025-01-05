@@ -40,15 +40,17 @@ const getFrPageLink = (n: FrNotification) => {
   }
 
   switch (n.type) {
-    case 'react_Photo':
-      return n.phId ? { name: 'photos', query: { r: n.phId } } : { name: 'photos' };
+    case 'publish_Post':
+      //
+      return { name: 'photos' };
     case 'publish_Photo':
-      return n.phId ? { name: 'photos-user', params: { uid: n.detail._id }, query: { r: n.phId } } : { name: 'photos-user', params: { uid: n.detail._id } };
+      return n.entity_id ? { name: 'photos-user', params: { uid: n.detail._id }, query: { r: n.entity_id } } : { name: 'photos-user', params: { uid: n.detail._id } };
     case 'publish_many_Photo':
       return { name: 'photos-user', params: { uid: n.detail._id }};
+    case 'react_Photo':
+      return n.entity_id ? { name: 'photos', query: { r: n.entity_id } } : { name: 'photos' };
     case 'react_Post':
-    case 'publish_Post':
-      return { name: 'photos' };
+
     default:
       return { name: 'photos' };
   }

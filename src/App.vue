@@ -8,11 +8,14 @@ import ImgPopup from "@/components/imgPopup/imgPopup.vue";
 import GlobalMedia from "@/components/common/globalMedia.vue";
 import {useRoute} from "vue-router";
 import {computed} from "vue";
+import GlobalPost from "@/components/posts/globalPost.vue";
 
 const route = useRoute()
 
 const appThemeStore = useAppThemeStore()
-const isMediaModalVisible = computed(() => route.query.r);
+
+const isMediaModalVisible = computed(() => route.query.r && !route.query.p);
+const isGPostVisible = computed(() => route.query.p && !route.query.r);
 </script>
 
 <template>
@@ -27,6 +30,7 @@ const isMediaModalVisible = computed(() => route.query.r);
     </v-dialog-transition>
 
     <global-media v-if="isMediaModalVisible"/>
+    <global-post v-if="isGPostVisible"/>
   </v-app>
 </template>
 

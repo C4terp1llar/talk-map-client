@@ -1,33 +1,45 @@
 <script setup lang="ts">
-import type { Post } from "@/helpers/interfaces";
+import type {Post, PostOwner} from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import PostReactions from "@/components/posts/postReactions.vue";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import PostItemHead from "@/components/posts/postItemHead.vue";
 import CommentsList from "@/components/posts/commentsList.vue";
+import {useRouter} from "vue-router";
+import PhotoImage from "@/components/photos/photoImage.vue";
+
+const emit = defineEmits(['deletePost'])
 
 interface Props {
   p: Post;
+  postOwnerInfo: PostOwner;
   mode: 'internal' | 'external';
+  isGlobal?: boolean;
 }
 
 const props = defineProps<Props>();
+const router = useRouter();
 
 const currentMedia = ref<number>(0);
 
-const isCommentsVisible = ref<boolean>(false);
+const isCommentsVisible = ref<boolean>(props.isGlobal);
 const handleActComments = () => {
   isCommentsVisible.value = !isCommentsVisible.value;
 }
+
 </script>
 
 <template>
   <div class="posts-item__wrapper">
 
-    <post-item-head :post="props.p" :mode="props.mode" />
+    <post-item-head @delete-post="emit('deletePost')" :is-global="props.isGlobal" :post-owner-info="props.postOwnerInfo" :post="props.p" :mode="props.mode" />
 
     <div class="post-item-media__wrapper mt-2" v-if="p.media && p.media.length">
-      <v-carousel :height="250" :show-arrows="p.media.length > 1" hide-delimiters class="media__slider" @update:model-value="i => typeof i === 'number' ? currentMedia = i : currentMedia = 0">
+      <v-carousel
+          :touch="!isGlobal" :show-arrows="p.media.length > 1"
+          hide-delimiters :class="['media__slider', isGlobal ? '__global' : '']"
+          @update:model-value="i => typeof i === 'number' ? currentMedia = i : currentMedia = 0"
+      >
         <v-carousel-item
             v-for="(m, index) in p.media"
             :key="m.id"
@@ -35,11 +47,12 @@ const handleActComments = () => {
         >
 
           <div v-if="m.type.startsWith('image/')" class="post-item-media__img">
-            <v-img  :src="m.url" :alt="'Image ' + index">
+            <v-img @click="router.push({query: {p: p._id}})" class="cursor-pointer" :src="m.url" :alt="'Image ' + index" v-if="!isGlobal">
               <template v-slot:placeholder>
                 <skeleton-loader />
               </template>
             </v-img>
+            <photo-image v-else :url="m.url" :without-slide="true"/>
           </div>
 
           <div v-if="m.type.startsWith('video/')" class="post-item-media__video">
@@ -58,7 +71,7 @@ const handleActComments = () => {
       <post-reactions @act-comments="handleActComments" :post="p"/>
     </div>
 
-    <comments-list :mode="props.mode" :entity-id="p._id" entity-type="Post" v-if="isCommentsVisible"/>
+    <comments-list :is-global="props.isGlobal" :mode="props.mode" :entity-id="p._id" entity-type="Post" v-if="isCommentsVisible"/>
   </div>
 </template>
 
@@ -88,6 +101,16 @@ const handleActComments = () => {
   }
 
 
+}
+
+.media__slider{
+  height: 250px !important;
+  &.__global{
+    height: 500px !important;
+    @media (max-width: 1000px) {
+      height: 350px !important;
+    }
+  }
 }
 
 .media__counter {

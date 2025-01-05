@@ -104,6 +104,24 @@ export const usePostStore = defineStore('post', () => {
         }
     };
 
+    const getPost = async (postId: string): Promise<{ posts: Post[]; ownerInfo: PostOwner | null }> => {
+        postsError.value = null;
+
+        try {
+            const response = await apiAuth.get(`user/post/${postId}`)
+
+            if (response.status === 200 && response.data) {
+                return response.data;
+            }else{
+                return {posts: [], ownerInfo: null}
+            }
+        } catch (e: any) {
+            postsError.value = "Произошла ошибка при получении поста, попробуйте позже";
+            console.error(e);
+            return { posts: [], ownerInfo: null };
+        }
+    };
+
     const delPostPending = ref<boolean>(false);
     const delPostError = ref<string | null>(null);
 
@@ -190,6 +208,7 @@ export const usePostStore = defineStore('post', () => {
         posts,
         postOwnerInfo,
         getPosts,
+        getPost,
 
         delPostPending,
         delPostError,

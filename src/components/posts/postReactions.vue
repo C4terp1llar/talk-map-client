@@ -46,14 +46,14 @@ const handleReact = async () => {
         <span class="reactions__amount">{{ post.likes_count }}</span>
       </div>
 
-      <div class="reactions-comments">
+      <div class="reactions-likes">
         <button
             class="reactions__btn __comment"
             @click="emit('actComments')"
         >
-          <v-icon :size="24">mdi-comment-text-outline</v-icon>
+          <v-icon :size="25">mdi-comment-text-outline</v-icon>
         </button>
-        <!--      <span class="comments__amount">{{ post.likesCount }}</span>-->
+        <span class="comments__amount">{{ post.comments_count }}</span>
       </div>
     </div>
 
@@ -75,14 +75,11 @@ const handleReact = async () => {
     align-items: center;
     gap: 5px;
 
-    .reactions-likes {
+    .reactions-likes, reactions-comments {
       display: flex;
       align-items: flex-end;
     }
 
-    .reactions-comments {
-
-    }
   }
 
   .publish__date {
@@ -133,5 +130,10 @@ const handleReact = async () => {
   font-size: 11px;
   font-weight: 500;
   color: #f44336;
+}
+.comments__amount {
+  font-size: 11px;
+  font-weight: 500;
+  color: currentColor;
 }
 </style>

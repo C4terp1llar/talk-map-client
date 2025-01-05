@@ -16,7 +16,8 @@ interface Props {
   entityId: string,
   mode: 'internal' | 'external',
   parentCommentId?: string,
-  repliesMode?: boolean
+  repliesMode?: boolean,
+  isGlobal?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -77,7 +78,7 @@ const replyModel = ref<{comment_id: string, to: { _id: string; nickname: string;
 
     <comments-skeleton v-if="pending"/>
 
-    <div :class="['comment-items__wrapper styled-scroll__np', props.repliesMode ? ' __replies' : ' mt-2 mb-2']" v-if="!pending && comments && comments.length">
+    <div :class="['comment-items__wrapper styled-scroll__np', props.repliesMode ? ' __replies' : ' mt-2 mb-2', props.isGlobal ? '__global' : '']" v-if="!pending && comments && comments.length">
 
       <comment-item class="mt-1 mb-1"
                     v-for="c in comments"
@@ -115,7 +116,7 @@ const replyModel = ref<{comment_id: string, to: { _id: string; nickname: string;
 .comment-items__wrapper{
   display: flex;
   flex-direction: column;
-  &:not(.__replies){
+  &:not(.__replies,.__global){
     max-height: 400px;
     overflow: auto;
   }
@@ -125,6 +126,10 @@ const replyModel = ref<{comment_id: string, to: { _id: string; nickname: string;
   position: sticky;
   bottom: 0;
   background: rgb(var(--v-theme-background));
+  padding-top: 5px;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+
 }
 
 
