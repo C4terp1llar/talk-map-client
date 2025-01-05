@@ -8,6 +8,7 @@ import type {Post, PostOwner} from "@/helpers/interfaces";
 import PostItem from "@/components/posts/postItem.vue";
 import {onClickOutside} from "@vueuse/core";
 import GPhotoContentSkeleton from "@/components/skeletons/gPhotoContentSkeleton.vue";
+import PostNotFound from "@/components/posts/postNotFound.vue";
 
 const postStore = usePostStore();
 const ntfStore = useNotificationStore();
@@ -70,6 +71,7 @@ onClickOutside(postContentRef, clickOutside);
           :is-global="true" :post-owner-info="currentPostOwner"
           :p="currentPost" :mode="currentMode"
       />
+      <post-not-found class="post-not-found" v-if="(!currentPostOwner || !currentPost || !currentMode) && !pending"/>
       <g-photo-content-skeleton class="loader" v-if="pending"/>
     </div>
   </div>
@@ -86,7 +88,7 @@ onClickOutside(postContentRef, clickOutside);
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(10px);
-  overflow-y: auto;
+  overflow-y: scroll;
 
   .post-content__wrapper{
     width: 80vw;
@@ -103,5 +105,8 @@ onClickOutside(postContentRef, clickOutside);
 .loader{
   height: 50vh;
   padding: 10px 5px 15px 5px;
+}
+.post-not-found{
+  padding: 20px;
 }
 </style>
