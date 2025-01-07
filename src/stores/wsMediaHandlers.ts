@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {useExternalUserStore} from "@/stores/externalUser";
 import {useFriendsStore} from "@/stores/friends";
-import type {FriendRequest} from "@/helpers/interfaces";
+import type {FriendRequest, Post} from "@/helpers/interfaces";
 import {ref} from "vue";
 import {useUserStore} from "@/stores/user";
 import {useRoute, useRouter} from "vue-router";
@@ -43,10 +43,15 @@ export const useWsMdStore = defineStore('wsMd', () => {
         }
     }
 
-    const react_media = async (payload: { entity: 'Photo' | 'Post' | 'Comment',  reactor: string, entity_id: string, wasLike: boolean }) => {
-        console.log('react_photo')
+    const react_media = async (payload: {
+        entity: 'Photo' | 'Post' | 'Comment',
+        reactor: string,
+        entity_id: string,
+        wasLike: boolean
+    }) => {
+        console.log('react_media')
 
-        if (!payload.wasLike){
+        if (!payload.wasLike) {
             await notifyWithPreload(`react_${payload.entity}`, payload.reactor, payload.entity_id)
             soundStore.addSound({soundType: 'default', soundCaller: 'react_photo'})
         }
@@ -60,22 +65,29 @@ export const useWsMdStore = defineStore('wsMd', () => {
             if (currentPost) {
                 payload.wasLike ? currentPost.likes_count -= 1 : currentPost.likes_count += 1
             }
-
-
-            // const element = document.getElementById(payload.entity_id);
-            // if (element) {
-            //     const top = element.getBoundingClientRect().top + window.scrollY - 100;
-            //     window.scrollTo({ top, behavior: 'smooth' });
-            // }
+            //дополнителдьно в глоб компоненте постов ексть подписка на это событие, которая управляет локальным стейтом полученного поста и раскидывает его в пропсах
         }
     }
 
-    //pb-post
-    //rec-post
+    const publish_post = async (payload: { uid: string, post: Post }) => {
+        console.log('publish_post')
+        await notifyWithPreload('publish_Post', payload.uid, payload.post._id)
+        soundStore.addSound({soundType: 'default', soundCaller: 'publish_photo'})
 
+        if (route.name === 'friends-user' && route.params.id === payload.uid && postStore.posts) {
+            await postStore.getPosts('load', undefined, payload.uid, true)
+        }
+    }
+
+
+    // const element = document.getElementById(payload.entity_id);
+    // if (element) {
+    //     const top = element.getBoundingClientRect().top + window.scrollY - 100;
+    //     window.scrollTo({ top, behavior: 'smooth' });
+    // }
 
     const notifyWithPreload = async (
-        type: 'publish_Photo' | 'publish_many_Photo' | 'react_Photo' | 'react_Post' | 'react_Comment', uid: string,
+        type: 'publish_Photo' | 'publish_many_Photo' | 'react_Photo' | 'react_Post' | 'react_Comment' | 'publish_Post', uid: string,
         entity_id?: string
     ) => {
         const user = await friendStore.getOneUser(uid, false);
@@ -97,6 +109,7 @@ export const useWsMdStore = defineStore('wsMd', () => {
         publish_photo,
         publish_many_photo,
         react_media,
+        publish_post
     }
 });
 

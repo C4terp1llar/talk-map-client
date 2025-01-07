@@ -37,15 +37,20 @@ const hasMore = ref<boolean>(false);
 const pending = ref<boolean>(false);
 const pendingMore = ref<boolean>(false);
 
-const getComments = async (mode: 'comments' | 'replies', pendMode: 'load' | 'loadMore') => {
-  if (mode === 'replies' && !props.parentCommentId) return;
+const getComments = async (mode: 'comments' | 'replies', pendMode: 'load' | 'loadMore', withoutPending?: boolean) => {
+  if (mode === 'replies' && (!props.parentCommentId || !parent)) return;
 
-  const currentPending = pendMode === 'load' ? pending : pendingMore;
-  currentPending.value = true;
+  let currentPending
+  if (!withoutPending){
+    currentPending = pendMode === 'load' ? pending : pendingMore;
+    currentPending.value = true;
+  }
 
   const data = await postStore.getComments(mode, props.entityType, props.entityId, currentPage.value, LIMIT, props.parentCommentId);
 
-  currentPending.value = false;
+  if (!withoutPending && currentPending){
+    currentPending.value = false;
+  }
 
   if (data.comments){
     comments.value = data.comments;
@@ -69,6 +74,10 @@ const moreFlag = computed(() => {
 
 const replyModel = ref<{comment_id: string, to: { _id: string; nickname: string; nickname_color: string | null; avatar: string}} | null>(null)
 
+const reloadComments = async (mode: 'comments' | 'replies') => {
+  await getComments(mode, 'load', true)
+}
+
 //mode: 'comments' | 'replies', entityType: 'Publication' | 'Post' | 'Comment', entityId: string, page: number = 1, limit: number = 15, parentCommentId?: string
 </script>
 
@@ -82,11 +91,13 @@ const replyModel = ref<{comment_id: string, to: { _id: string; nickname: string;
 
       <comment-item class="mt-1 mb-1"
                     v-for="c in comments"
+                    :id="c._id"
                     :key="c._id" :comment="c"
                     :mode="props.mode" :entity-id="props.entityId"
                     :entity-type="props.entityType" :parent-comment-id="props.parentCommentId"
                     @reply="payload => replyModel = payload"
                     :replies-mode="props.repliesMode"
+                    :is-global="props.isGlobal"
       />
 
       <v-btn v-if="moreFlag && !pendingMore" color="green" class="text-none mb-1" variant="text">
@@ -103,6 +114,7 @@ const replyModel = ref<{comment_id: string, to: { _id: string; nickname: string;
                     :entity-id="props.entityId" :entity-type="props.entityType"
                     :parent-comment-id="props.parentCommentId"
                     @clear-reply="replyModel = null"
+                    @reload-comments="md => reloadComments(md)"
                     class="create__comment"
     />
   </div>

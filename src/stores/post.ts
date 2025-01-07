@@ -144,7 +144,7 @@ export const usePostStore = defineStore('post', () => {
     const commentError = ref<string | null>(null);
 
     const getComments = async (
-        mode: 'comments' | 'replies', entityType: 'Publication' | 'Post' | 'Comment', entityId: string, page: number = 1, limit: number = 15, parentCommentId?: string
+        mode: 'comments' | 'replies', entityType: 'Publication' | 'Post' | 'Comment', entityId: string, page: number = 1, limit: number = 15, parentCommentId?: string, withoutPending?: boolean
     ) => {
 
         if (mode === 'replies' && !parentCommentId) return;

@@ -10,7 +10,10 @@ import CircularLoader from "@/components/common/circularLoader.vue";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import EditorReplyChip from "@/components/posts/editorReplyChip.vue";
 
-const emit = defineEmits(['clearReply'])
+const emit = defineEmits<{
+  (e: 'clearReply'): void,
+  (e: 'reloadComments', mode: 'comments' | 'replies'): void,
+}>();
 
 interface Props {
   entityType: 'Publication' | 'Post' | 'Comment',
@@ -52,7 +55,9 @@ const handleComment = async () => {
   if (postStore.createCommError){
     nthStore.addNotification('error', postStore.createCommError, 3000);
   }else{
+    emit('reloadComments', !props.reply ? 'comments' : 'replies');
     commentText.value = '';
+    emit('clearReply')
     nthStore.addNotification('success', 'Комментарий успешно опубликован!', 3000);
   }
 }

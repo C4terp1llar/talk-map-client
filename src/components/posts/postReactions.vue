@@ -3,8 +3,12 @@ import type {PhotoG, Post} from "@/helpers/interfaces";
 import {usePhotoStore} from "@/stores/photo";
 import {useUserStore} from "@/stores/user";
 import {useNotificationStore} from "@/stores/notifications";
-import {format} from "date-fns";
 import {formatShortDate} from "../../helpers/dateHelper";
+import {usePostStore} from "@/stores/post";
+import {useRoute} from "vue-router";
+
+const postStore = usePostStore();
+const route = useRoute();
 
 interface Props {
   post: Post,
@@ -28,8 +32,18 @@ const handleReact = async () => {
   } else {
     props.post.likes_count += props.post.liked ? -1 : 1;
     props.post.liked = !props.post.liked;
+
+    if (postStore.posts && route.query.p) {
+      const currentPost = postStore.posts.find(i => i._id === props.post._id)
+      if (currentPost) {
+        currentPost.likes_count += currentPost.liked ? -1 : 1;
+        currentPost.liked = !currentPost.liked;
+      }
+    }
+    //дополнителдьно в глоб компоненте постов ексть подписка на это событие, которая управляет локальным стейтом полученного поста и раскидывает его в пропсах
   }
 }
+
 </script>
 
 <template>

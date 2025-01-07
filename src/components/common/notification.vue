@@ -41,8 +41,7 @@ const getFrPageLink = (n: FrNotification) => {
 
   switch (n.type) {
     case 'publish_Post':
-      //
-      return { name: 'photos' };
+      return n.entity_id ? { name: 'friends-user', params: { id: n.detail._id }, query: { p: n.entity_id } } : { name: 'friends-user', params: { id: n.detail._id } };
     case 'publish_Photo':
       return n.entity_id ? { name: 'photos-user', params: { uid: n.detail._id }, query: { r: n.entity_id } } : { name: 'photos-user', params: { uid: n.detail._id } };
     case 'publish_many_Photo':
@@ -50,9 +49,9 @@ const getFrPageLink = (n: FrNotification) => {
     case 'react_Photo':
       return n.entity_id ? { name: 'photos', query: { r: n.entity_id } } : { name: 'photos' };
     case 'react_Post':
-
+      return n.entity_id ? { name: 'home', query: { p: n.entity_id } } : { name: 'home' };
     default:
-      return { name: 'photos' };
+      return { name: 'home' };
   }
 }
 </script>

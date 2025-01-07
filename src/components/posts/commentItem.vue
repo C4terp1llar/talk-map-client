@@ -17,12 +17,13 @@ interface Props {
   entityId: string,
   mode: 'internal' | 'external',
   parentCommentId?: string,
-  repliesMode?: boolean
+  repliesMode?: boolean,
+  isGlobal?: boolean;
 }
 
 const props = defineProps<Props>();
 
-const isSubsComments = ref<boolean>(false);
+const isSubsComments = ref<boolean>(props.isGlobal && props.comment.repliesCount > 0);
 </script>
 
 <template>

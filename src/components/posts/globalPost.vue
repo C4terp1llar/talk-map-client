@@ -9,9 +9,11 @@ import PostItem from "@/components/posts/postItem.vue";
 import {onClickOutside} from "@vueuse/core";
 import GPhotoContentSkeleton from "@/components/skeletons/gPhotoContentSkeleton.vue";
 import PostNotFound from "@/components/posts/postNotFound.vue";
+import {useWsStore} from "@/stores/wsStore";
 
 const postStore = usePostStore();
 const ntfStore = useNotificationStore();
+const wsStore = useWsStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -45,6 +47,13 @@ onMounted(async () => {
 
   if (postStore.postsError) {
     ntfStore.addNotification('error', postStore.postsError, 3000)
+  }else{
+    wsStore.userSocket?.on('react_media', (payload: { entity: 'Photo' | 'Post' | 'Comment',  reactor: string, entity_id: string, wasLike: boolean }) => {
+      if (payload.entity === 'Post' && currentPost.value){
+        currentPost.value.likes_count += payload.wasLike ? -1 : 1;
+      }
+
+    })
   }
 })
 
@@ -93,12 +102,12 @@ onClickOutside(postContentRef, clickOutside);
   .post-content__wrapper{
     width: 80vw;
     @media screen and (max-width: 650px) {
-      width: calc(100vw - 10px);
+      width: calc(100vw - 30px);
     }
+    margin: 5px;
     box-shadow: 0 1px 10px currentColor;
     border-radius: 15px;
     background: rgb(var(--v-theme-background));
-    margin: 5px 0 5px 0;
   }
 
 }

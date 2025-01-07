@@ -5,7 +5,7 @@ import { io, Socket } from "socket.io-client";
 import { checkTokenValidity, refreshToken } from "@/stores/sync";
 import {attachBaseWsHandlers} from "@/utils/wsBaseHandlers";
 import {useWsAddStore} from "@/stores/wsAddHandlers";
-import type {FriendRequest} from "@/helpers/interfaces";
+import type {FriendRequest, Post} from "@/helpers/interfaces";
 import {useWsMdStore} from "@/stores/wsMediaHandlers";
 
 type UserSocket = Socket | null;
@@ -82,6 +82,10 @@ export const useWsStore = defineStore('ws', () => {
 
         userSocket.value.on('publish_Photo', (payload: { uid: string, phId: string }) => {
             wsMd.publish_photo(payload)
+        })
+
+        userSocket.value.on('publish_Post', (payload: { uid: string, post: Post }) => {
+            wsMd.publish_post(payload)
         })
 
         userSocket.value.on('publish_many_Photo', (payload: { uid: string}) => {
