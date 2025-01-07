@@ -71,7 +71,11 @@ const isSubsComments = ref<boolean>(props.isGlobal && props.comment.repliesCount
         <span class="item__date">{{formatShortDate(comment.createdAt)}}</span>
       </div>
 
-      <comments-list v-if="isSubsComments" :mode="props.mode" :entity-type="props.entityType" :parent-comment-id="comment._id" :entity-id="props.entityId" :replies-mode="true"/>
+
+      <comments-list v-if="isSubsComments" @show-sub-comments="console.log('rty')"
+                     :mode="props.mode" :entity-type="props.entityType" :parent-comment-id="comment._id"
+                     :entity-id="props.entityId" :replies-mode="true"
+      />
     </div>
   </div>
 </template>
