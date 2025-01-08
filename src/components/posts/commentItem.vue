@@ -17,7 +17,6 @@ const emit = defineEmits<{
   (e: 'deleteComment', payload: {comment_id: string, act: 'deleted' | 'markDelete'}): void,
   (e: 'deleteReply', payload: {comment_id: string}): void,
   (e: 'exactDeleteReply', payload: {comment_id: string}): void,
-  (e: 'commentUpdated', payload: {comment_id: string, newText: string, updated: Date}): void,
 }>();
 
 interface Props {
@@ -49,8 +48,7 @@ const updateComment = (payload: {comment_id: string, newText: string, updated: D
   props.comment.isEdited = true;
   props.comment.text = payload.newText;
   props.comment.updatedAt = payload.updated;
-  //
-  // emit('commentUpdated', payload)
+
 }
 </script>
 

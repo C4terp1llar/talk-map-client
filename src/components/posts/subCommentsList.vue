@@ -87,15 +87,7 @@ const deleteReply = async (payload: {comment_id: string}) => {
   emit('exactDeleteReply', {comment_id: props.parentCommentId});
 }
 
-const updateComment = (payload: {comment_id: string, newText: string, updated: Date}) => {
-  if(comments.value){
-    const index = comments.value.findIndex(i => i._id === payload.comment_id)
-    if(index !== -1){
-      comments.value[index].text = payload.newText;
-      comments.value[index].updatedAt = payload.updated;
-    }
-  }
-}
+
 </script>
 
 <template>
@@ -111,7 +103,6 @@ const updateComment = (payload: {comment_id: string, newText: string, updated: D
                     :mode="props.mode" :entity-id="props.entityId"
                     :entity-type="props.entityType" :parent-comment-id="props.parentCommentId"
                     :replies-mode="repliesMode" @delete-reply="payload => deleteReply(payload)"
-                    @comment-updated="payload => updateComment(payload)"
       />
 
       <v-btn v-if="moreFlag && !pendingMore" color="green" class="text-none mb-1" variant="text">

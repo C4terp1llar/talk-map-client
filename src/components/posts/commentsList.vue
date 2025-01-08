@@ -130,15 +130,7 @@ const decIncReplies = (mode: 'dec' | 'inc', commentId: string) => {
   }
 }
 
-const updateComment = (payload: {comment_id: string, newText: string, updated: Date}) => {
-  if(comments.value){
-    const index = comments.value.findIndex(i => i._id === payload.comment_id)
-    if(index !== -1){
-      comments.value[index].text = payload.newText;
-      comments.value[index].updatedAt = payload.updated;
-    }
-  }
-}
+
 </script>
 
 <template>
@@ -160,7 +152,6 @@ const updateComment = (payload: {comment_id: string, newText: string, updated: D
                     :is-global="props.isGlobal"
                     @delete-comment="payload => handleDeleteComment(payload)"
                     @exact-delete-reply="payload => handleDeleteReply(payload)"
-                    @comment-updated="payload => updateComment(payload)"
       />
 
       <v-btn v-if="moreFlag && !pendingMore" color="green" class="text-none mb-1" variant="text">
