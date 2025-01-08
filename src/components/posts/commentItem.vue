@@ -3,8 +3,9 @@ import type {UserComment} from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {formatShortDate} from "../../helpers/dateHelper";
 import SubCommentsList from "@/components/posts/subCommentsList.vue";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import CommentsList from "@/components/posts/commentsList.vue";
+import {usePostStore} from "@/stores/post";
 
 const emit = defineEmits<{
   (e: 'reply', payload: {comment_id: string, to: { _id: string; nickname: string; nickname_color: string | null; avatar: string}}): void,
@@ -72,10 +73,17 @@ const isSubsComments = ref<boolean>(props.isGlobal && props.comment.repliesCount
       </div>
 
 
-      <comments-list v-if="isSubsComments" @show-sub-comments="console.log('rty')"
-                     :mode="props.mode" :entity-type="props.entityType" :parent-comment-id="comment._id"
-                     :entity-id="props.entityId" :replies-mode="true"
+      <sub-comments-list
+          v-if="isSubsComments"
+          :mode="props.mode" :entity-type="props.entityType" :parent-comment-id="comment._id"
+          :entity-id="props.entityId" :replies-mode="true" :is-global="props.isGlobal"
+          :replies-count="props.comment.repliesCount"
       />
+
+<!--      <comments-list v-if="isSubsComments" -->
+<!--                     :mode="props.mode" :entity-type="props.entityType" :parent-comment-id="comment._id"-->
+<!--                     :entity-id="props.entityId" :replies-mode="true"-->
+<!--      />-->
     </div>
   </div>
 </template>

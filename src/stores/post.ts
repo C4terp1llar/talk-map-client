@@ -170,6 +170,8 @@ export const usePostStore = defineStore('post', () => {
         }
     };
 
+    const reloadRepliesFlag = ref<string>('');
+
     const createCommPending = ref<boolean>(false);
     const createCommError = ref<string | null>(null);
 
@@ -216,6 +218,7 @@ export const usePostStore = defineStore('post', () => {
 
         commentError,
         getComments,
+        reloadRepliesFlag,
 
         createCommPending,
         createCommError,

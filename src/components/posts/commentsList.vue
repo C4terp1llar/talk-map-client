@@ -77,23 +77,16 @@ const moreFlag = computed(() => {
 const replyModel = ref<{comment_id: string, to: { _id: string; nickname: string; nickname_color: string | null; avatar: string}} | null>(null)
 
 const reloadComments = async (mode: 'comments' | 'replies') => {
-  // if(comments.value && mode === 'replies'){
-  //   const index = comments.value.findIndex(i => i._id === replyModel.value?.comment_id)
-  //   if(index !== -1){
-  //     comments.value[index].repliesCount += 1
-  //   }
-  //   emit('showSubComments')
-  // }
+
+  if(comments.value && mode === 'replies' && replyModel.value?.comment_id){
+    const index = comments.value.findIndex(i => i._id === replyModel.value?.comment_id)
+    if(index !== -1){
+      comments.value[index].repliesCount += 1
+    }
+    postStore.reloadRepliesFlag = replyModel.value?.comment_id
+  }
 
   await getComments(mode, 'load', true)
-
-  if (comments.value && comments.value.length){
-    const element = document.getElementById(comments.value[comments.value.length - 1]._id);
-    if (element) {
-      const top = element.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
-  }
 
   if (postStore.posts && postStore.posts.length){
     const index = postStore.posts.findIndex(i => i._id === props.entityId)
