@@ -13,6 +13,7 @@ import EditorReplyChip from "@/components/posts/editorReplyChip.vue";
 const emit = defineEmits<{
   (e: 'clearReply'): void,
   (e: 'reloadComments', mode: 'comments' | 'replies'): void,
+  (e: 'commentUpdated', payload: {comment_id: string, newText: string, updated: Date}): void,
 }>();
 
 interface Props {
@@ -20,7 +21,9 @@ interface Props {
   entityId: string,
   mode: 'internal' | 'external',
   parentCommentId?: string,
-  reply: {comment_id: string, to: { _id: string; nickname: string; nickname_color: string | null; avatar: string}} | null
+  reply: {comment_id: string, to: { _id: string; nickname: string; nickname_color: string | null; avatar: string}} | null,
+  changeText?: string;
+  comment_id?: string;
 }
 
 const props = defineProps<Props>();
@@ -28,7 +31,7 @@ const props = defineProps<Props>();
 const postStore = usePostStore();
 const nthStore = useNotificationStore();
 
-const commentText = ref<string>('');
+const commentText = ref<string>(props.changeText || '');
 
 const isPickerVisible = ref<boolean>(false);
 
@@ -62,7 +65,23 @@ const handleComment = async () => {
   }
 }
 
-//entityType: 'Publication' | 'Post' | 'Comment', entityId: string, text: string, parentCommentId?: string
+const handleChangeComment = async () => {
+  if (props.changeText && props.changeText.trim() && commentText.value.trim() &&  props.changeText.trim() !== commentText.value && props.comment_id){
+
+    let newCommentText = commentText.value.trim()
+    let commentID = props.comment_id;
+
+    const {updatedAt, text} = await postStore.updateComment(commentID, newCommentText)
+
+    if (postStore.updCommError){
+      nthStore.addNotification('error', postStore.updCommError, 3000);
+    }else if (updatedAt && text && !postStore.updCommError){
+      emit('commentUpdated', {comment_id: commentID, newText: text, updated: updatedAt})
+      nthStore.addNotification('success', 'Комментарий успешно изменен!', 3000);
+    }
+  }
+}
+
 </script>
 
 <template>
@@ -70,12 +89,13 @@ const handleComment = async () => {
 
     <editor-reply-chip v-if="props.reply" :reply="props.reply" @clear-reply="emit('clearReply')"/>
 
-    <v-form @submit.prevent="handleComment" class="post-editor__text-content">
+    <v-form @submit.prevent="changeText ? handleChangeComment() : handleComment()" class="post-editor__text-content">
       <button type="button" class="post-editor__action-btn" @click="isPickerVisible = !isPickerVisible">
         <v-icon :size="28">mdi-sticker-emoji</v-icon>
       </button>
 
         <v-textarea
+            class="fz-12"
             variant="outlined"
             v-model="commentText"
             no-resize
@@ -83,10 +103,12 @@ const handleComment = async () => {
             placeholder="Напишите что-нибудь..."
             :maxlength="1000"
             :counter="commentText.trim()"
-            :disabled="postStore.createCommPending"
+            :disabled="changeText ? postStore.updCommPending : postStore.createCommPending"
         />
 
-      <button :disabled="postStore.createCommPending" :class="['post-editor__action-btn', postStore.createCommPending ? 'blinking__pending' : '']" type="submit">
+      <button :disabled="postStore.createCommPending || postStore.updCommPending"
+              :class="['post-editor__action-btn', postStore.createCommPending || postStore.updCommPending ? 'blinking__pending' : '']" type="submit"
+      >
         <v-icon :size="28">mdi-send-variant-outline</v-icon>
       </button>
     </v-form>
@@ -106,7 +128,7 @@ const handleComment = async () => {
 
 
   .post-editor__action-btn {
-    padding: 0 5px 5px 5px;
+    padding: 5px;
     transition: 0.3s;
     height: fit-content;
 
@@ -127,6 +149,7 @@ const handleComment = async () => {
     bottom: 110%;
   }
 }
+
 
 
 </style>

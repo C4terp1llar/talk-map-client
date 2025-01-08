@@ -195,6 +195,53 @@ export const usePostStore = defineStore('post', () => {
         }
     };
 
+    const delCommPending = ref<boolean>(false);
+    const delCommError = ref<string | null>(null);
+
+    const deleteComment = async (id: string) : Promise<{success: boolean, act: 'deleted' | 'markDelete'}> => {
+        delCommPending.value = true;
+        delCommError.value = null;
+        try {
+            const response = await apiAuth.delete(`user/comment/${id}`)
+
+            if (response.status === 200 && response.data) {
+                return response.data
+            }else{
+                return {success: false, act: 'deleted'}
+            }
+
+        } catch (e: any) {
+            delCommError.value = "Произошла ошибка при удалении комментария, попробуйте позже";
+            console.error(e);
+            return {success: false, act: 'deleted'}
+        } finally {
+            delCommPending.value = false;
+        }
+    };
+
+    const updCommPending = ref<boolean>(false);
+    const updCommError = ref<string | null>(null);
+
+    const updateComment = async (id: string, newText: string) : Promise<{updatedAt: Date | null, text: string | null}> => {
+        updCommPending.value = true;
+        updCommError.value = null;
+        try {
+            const response = await apiAuth.patch(`user/comment/${id}`, {newText: newText})
+
+            if (response.status === 200 && response.data) {
+                return response.data
+            }else{
+                return {updatedAt: null, text: null}
+            }
+
+        } catch (e: any) {
+            updCommError.value = "Произошла ошибка при обновлении комментария, попробуйте позже";
+            console.error(e);
+            return {updatedAt: null, text: null}
+        } finally {
+            updCommPending.value = false;
+        }
+    };
 
     return {
         pending,
@@ -224,5 +271,12 @@ export const usePostStore = defineStore('post', () => {
         createCommError,
         createComment,
 
+        delCommPending,
+        delCommError,
+        deleteComment,
+
+        updCommPending,
+        updCommError,
+        updateComment,
     };
 });

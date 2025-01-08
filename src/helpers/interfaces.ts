@@ -185,7 +185,9 @@ export interface UserComment{
     parentCommentId: string | null,
     text: string,
     isEdited: boolean,
+    isDeleted: boolean,
     createdAt: Date,
+    updatedAt: Date,
     repliesCount: number,
     mode: 'internal' | 'external',
     user: {

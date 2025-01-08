@@ -2,7 +2,7 @@
 import TextDivider from "@/components/common/textDivider.vue";
 import {usePostStore} from "@/stores/post";
 import {useNotificationStore} from "@/stores/notifications";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, setDevtoolsHook} from "vue";
 import CreateComment from "@/components/posts/createComment.vue";
 import type {UserComment} from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
@@ -10,8 +10,10 @@ import CommentsSkeleton from "@/components/skeletons/commentsSkeleton.vue";
 import CommentsNotFound from "@/components/posts/commentsNotFound.vue";
 import CommentItem from "@/components/posts/commentItem.vue";
 import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
+import {useRoute} from "vue-router";
 
-const emit = defineEmits(['incCommentsCount'])
+const emit = defineEmits(['incCommentsCount', 'decCommentsCount', 'showSubComments'])
+const route = useRoute();
 
 interface Props {
   entityType: 'Publication' | 'Post' | 'Comment',
@@ -78,29 +80,65 @@ const replyModel = ref<{comment_id: string, to: { _id: string; nickname: string;
 
 const reloadComments = async (mode: 'comments' | 'replies') => {
 
-  if(comments.value && mode === 'replies' && replyModel.value?.comment_id){
-    const index = comments.value.findIndex(i => i._id === replyModel.value?.comment_id)
-    if(index !== -1){
-      comments.value[index].repliesCount += 1
-    }
-    postStore.reloadRepliesFlag = replyModel.value?.comment_id
+  if(mode === 'replies' && replyModel.value?.comment_id){
+    decIncReplies('inc', replyModel.value?.comment_id)
   }
 
   await getComments(mode, 'load', true)
-
-  if (postStore.posts && postStore.posts.length){
-    const index = postStore.posts.findIndex(i => i._id === props.entityId)
-    if(index !== -1){
-      postStore.posts[index].comments_count += 1;
-    }
-  }
-  emit('incCommentsCount')
-
+  decIncComments('inc')
 }
 
+const handleDeleteComment = async (payload: {comment_id: string, act: 'deleted' | 'markDelete'}) => {
+  await getComments('comments', 'load', true)
 
+  if (payload.act === 'deleted'){
+    decIncComments('dec')
+  }
+}
 
-//mode: 'comments' | 'replies', entityType: 'Publication' | 'Post' | 'Comment', entityId: string, page: number = 1, limit: number = 15, parentCommentId?: string
+const handleDeleteReply = async (payload: {comment_id: string}) => {
+  decIncReplies('dec', payload.comment_id);
+  decIncComments('dec')
+
+  if (comments.value){
+    const index = comments.value.findIndex(i => i._id === payload.comment_id)
+    if(index !== -1){
+      if(comments.value[index].repliesCount <= 0 && comments.value[index].isDeleted){
+        await getComments('comments', 'load', true)
+        decIncComments('dec')
+      }
+    }
+  }
+}
+
+const decIncComments = (mode: 'dec' | 'inc') => {
+  if(route.query.p && postStore.posts && postStore.posts.length) {
+    const index = postStore.posts.findIndex(i => i._id === props.entityId)
+    if(index !== -1){
+      postStore.posts[index].comments_count += mode === 'inc' ? 1 : -1;
+    }
+  }
+  emit(`${mode}CommentsCount`)
+}
+
+const decIncReplies = (mode: 'dec' | 'inc', commentId: string) => {
+  if(comments.value){
+    const index = comments.value.findIndex(i => i._id === commentId)
+    if(index !== -1){
+      comments.value[index].repliesCount += mode === 'inc' ? 1 : -1;
+    }
+  }
+}
+
+const updateComment = (payload: {comment_id: string, newText: string, updated: Date}) => {
+  if(comments.value){
+    const index = comments.value.findIndex(i => i._id === payload.comment_id)
+    if(index !== -1){
+      comments.value[index].text = payload.newText;
+      comments.value[index].updatedAt = payload.updated;
+    }
+  }
+}
 </script>
 
 <template>
@@ -120,6 +158,9 @@ const reloadComments = async (mode: 'comments' | 'replies') => {
                     @reply="payload => replyModel = payload"
                     :replies-mode="props.repliesMode"
                     :is-global="props.isGlobal"
+                    @delete-comment="payload => handleDeleteComment(payload)"
+                    @exact-delete-reply="payload => handleDeleteReply(payload)"
+                    @comment-updated="payload => updateComment(payload)"
       />
 
       <v-btn v-if="moreFlag && !pendingMore" color="green" class="text-none mb-1" variant="text">

@@ -25,7 +25,7 @@ const currentMedia = ref<number>(0);
 const isCommentsVisible = ref<boolean>(props.isGlobal);
 
 const handleActComments = () => {
-  isCommentsVisible.value = !isCommentsVisible.value
+  router.push({query: {p: props.p._id}})
 }
 
 </script>
@@ -72,7 +72,9 @@ const handleActComments = () => {
       <post-reactions @act-comments="handleActComments" :post="p"/>
     </div>
 
-    <comments-list :is-global="props.isGlobal" :mode="props.mode" :entity-id="p._id" entity-type="Post" v-if="isCommentsVisible"/>
+    <comments-list @dec-comments-count="p.comments_count -= 1" @inc-comments-count="p.comments_count += 1"
+                   :is-global="props.isGlobal" :mode="props.mode" :entity-id="p._id" entity-type="Post" v-if="isCommentsVisible"
+    />
   </div>
 </template>
 

@@ -16,6 +16,20 @@ $gap-large: 50px;
 
 $radius: 10px;
 
+.fz-14{
+  font-size: 14px !important;
+}
+.fz-12{
+  font-size: 12px !important;
+}
+
+.v-textarea .v-field__input{
+  mask-image: unset !important;
+  -webkit-mask-image: unset !important;
+  padding: 5px 10px !important;
+  font-size: 14px !important;
+}
+
 .active-link {
   color: green;
   text-decoration: underline;
@@ -303,11 +317,7 @@ textarea::-webkit-scrollbar-track {
   border-radius: 15px !important;
 }
 
-.v-textarea .v-field__input{
-  mask-image: unset !important;
-  -webkit-mask-image: unset !important;
-  padding: 10px !important;
-}
+
 
 //
 
