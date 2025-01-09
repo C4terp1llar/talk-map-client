@@ -88,12 +88,20 @@ export const useWsStore = defineStore('ws', () => {
             wsMd.publish_post(payload)
         })
 
+        userSocket.value.on('reload_posts', (payload: { post_id?: string, post_owner: string }) => {
+            wsMd.reload_posts(payload)
+        })
+
         userSocket.value.on('publish_many_Photo', (payload: { uid: string}) => {
             wsMd.publish_many_photo(payload)
         })
 
         userSocket.value.on('react_media', (payload: { entity: 'Photo' | 'Post' | 'Comment',  reactor: string, entity_id: string, wasLike: boolean }) => {
             wsMd.react_media(payload)
+        })
+
+        userSocket.value.on('publish_comment', (payload: {entity_id: string, entity_type: 'Photo' | 'Post' | 'Comment', commentator: string}) => {
+            wsMd.publish_comment(payload)
         })
     }
 

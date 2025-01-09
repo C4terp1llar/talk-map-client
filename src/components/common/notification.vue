@@ -27,6 +27,9 @@ const frMap = new Map([
   ['publish_Photo', 'Опубликовал(а) свою фотку. Просто огонь! 🔥'],
   ['publish_many_Photo', 'Опубликовал(а) несколько фотографий. Настоящий фото-арт! 📸✨'],
   ['publish_Post', 'Опубликовал(а) свой пост. Это будет бомба! 💥'],
+  ['comment_Photo', 'Оставил(а) комментарий к вашей фоточке. Что-то интересное? 💬📸'],
+  ['comment_Post', 'Оставил(а) комментарий к вашему посту. Интересно мнение! 💬📝'],
+  ['comment_Comment', 'Ответил(а) на ваш комментарий. Диалог продолжается! 🔄💬']
 ]);
 
 const getFrLink = (type: string) => {
@@ -50,6 +53,10 @@ const getFrPageLink = (n: FrNotification) => {
       return n.entity_id ? { name: 'photos', query: { r: n.entity_id } } : { name: 'photos' };
     case 'react_Post':
       return n.entity_id ? { name: 'home', query: { p: n.entity_id } } : { name: 'home' };
+    case 'comment_Post':
+      return n.entity_id ? { name: 'home', query: { p: n.entity_id } } : { name: 'home' };
+    case 'comment_Comment':
+      return n.entity_id ? { query: { p: n.entity_id } } : false
     default:
       return { name: 'home' };
   }

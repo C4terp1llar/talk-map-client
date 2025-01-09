@@ -8,6 +8,7 @@ import PhotosListItem from "@/components/photos/photosListItem.vue";
 import PhotosNotFound from "@/components/photos/photosNotFound.vue";
 import PostItem from "@/components/posts/postItem.vue";
 import PostListSkeleton from "@/components/skeletons/postListSkeleton.vue";
+import {useWsStore} from "@/stores/wsStore";
 
 interface Props {
   mode: 'internal' | 'external',
@@ -20,10 +21,22 @@ const props = defineProps<Props>()
 
 const postStore = usePostStore();
 const notificationStore = useNotificationStore()
+const wsStore = useWsStore();
 
 onMounted(async () => {
   if (!props.withoutPreload){
     await uploadData('load')
+  }
+
+  if (wsStore.userSocket){
+    wsStore.userSocket.on('reload_comments', async (payload: {entity_id: string, comment_id: string, act: 'inc' | 'dec', mode: 'replies' | 'comments'}) => {
+      if (postStore.posts){
+        const index = postStore.posts.findIndex(i => i._id === payload.entity_id)
+        if(index !== -1){
+          postStore.posts[index].comments_count += payload.act === 'inc' ? 1 : -1;
+        }
+      }
+    })
   }
 })
 

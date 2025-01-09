@@ -79,16 +79,24 @@ export const useWsMdStore = defineStore('wsMd', () => {
         }
     }
 
+    const reload_posts = async (payload: { post_id?: string, post_owner: string }) => {
+        if (route.name === 'friends-user' && route.params.id === payload.post_owner && postStore.posts) {
+            await postStore.getPosts('load', undefined, payload.post_owner, true)
+        }
+        if (route.query.p === payload.post_id){
+            await router.push({query: {p: undefined}})
+        }
+    }
 
-    // const element = document.getElementById(payload.entity_id);
-    // if (element) {
-    //     const top = element.getBoundingClientRect().top + window.scrollY - 100;
-    //     window.scrollTo({ top, behavior: 'smooth' });
-    // }
+    const publish_comment = async (payload: {entity_id: string, entity_type: 'Photo' | 'Post' | 'Comment', commentator: string}) => {
+        console.log('publish_comment')
+        await notifyWithPreload(`comment_${payload.entity_type}`, payload.commentator, payload.entity_id)
+        soundStore.addSound({soundType: 'default', soundCaller: 'publish_comment'})
+    }
 
     const notifyWithPreload = async (
-        type: 'publish_Photo' | 'publish_many_Photo' | 'react_Photo' | 'react_Post' | 'react_Comment' | 'publish_Post', uid: string,
-        entity_id?: string
+        type: 'publish_Photo' | 'publish_many_Photo' | 'react_Photo' | 'react_Post' | 'react_Comment' | 'publish_Post' | 'comment_Photo' | 'comment_Post' | 'comment_Comment'
+        ,uid: string, entity_id?: string
     ) => {
         const user = await friendStore.getOneUser(uid, false);
 
@@ -109,7 +117,9 @@ export const useWsMdStore = defineStore('wsMd', () => {
         publish_photo,
         publish_many_photo,
         react_media,
-        publish_post
+        publish_post,
+        reload_posts,
+        publish_comment,
     }
 });
 

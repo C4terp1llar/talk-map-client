@@ -11,6 +11,7 @@ import CommentsNotFound from "@/components/posts/commentsNotFound.vue";
 import CommentItem from "@/components/posts/commentItem.vue";
 import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
 import {useRoute} from "vue-router";
+import {useWsStore} from "@/stores/wsStore";
 
 const emit = defineEmits(['incCommentsCount', 'decCommentsCount', 'showSubComments'])
 const route = useRoute();
@@ -31,9 +32,23 @@ const LIMIT = 15
 
 const postStore = usePostStore();
 const nthStore = useNotificationStore();
+const wsStore = useWsStore();
 
 onMounted(async () => {
   await getComments(props.repliesMode ? 'replies' : 'comments', 'load');
+
+  if (wsStore.userSocket){
+    wsStore.userSocket.on('reload_comments', async (payload: {comment_id: string, parentCommentId?: string, act: 'inc' | 'dec', mode: 'replies' | 'comments'}) => {
+      if (payload.mode === 'comments'){
+        await getComments('comments', 'load', true)
+        emit(`${payload.act}CommentsCount`)
+      }
+      if (payload.mode === 'replies' && payload.parentCommentId){
+        emit(`${payload.act}CommentsCount`)
+        decIncReplies(payload.act, payload.parentCommentId)
+      }
+    })
+  }
 })
 
 const comments = ref<UserComment[] | null>(null);

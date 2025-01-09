@@ -7,6 +7,7 @@ import PostItemHead from "@/components/posts/postItemHead.vue";
 import CommentsList from "@/components/posts/commentsList.vue";
 import {useRouter} from "vue-router";
 import PhotoImage from "@/components/photos/photoImage.vue";
+import {useWsStore} from "@/stores/wsStore";
 
 const emit = defineEmits(['deletePost'])
 

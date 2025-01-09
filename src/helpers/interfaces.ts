@@ -7,7 +7,8 @@ export interface Notification {
 
 export interface FrNotification {
     id: number;
-    type: 'receive' | 'abort' | 'decline' | 'submit' | 'delete' | 'react_Photo' | 'react_Post' | 'react_Comment' | 'publish_Photo' | 'publish_many_Photo' | 'publish_Post';
+    type: 'receive' | 'abort' | 'decline' | 'submit' | 'delete' | 'react_Photo' | 'react_Post' | 'react_Comment' | 'publish_Photo' | 'publish_many_Photo' | 'publish_Post'
+        | 'comment_Photo' | 'comment_Post' | 'comment_Comment';
     message: string;
     timeout: number;
     detail: ShortMutualUserFriend;
