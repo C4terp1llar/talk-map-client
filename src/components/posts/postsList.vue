@@ -29,8 +29,8 @@ onMounted(async () => {
   }
 
   if (wsStore.userSocket){
-    wsStore.userSocket.on('reload_comments', async (payload: {entity_id: string, comment_id: string, act: 'inc' | 'dec', mode: 'replies' | 'comments'}) => {
-      if (postStore.posts){
+    wsStore.userSocket.on('reload_comments', async (payload: {entity_id: string, comment_id: string, act: 'inc' | 'dec' | '', mode: 'replies' | 'comments'}) => {
+      if (postStore.posts && (payload.act === 'inc' || payload.act === 'dec')){
         const index = postStore.posts.findIndex(i => i._id === payload.entity_id)
         if(index !== -1){
           postStore.posts[index].comments_count += payload.act === 'inc' ? 1 : -1;

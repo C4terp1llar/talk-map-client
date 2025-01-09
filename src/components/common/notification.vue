@@ -2,6 +2,7 @@
 import { useNotificationStore } from "@/stores/notifications";
 import FriendsMutualItem from "@/components/friends/friendsMutualItem.vue";
 import type {FrNotification} from "@/helpers/interfaces";
+import {truncateText} from "@/helpers/sliceNtfAddText";
 
 const store = useNotificationStore();
 
@@ -28,8 +29,8 @@ const frMap = new Map([
   ['publish_many_Photo', 'Опубликовал(а) несколько фотографий. Настоящий фото-арт! 📸✨'],
   ['publish_Post', 'Опубликовал(а) свой пост. Это будет бомба! 💥'],
   ['comment_Photo', 'Оставил(а) комментарий к вашей фоточке. Что-то интересное? 💬📸'],
-  ['comment_Post', 'Оставил(а) комментарий к вашему посту. Интересно мнение! 💬📝'],
-  ['comment_Comment', 'Ответил(а) на ваш комментарий. Диалог продолжается! 🔄💬']
+  ['comment_Post', 'Оставил(а) комментарий к вашему посту:'],
+  ['comment_Comment', 'Ответил(а) на ваш комментарий:']
 ]);
 
 const getFrLink = (type: string) => {
@@ -59,6 +60,14 @@ const getFrPageLink = (n: FrNotification) => {
       return n.entity_id ? { query: { p: n.entity_id } } : false
     default:
       return { name: 'home' };
+  }
+}
+
+const getFrText = (n: FrNotification) => {
+  if (n.additional_text && (n.type === 'comment_Comment' || n.type === 'comment_Post')){
+    return `${frMap.get(n.type)} «${truncateText(n.additional_text)}» 💬`;
+  }else{
+    return frMap.get(n.type)
   }
 }
 </script>
@@ -104,7 +113,7 @@ const getFrPageLink = (n: FrNotification) => {
         </div>
 
         <div class="notification-details__message">
-          {{ frMap.get(n.type)}}
+          {{ getFrText(n) }}
           <router-link class="hide__link" :to="getFrPageLink(n)"/>
         </div>
       </div>

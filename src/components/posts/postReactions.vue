@@ -6,6 +6,7 @@ import {useNotificationStore} from "@/stores/notifications";
 import {formatShortDate} from "../../helpers/dateHelper";
 import {usePostStore} from "@/stores/post";
 import {useRoute} from "vue-router";
+import {ref} from "vue";
 
 const postStore = usePostStore();
 const route = useRoute();
@@ -22,10 +23,13 @@ const phStore = usePhotoStore();
 const uStore = useUserStore();
 const ntfStore = useNotificationStore();
 
+const currentPending = ref<string | null>(null)
+
 const handleReact = async () => {
   if (props.post.mode === 'internal' || !uStore.mainUserInfo?._id) return;
-
+  currentPending.value = props.post._id
   await phStore.reactAction('Post', props.post._id, uStore.mainUserInfo?._id);
+  currentPending.value = null
 
   if (phStore.reactError) {
     ntfStore.addNotification('error', phStore.reactError, 3000)
@@ -51,8 +55,8 @@ const handleReact = async () => {
     <div class="post__actions">
       <div class="reactions-likes">
         <button
-            :class="['reactions__btn', post.mode === 'internal' ? '__non-hover' : '', { 'loading': phStore.reactPending }]"
-            :disabled="post.mode === 'internal' || phStore.reactPending"
+            :class="['reactions__btn', post.mode === 'internal' ? '__non-hover' : '', { 'loading': currentPending === props.post._id }]"
+            :disabled="post.mode === 'internal' ||  currentPending === props.post._id"
             @click="handleReact"
         >
           <v-icon :size="25" color="red">{{ post.liked ? 'mdi-heart' : 'mdi-heart-outline' }}</v-icon>

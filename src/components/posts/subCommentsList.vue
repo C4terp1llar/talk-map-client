@@ -9,6 +9,7 @@ import TextDivider from "@/components/common/textDivider.vue";
 import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
 import CreateComment from "@/components/posts/createComment.vue";
 import CommentItem from "@/components/posts/commentItem.vue";
+import {useWsStore} from "@/stores/wsStore";
 
 const emit = defineEmits<{
   (e: 'exactDeleteReply', payload: {comment_id: string}): void
@@ -32,6 +33,7 @@ const LIMIT = 15
 
 const postStore = usePostStore();
 const nthStore = useNotificationStore();
+const wsStore = useWsStore();
 
 onMounted(async () => {
   await getComments( 'load');
@@ -42,6 +44,19 @@ onMounted(async () => {
         await getComments('load', true);
       }
   );
+
+  if (wsStore.userSocket){
+    wsStore.userSocket.on('reload_comments', async (
+        payload: {comment?: UserComment ,comment_id: string, parentCommentId?: string, act: 'inc' | 'dec' | 'change', mode: 'replies' | 'comments'}
+    ) => {
+      if(payload.act === 'change' && payload.mode === 'replies' && payload.comment && comments.value){
+        const index  = comments.value.findIndex(i => i._id === payload.comment_id);
+        if (index !== -1){
+          comments.value[index] = payload.comment
+        }
+      }
+    })
+  }
 })
 
 const comments = ref<UserComment[] | null>(null);
@@ -117,8 +132,10 @@ const deleteReply = async (payload: {comment_id: string}) => {
 
 <style scoped lang="scss">
 .comments-list__wrapper{
-  padding: 5px 0 0 0;
+  //padding: 5px 0 0 0;
+  margin-left: 50px;
 }
+
 
 .comment-items__wrapper{
   display: flex;

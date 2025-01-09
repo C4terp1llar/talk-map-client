@@ -62,6 +62,8 @@ onClickOutside(commentMenuRef, clickOutside);
           prepend-icon="mdi-pencil-outline"
           size="small"
           @click="handleChange"
+          :disabled="postStore.delCommPending || postStore.updCommPending"
+          :loading="postStore.updCommPending"
       >
         Изменить
       </v-btn>
@@ -72,6 +74,8 @@ onClickOutside(commentMenuRef, clickOutside);
           prepend-icon="mdi-delete-outline"
           size="small"
           @click="handleDelete"
+          :disabled="postStore.delCommPending || postStore.updCommPending"
+          :loading="postStore.delCommPending"
       >
         Удалить
       </v-btn>

@@ -88,15 +88,19 @@ export const useWsMdStore = defineStore('wsMd', () => {
         }
     }
 
-    const publish_comment = async (payload: {entity_id: string, entity_type: 'Photo' | 'Post' | 'Comment', commentator: string}) => {
+    const publish_comment = async (payload: {text: string, entity_id: string, entity_type: 'Photo' | 'Post' | 'Comment', commentator: string, isReply?: boolean}) => {
         console.log('publish_comment')
-        await notifyWithPreload(`comment_${payload.entity_type}`, payload.commentator, payload.entity_id)
+        if (payload.isReply){
+            await notifyWithPreload(`comment_Comment`, payload.commentator, payload.entity_id, payload.text)
+        }else{
+            await notifyWithPreload(`comment_${payload.entity_type}`, payload.commentator, payload.entity_id, payload.text)
+        }
         soundStore.addSound({soundType: 'default', soundCaller: 'publish_comment'})
     }
 
     const notifyWithPreload = async (
         type: 'publish_Photo' | 'publish_many_Photo' | 'react_Photo' | 'react_Post' | 'react_Comment' | 'publish_Post' | 'comment_Photo' | 'comment_Post' | 'comment_Comment'
-        ,uid: string, entity_id?: string
+        ,uid: string, entity_id?: string, additional_text?: string
     ) => {
         const user = await friendStore.getOneUser(uid, false);
 
@@ -109,7 +113,8 @@ export const useWsMdStore = defineStore('wsMd', () => {
                 ...user[0]
             },
             actionType: 'media',
-            entity_id: entity_id
+            entity_id: entity_id,
+            additional_text: additional_text
         })
     }
 

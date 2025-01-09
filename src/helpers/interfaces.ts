@@ -13,7 +13,8 @@ export interface FrNotification {
     timeout: number;
     detail: ShortMutualUserFriend;
     actionType: 'friends' | 'media' | 'communications';
-    entity_id?: string
+    additional_text?: string,
+    entity_id?: string,
 }
 
 

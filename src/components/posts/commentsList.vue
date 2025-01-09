@@ -38,14 +38,26 @@ onMounted(async () => {
   await getComments(props.repliesMode ? 'replies' : 'comments', 'load');
 
   if (wsStore.userSocket){
-    wsStore.userSocket.on('reload_comments', async (payload: {comment_id: string, parentCommentId?: string, act: 'inc' | 'dec', mode: 'replies' | 'comments'}) => {
+    wsStore.userSocket.on('reload_comments', async (
+        payload: {comment?: UserComment ,comment_id: string, parentCommentId?: string, act: 'inc' | 'dec' | 'change', mode: 'replies' | 'comments'}
+    ) => {
       if (payload.mode === 'comments'){
         await getComments('comments', 'load', true)
-        emit(`${payload.act}CommentsCount`)
+
+        if(payload.act === 'inc' || payload.act === 'dec'){
+          emit(`${payload.act}CommentsCount`)
+        }
       }
-      if (payload.mode === 'replies' && payload.parentCommentId){
+      if (payload.mode === 'replies' && payload.parentCommentId && (payload.act === 'inc' || payload.act === 'dec')){
         emit(`${payload.act}CommentsCount`)
         decIncReplies(payload.act, payload.parentCommentId)
+      }
+
+      if(payload.act === 'change' && payload.mode === 'comments' && payload.comment && comments.value){
+        const index  = comments.value.findIndex(i => i._id === payload.comment_id);
+        if (index !== -1){
+          comments.value[index] = payload.comment
+        }
       }
     })
   }

@@ -100,7 +100,7 @@ export const useWsStore = defineStore('ws', () => {
             wsMd.react_media(payload)
         })
 
-        userSocket.value.on('publish_comment', (payload: {entity_id: string, entity_type: 'Photo' | 'Post' | 'Comment', commentator: string}) => {
+        userSocket.value.on('publish_comment', (payload: {text: string, entity_id: string, entity_type: 'Photo' | 'Post' | 'Comment', commentator: string, isReply?: boolean}) => {
             wsMd.publish_comment(payload)
         })
     }

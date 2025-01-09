@@ -55,7 +55,7 @@ const updateComment = (payload: {comment_id: string, newText: string, updated: D
 <template>
   <div class="comment-items__content">
 
-    <div class="item__avatar" >
+    <div class="item__avatar">
       <v-avatar>
         <v-img
             :src="comment.user.avatar"
@@ -86,17 +86,13 @@ const updateComment = (payload: {comment_id: string, newText: string, updated: D
         />
       </div>
 
-      <div class="item__text" v-if="!isChangeMode">
+      <div class="item__text">
         <span v-if="!comment.isDeleted">{{props.comment.text}}</span>
         <div v-else class="deleted-comment">
           <span>Комментарий удален</span>
           <v-icon color="warning">mdi-delete-empty-outline</v-icon>
         </div>
       </div>
-      <change-comment v-else @act-change-comment="isChangeMode = !isChangeMode" :entity-type="props.entityType"
-                      :entityId="props.entityId" :mode="props.mode" :text="comment.text" :comment_id="comment._id"
-                      @comment-updated="payload => updateComment(payload)"
-      />
 
       <comment-item-actions
           v-if="!isChangeMode"
@@ -106,14 +102,18 @@ const updateComment = (payload: {comment_id: string, newText: string, updated: D
       />
 
 
-      <sub-comments-list
-          v-if="isSubsComments"
-          :mode="props.mode" :entity-type="props.entityType" :parent-comment-id="comment._id"
-          :entity-id="props.entityId" :replies-mode="true" :is-global="props.isGlobal"
-          :replies-count="props.comment.repliesCount" @exact-delete-reply="payload => emit('exactDeleteReply', {comment_id: payload.comment_id})"
-      />
-
     </div>
+    <change-comment v-if="isChangeMode" class="change-comment" @act-change-comment="isChangeMode = !isChangeMode" :entity-type="props.entityType"
+                    :entityId="props.entityId" :mode="props.mode" :text="comment.text" :comment_id="comment._id"
+                    @comment-updated="payload => updateComment(payload)"
+    />
+
+    <sub-comments-list
+        v-if="isSubsComments" class="sub-comments-list"
+        :mode="props.mode" :entity-type="props.entityType" :parent-comment-id="comment._id"
+        :entity-id="props.entityId" :replies-mode="true" :is-global="props.isGlobal"
+        :replies-count="props.comment.repliesCount" @exact-delete-reply="payload => emit('exactDeleteReply', {comment_id: payload.comment_id})"
+    />
   </div>
 
 </template>
@@ -126,8 +126,10 @@ const updateComment = (payload: {comment_id: string, newText: string, updated: D
   padding: 5px;
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 10px;
 
+  .change-comment,.sub-comments-list{
+    grid-column: span 2;
+  }
 }
 
 .item__text{
@@ -140,6 +142,10 @@ const updateComment = (payload: {comment_id: string, newText: string, updated: D
   align-items: center;
   justify-content: space-between;
 
+}
+
+.item__avatar{
+  margin-right: 10px;
 }
 
 .deleted-comment{

@@ -24,12 +24,14 @@ const props = defineProps<Props>();
       <button class="item__replies-btn" v-if="!comment.isDeleted" @click="emit('reply', {comment_id: comment._id, to: comment.user})">
         Ответить
       </button>
-      <button @click="emit('actSubComments')" class="item__replies-btn" v-if="comment.repliesCount">
+      <button @click="emit('actSubComments')" class="item__replies-btn mr-2" v-if="comment.repliesCount">
         Ответы {{comment.repliesCount}}
       </button>
     </div>
-    <span class="item__date ml-auto" v-if="!comment.isEdited">{{formatShortDate(comment.createdAt)}}</span>
-    <span class="item__date ml-auto" v-else>{{ `[изменено ${formatShortDate(comment.updatedAt)}]` }}</span>
+    <div class="d-flex align-items-center ml-auto">
+      <span class="item__date " v-if="!comment.isEdited">{{formatShortDate(comment.createdAt)}}</span>
+      <span class="item__date " v-else>{{ `[изменено ${formatShortDate(comment.updatedAt)}]` }}</span>
+    </div>
   </div>
 </template>
 
