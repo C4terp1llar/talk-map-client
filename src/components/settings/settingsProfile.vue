@@ -26,7 +26,7 @@ const userStore = useUserStore()
     <div class="wrapper-settings-tab__profile" v-if="!userStore.pending">
 
       <div class="profile-preview">
-        <h4 class="text-center">Предпросмотр профиля</h4>
+        <h5 class="text-center">Предпросмотр профиля</h5>
         <v-divider/>
         <wallpaper :with-actions="true" :is-preview="true">
           <wallpaper-avatar :with-actions="true" :is-preview="true"/>
@@ -36,7 +36,7 @@ const userStore = useUserStore()
 
 
       <div class="profile-nickname">
-        <h4 class="text-center">Никнейм</h4>
+        <h5 class="text-center">Никнейм</h5>
         <v-divider/>
         <nickname-change/>
         <nickname-color-change class="mt-3"/>
@@ -44,7 +44,7 @@ const userStore = useUserStore()
       </div>
 
       <div class="profile-nickname">
-        <h4 class="text-center">Теги</h4>
+        <h5 class="text-center">Теги</h5>
         <v-divider/>
         <tag-complete-make/>
         <tag-complete-change/>
@@ -52,7 +52,7 @@ const userStore = useUserStore()
       </div>
 
       <div class="profile-address">
-        <h4 class="text-center">Адрес</h4>
+        <h5 class="text-center">Адрес</h5>
         <v-divider/>
         <address-step :reg-mode="false"/>
         <v-divider/>

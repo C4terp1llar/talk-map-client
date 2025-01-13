@@ -28,9 +28,6 @@ const registrationStore = useRegistrationStore();
 
 <style scoped>
 .indicator-wrapper{
-  position: absolute;
-  right: -20px;
-  top: 0;
   height: 56px;
   display: flex;
   align-items: center;
