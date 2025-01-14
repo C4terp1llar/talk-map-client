@@ -1,11 +1,12 @@
 <script setup lang="ts">
-
-import ChangePassword from "@/components/settings/security/changePassword.vue";
+import ChangePasswordWrap from "@/components/settings/security/changePasswordWrap.vue";
+import SessionList from "@/components/settings/security/sessionList.vue";
 </script>
 
 <template>
   <div class="wrapper-settings__settings-tab">
-    <change-password/>
+    <session-list/>
+    <change-password-wrap/>
   </div>
 </template>
 
@@ -14,6 +15,5 @@ import ChangePassword from "@/components/settings/security/changePassword.vue";
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 10px;
 }
 </style>

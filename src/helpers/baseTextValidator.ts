@@ -16,13 +16,16 @@ export const rules = {
         return p1 === p2 || 'Пароли не совпадают'
     },
     lengthPass: (password: string) => {
-        return password.length >= 6 || 'Увеличьте длину пароля'
+        return password.length >= 6 || 'Минимальная длина пароля - 6 символов'
+    },
+    passMismatch: (p: string, newP: string) => {
+        return p !== newP || 'Текущий и новый пароли не должны совпадать'
     },
     lengthNickname: (nick: string) => {
-        return nick.length >= 6 || 'Увеличьте длину никнейма'
+        return nick.length >= 6 || 'Минимальная длина никнейма - 6 символов'
     },
     lengthTag: (tag: string) => {
-        return tag.length >= 6 || 'Минимальная длина 6 символов'
+        return tag.length >= 6 || 'Минимальная длина тега - 6 символов'
     },
     onlyDigitOrLetterPass: (password: string) => {
         return /[A-z,a-z]/.test(password) && /\d/.test(password) || 'Добавьте и буквы и цифры'

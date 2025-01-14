@@ -81,11 +81,23 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    const getSession = async (id: string) => {
+        try {
+            const response = await apiAuth.get(`user/sessions/${id}`, { withCredentials: true });
+            if (response.status === 200 && response.data) {
+                return response.data.match;
+            }
+        } catch (e: any) {
+            console.error(e);
+        }
+    };
+
     return {
         pending,
         error,
         changeUserPassword,
         login,
-        logout
+        logout,
+        getSession
     };
 });

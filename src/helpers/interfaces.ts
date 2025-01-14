@@ -199,3 +199,10 @@ export interface UserComment{
         avatar: string,
     }
 }
+
+export interface UserSession{
+    _id: string,
+    user_id: string,
+    device: string,
+    created: Date
+}

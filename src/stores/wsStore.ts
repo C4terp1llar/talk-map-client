@@ -7,6 +7,8 @@ import {attachBaseWsHandlers} from "@/utils/wsBaseHandlers";
 import {useWsAddStore} from "@/stores/wsAddHandlers";
 import type {FriendRequest, Post} from "@/helpers/interfaces";
 import {useWsMdStore} from "@/stores/wsMediaHandlers";
+import {useAuthStore} from "@/stores/auth";
+import {decodeJWT} from "@/helpers/decodeJwt";
 
 type UserSocket = Socket | null;
 
@@ -15,6 +17,8 @@ export const useWsStore = defineStore('ws', () => {
     const wsMd = useWsMdStore()
 
     const userSocket: Ref<UserSocket> = ref(null);
+
+    const authStore = useAuthStore();
 
     const connectSocket = async () => {
         let token = localStorage.getItem('access_token');
@@ -48,8 +52,21 @@ export const useWsStore = defineStore('ws', () => {
         await attachMediaWsHandlers();
 
         socket.on("tokenError", async () => {
-            console.log('токен истек, реконнект')
-            await connectSocket()
+            setTimeout(async () => {
+                console.log('токен истек, реконнект')
+                return await connectSocket()
+            }, 3000)
+        });
+
+        socket.on("session_close", async (payload: {id: string, device_info: string}) => {
+            const token = localStorage.getItem('access_token')
+            if (token){
+                const decode = decodeJWT(token)
+                if (decode && decode.device_info === payload.device_info){
+                    console.log('вызвано завершение сессии, логаут')
+                    await authStore.logout()
+                }
+            }
         });
     };
 

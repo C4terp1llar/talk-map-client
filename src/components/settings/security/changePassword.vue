@@ -1,32 +1,31 @@
 <script setup lang="ts">
-import {rules} from "@/helpers/baseTextValidator";
+import {useSecurityStore} from "@/stores/security";
+import {useNotificationStore} from "@/stores/notifications";
+import {computed, ref} from "vue";
 import {checkPasswordStrength} from "@/helpers/passStrength";
 import {replaceSymbols} from "@/helpers/replaceSymbols";
-import {computed, onMounted, ref} from "vue";
-import {useRegistrationStore} from "@/stores/regSteps";
+import {rules} from "@/helpers/baseTextValidator";
 import {debounce} from "perfect-debounce";
-import NicknameIndicator from "@/components/nicknameIndicator.vue";
 import PassIndicator from "@/components/passIndicator.vue";
 
-onMounted(() => {
+const secureStore = useSecurityStore();
+const ntfStore = useNotificationStore();
 
-})
-
-const strength = computed((): number => checkPasswordStrength(confirmPassword.value));
+const strength = computed((): number => checkPasswordStrength(newPassword.value));
 
 const isPasswordVisible = ref<boolean>(false);
 const isPasswordConfirmVisible = ref<boolean>(false);
 
 const password = ref<string>('');
-const confirmPassword = ref<string>('');
+const newPassword = ref<string>('');
 
 const errorMessages = ref<string[]>([]);
 
 const handleInputOldPassword = () => {
+  password.value = replaceSymbols(password.value);
+  oldPassMatch.value = null;
 
-  nickname.value = replaceSymbols(nickname.value);
-
-  if (nickname.value.length <= 5 || rules.lengthNickname(nickname.value) !== true || rules.fieldSymbols(nickname.value) !== true) {
+  if (password.value.length < 5 || rules.lengthPass(password.value) !== true) {
     errorMessages.value = [];
     return
   }else{
@@ -35,80 +34,98 @@ const handleInputOldPassword = () => {
   }
 };
 
-const debouncedOperation = debounce(async () => {
-  // чек кпароля
+const oldPassMatch = ref<boolean | null>(null)
 
-  // if (isTaken) {
-  //   errorMessages.value.push('Данный никнейм уже занят');
-  // }
+const debouncedOperation = debounce(async () => {
+  const {match} = await secureStore.checkPassword(password.value)
+
+  oldPassMatch.value = match
+
+  if (!match) {
+    errorMessages.value.push('Пароль некорректный');
+  }
 }, 1000);
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
+  if (rules.passMismatch(password.value, newPassword.value) !== true  || secureStore.checkPending || rules.fieldSymbols(newPassword.value) !== true
+      || rules.lengthPass(newPassword.value) !== true || rules.onlyDigitOrLetterPass(newPassword.value) !== true || strength.value < 2 || !oldPassMatch.value
+  ) return;
 
+  const data = await secureStore.changePassword(newPassword.value)
+
+  password.value = '';
+  newPassword.value = '';
+  oldPassMatch.value = null;
+
+  ntfStore.addNotification(data.s, data.message, 3000)
 }
 </script>
 
 <template>
-  <div class="change-password__wrapper">
+  <v-divider class="mt-2 mb-2"/>
+  <v-form validate-on="submit lazy" @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3 form-change-pass">
+    <div class="field">
+      <label class="inp-default-label">Текущий пароль:</label>
 
-    <v-form @submit.prevent="handleSubmit" class="w-100 d-flex flex-column gap-3">
       <div class="position-relative">
-        <div class="field">
-          <label class="inp-default-label">Старый пароль:</label>
-          <v-text-field
-              v-model="password"
-              :rules="[rules.required, rules.lengthPass(password)]"
-              variant="outlined"
-              :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
-              :type="isPasswordVisible ? 'text' : 'password'"
-              @click:append-inner="isPasswordVisible = !isPasswordVisible"
-              @input="password = replaceSymbols(password)"
-              hide-details="auto"
-              :error-messages="errorMessages"
-          />
-        </div>
-
+        <v-text-field
+            v-model.trim="password"
+            :rules="[rules.required, rules.lengthPass(password)]"
+            variant="outlined"
+            :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
+            :type="isPasswordVisible ? 'text' : 'password'"
+            @click:append-inner="isPasswordVisible = !isPasswordVisible"
+            @input="handleInputOldPassword"
+            hide-details="auto"
+            :error-messages="errorMessages"
+            :disabled="secureStore.pending"
+        />
         <div class="password-indicator">
-          <pass-indicator/>
+          <pass-indicator :match="oldPassMatch"/>
         </div>
       </div>
+    </div>
 
-      <div class="position-relative">
-        <div class="field">
-          <label class="inp-default-label">Новый Пароль:</label>
-          <v-text-field
-              v-model="confirmPassword"
-              :rules="[rules.fieldSymbols(confirmPassword), rules.required, rules.lengthPass(password), rules.onlyDigitOrLetterPass(password)]"
-              variant="outlined"
-              :append-inner-icon="isPasswordConfirmVisible ? 'mdi-eye-off' : 'mdi-eye'"
-              :type="isPasswordConfirmVisible ? 'text' : 'password'"
-              @click:append-inner="isPasswordConfirmVisible = !isPasswordConfirmVisible"
-              hide-details="auto"
-              @input="checkPasswordStrength, confirmPassword = replaceSymbols(confirmPassword)"
-          />
-        </div>
-
-        <div class="password-strength-indicator">
-          <span :class="{ filled: strength >= 1 }"></span>
-          <span :class="{ filled: strength >= 2 }"></span>
-          <span :class="{ filled: strength >= 3 }"></span>
-          <span :class="{ filled: strength >= 4 }"></span>
-        </div>
+    <div class="position-relative">
+      <div class="field">
+        <label class="inp-default-label">Новый Пароль:</label>
+        <v-text-field
+            v-model.trim="newPassword"
+            :rules="[rules.required, rules.fieldSymbols(newPassword), rules.lengthPass(newPassword), rules.onlyDigitOrLetterPass(newPassword), rules.passMismatch(password,newPassword)]"
+            variant="outlined"
+            :append-inner-icon="isPasswordConfirmVisible ? 'mdi-eye-off' : 'mdi-eye'"
+            :type="isPasswordConfirmVisible ? 'text' : 'password'"
+            @click:append-inner="isPasswordConfirmVisible = !isPasswordConfirmVisible"
+            hide-details="auto"
+            @input="checkPasswordStrength, newPassword = replaceSymbols(newPassword)"
+            :disabled="secureStore.pending"
+        />
       </div>
 
-    </v-form>
+      <div class="password-strength-indicator">
+        <span :class="{ filled: strength >= 1 }"></span>
+        <span :class="{ filled: strength >= 2 }"></span>
+        <span :class="{ filled: strength >= 3 }"></span>
+        <span :class="{ filled: strength >= 4 }"></span>
+      </div>
+    </div>
 
-  </div>
+    <v-btn :loading="secureStore.pending" :disabled="secureStore.pending" color="green" variant="outlined" class="text-none" type="submit">Изменить</v-btn>
+  </v-form>
 </template>
 
 <style scoped lang="scss">
-.change-password__wrapper{
-
+.form-change-pass{
+  padding: 0 10px;
+  @media (max-width: 650px) {
+    padding: 0 15px 0 5px;
+  }
 }
 
 .password-indicator{
   position: absolute;
-  right: 0;
+  right: -18px;
+  top: 0;
 }
 
 .password-strength-indicator {
@@ -133,4 +150,5 @@ const handleSubmit = () => {
 .password-strength-indicator span.filled {
   background-color: green;
 }
+
 </style>

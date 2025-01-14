@@ -149,10 +149,7 @@ body{
   display: flex;
   align-items: center;
   gap: 5px;
-  .flag {
-    filter: drop-shadow(0 0 1px currentColor);
-    border-radius: 10%;
-  }
+
   .flag-txt{
     font-size: 14px;
     font-weight: 500;
@@ -161,6 +158,11 @@ body{
       font-size: 12px;
     }
   }
+}
+
+.flag {
+  filter: drop-shadow(0 0 1px currentColor);
+  border-radius: 10%;
 }
 
 .btn__control-upper{
