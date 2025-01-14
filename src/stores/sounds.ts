@@ -22,6 +22,7 @@ export const useSoundsStore = defineStore('sounds', () => {
     };
 
     const addSound = (payload: SoundsQueue) => {
+        if (localStorage.getItem('ntf_sound_enable') === 'false') return
         soundsQueue.value.push(payload);
         if (!isPlaying.value) {
             playNextSound();

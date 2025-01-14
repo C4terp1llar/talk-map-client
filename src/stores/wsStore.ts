@@ -57,17 +57,6 @@ export const useWsStore = defineStore('ws', () => {
                 return await connectSocket()
             }, 3000)
         });
-
-        socket.on("session_close", async (payload: {id: string, device_info: string}) => {
-            const token = localStorage.getItem('access_token')
-            if (token){
-                const decode = decodeJWT(token)
-                if (decode && decode.device_info === payload.device_info){
-                    console.log('вызвано завершение сессии, логаут')
-                    await authStore.logout()
-                }
-            }
-        });
     };
 
     const attachAddWsHandlers = async () => {
@@ -96,6 +85,14 @@ export const useWsStore = defineStore('ws', () => {
 
     const attachMediaWsHandlers = async () => {
         if (!userSocket.value) return;
+
+        userSocket.value.on('session_close', (payload: {id: string, device_info: string}) => {
+            wsMd.session_close(payload)
+        })
+
+        userSocket.value.on('sessions_reload', () => {
+            wsMd.reload_sessions()
+        })
 
         userSocket.value.on('publish_Photo', (payload: { uid: string, phId: string }) => {
             wsMd.publish_photo(payload)

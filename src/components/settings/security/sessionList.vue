@@ -6,6 +6,7 @@ import SessionItemSkeleton from "@/components/skeletons/sessionItemSkeleton.vue"
 import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
 import SessionItem from "@/components/settings/security/sessionItem.vue";
 import TextDivider from "@/components/common/textDivider.vue";
+import NotFoundTemplate from "@/components/notFoundTemplate.vue";
 
 const secureStore = useSecurityStore()
 const notificationStore = useNotificationStore();
@@ -46,10 +47,14 @@ const uploadData = async (mode: 'l' | 'l-more', withoutPending?: boolean) => {
       <session-item :session="secureStore.activeSession" mode="active"/>
     </div>
 
-    <div class="sessions-list__content-wrapper" v-if="!secureStore.loadPending && secureStore.sessions && secureStore.sessions.length">
+    <div class="sessions-list__content-wrapper" v-if="!secureStore.loadPending && secureStore.sessions">
       <text-divider text="Сессии"/>
 
-      <session-item @reload-sessions="uploadData('l', true)" v-for="s in secureStore.sessions" :key="s._id" :session="s"/>
+      <not-found-template :icon-size="28" text="Других сессий пока нет" icon="mdi-badge-account-horizontal-outline" icon-color="green" v-if="!secureStore.sessions.length"/>
+
+      <session-item v-else @reload-sessions="uploadData('l', true)" v-for="s in secureStore.sessions" :key="s._id" :session="s"/>
+
+      <v-divider class="mt-2 mb-1"/>
 
       <div class="controls  mt-1 d-flex justify-content-center">
         <v-btn

@@ -22,6 +22,7 @@ export const useNotificationStore = defineStore('notification', () => {
     };
 
     const addFrNotification = (payload: FrNotification) => {
+        if (localStorage.getItem('ntf_enable') === 'false') return
         notificationsFr.value.push(payload);
 
         setTimeout(() => {

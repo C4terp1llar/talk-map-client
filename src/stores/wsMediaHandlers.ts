@@ -9,6 +9,9 @@ import {useSoundsStore} from "@/stores/sounds";
 import {useNotificationStore} from "@/stores/notifications";
 import {usePhotoStore} from "@/stores/photo";
 import {usePostStore} from "@/stores/post";
+import {useSecurityStore} from "@/stores/security";
+import {decodeJWT} from "@/helpers/decodeJwt";
+import {useAuthStore} from "@/stores/auth";
 
 export const useWsMdStore = defineStore('wsMd', () => {
 
@@ -18,10 +21,28 @@ export const useWsMdStore = defineStore('wsMd', () => {
     const phStore = usePhotoStore();
     const postStore = usePostStore();
     const soundStore = useSoundsStore();
-
+    const secureStore = useSecurityStore()
+    const authStore = useAuthStore();
 
     const route = useRoute();
     const router = useRouter();
+
+    const reload_sessions = async () => {
+        if (route.name === 'settings' && route.query.tab === 'security'){
+            await secureStore.getActiveSessions('l', true)
+        }
+    }
+
+    const session_close = async (payload: {id: string, device_info: string}) => {
+        const token = localStorage.getItem('access_token')
+        if (token){
+            const decode = decodeJWT(token)
+            if (decode && decode.device_info === payload.device_info){
+                console.log('вызвано завершение сессии, логаут')
+                await authStore.logout()
+            }
+        }
+    }
 
     const publish_photo = async (payload: { uid: string, phId: string }) => {
         console.log('publish_photo')
@@ -125,6 +146,8 @@ export const useWsMdStore = defineStore('wsMd', () => {
         publish_post,
         reload_posts,
         publish_comment,
+        reload_sessions,
+        session_close
     }
 });
 
