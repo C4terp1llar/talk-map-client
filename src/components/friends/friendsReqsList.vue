@@ -6,6 +6,8 @@ import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 import SearchFriendListItem from "@/components/friends/searchFriendListItem.vue";
 import FriendsReqsItem from "@/components/friends/friendsReqsItem.vue";
+import NotFoundTemplate from "@/components/notFoundTemplate.vue";
+import {useRouter} from "vue-router";
 
 interface Props {
   mode: 'incoming' | 'outgoing',
@@ -45,14 +47,18 @@ onBeforeUnmount(() => {
   window.removeEventListener("scroll", handleScroll);
 });
 
+const router = useRouter()
 </script>
 
 <template>
   <div class="friends-reqs-list__wrapper">
 
     <div class="friends-reqs-list__not-found" v-if="!friendsStore.foundRequests || !friendsStore.foundRequests.length">
-      <h6 v-if="props.mode === 'incoming'">тут будет картинка которая говорит о том что входящих заявок нет</h6>
-      <h6 v-else>тут будет картинка которая говорит о том что исходящих заявок нет</h6>
+      <not-found-template :text="props.mode === 'incoming' ? 'Входящих заявок пока нет' : 'Исходящих заявок пока нет'"
+                          :icon="props.mode === 'incoming' ? 'mdi-inbox-arrow-down-outline' : 'mdi-inbox-arrow-up-outline'"
+                          :icon-size="28" icon-color="green"
+      />
+      <v-btn class="text-none" @click="router.push({name: 'friends', query:{tab: 'search'}})">Найти друзей</v-btn>
     </div>
 
     <div class="friends-reqs-list-items__wrapper" v-else>
@@ -73,5 +79,13 @@ onBeforeUnmount(() => {
     flex-direction: column;
     gap: 10px;
   }
+}
+.friends-reqs-list__not-found{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 </style>

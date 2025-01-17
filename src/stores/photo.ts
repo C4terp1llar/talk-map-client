@@ -46,7 +46,7 @@ export const usePhotoStore = defineStore('photo', () => {
 
     const photos = ref<Photo[] | null>(null);
 
-    const getPhotos = async (mode: 'load' | 'load-more', limit?: number, requester?: string, withoutPending?: boolean) => {
+    const getPhotos = async (mode: 'load' | 'load-more', limit?: number, requester?: string, withoutPending?: boolean, sortStr?: string) => {
 
         let currentPending = mode === 'load' ? loadPending : loaMorePending;
 
@@ -69,7 +69,8 @@ export const usePhotoStore = defineStore('photo', () => {
                     mode: requester ? 'external' : 'internal',
                     searchUid: requester ? requester : undefined,
                     page: currentPage.value,
-                    limit: limit ? limit : perPage.value
+                    limit: limit ? limit : perPage.value,
+                    sort: sortStr
                 }
             });
 
