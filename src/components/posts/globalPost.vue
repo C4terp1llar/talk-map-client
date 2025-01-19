@@ -75,7 +75,7 @@ onClickOutside(postContentRef, clickOutside);
     <div class="post-content__wrapper" ref="postContentRef">
       <post-item
           class="exact-post"
-          @delete-post="router.push({query: {p: undefined}})"
+          @delete-post="clickOutside"
           v-if="currentPostOwner && currentPost && currentMode && !pending"
           :is-global="true" :post-owner-info="currentPostOwner"
           :p="currentPost" :mode="currentMode"

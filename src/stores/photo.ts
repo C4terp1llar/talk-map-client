@@ -150,7 +150,7 @@ export const usePhotoStore = defineStore('photo', () => {
         phGList.value = null;
 
         try {
-            const response = await apiAuth.get(`user/gPhoto`, {
+            const response = await apiAuth.get(`user/photo/g`, {
                 params: {
                     id: phId
                 }

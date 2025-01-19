@@ -55,6 +55,7 @@ import PostsList from "@/components/posts/postsList.vue";
     }
 
     .home-page__fr-wrapper{
+      grid-row: span 2;
       width: fit-content;
       @media screen and (max-width: 900px){
         width: 100%;

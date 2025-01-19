@@ -20,7 +20,7 @@ const isActive = (path: string) => computed(() => route.path.includes(`/app/${pa
       </li>
 
       <li :class="{ active: isActive('communications').value }">
-        <RouterLink to="/app/communications"/>
+        <RouterLink :to="{name: 'communications', query: { tab: 'personal' }}"/>
         <v-icon>mdi-message-outline</v-icon>
         <span>Общение</span>
       </li>

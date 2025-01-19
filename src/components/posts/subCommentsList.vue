@@ -25,7 +25,6 @@ interface Props {
   isGlobal?: boolean;
 }
 
-
 const props = defineProps<Props>();
 
 const currentPage = ref<number>(1);
@@ -52,7 +51,10 @@ onMounted(async () => {
       if(payload.act === 'change' && payload.mode === 'replies' && payload.comment && comments.value){
         const index  = comments.value.findIndex(i => i._id === payload.comment_id);
         if (index !== -1){
-          comments.value[index] = payload.comment
+          comments.value[index].isEdited = payload.comment.isEdited;
+          comments.value[index].isDeleted = payload.comment.isDeleted;
+          comments.value[index].text = payload.comment.text;
+          comments.value[index].updatedAt = payload.comment.updatedAt;
         }
       }
     })
@@ -107,7 +109,7 @@ const deleteReply = async (payload: {comment_id: string}) => {
 
 <template>
   <div class="comments-list__wrapper">
-    <comments-skeleton v-if="pending"/>
+<!--    <comments-skeleton v-if="pending"/>-->
 
     <div class="comment-items__wrapper__replies mt-2 mb-2" v-if="!pending && comments && comments.length">
 

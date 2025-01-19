@@ -61,7 +61,7 @@ onUnmounted(() => photoStore.photos = null)
   padding: 10px;
   background: rgb(var(--v-theme-background));
   text-align: center;
-  height: fit-content;
+  height: 100%;
   width: 100%;
   grid-column: span 1;
 

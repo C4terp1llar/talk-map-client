@@ -141,8 +141,8 @@ const getExternalUserInfo = async (userId: string) => {
       padding: 10px;
       background: rgb(var(--v-theme-background));
       text-align: center;
-      height: fit-content;
       width: 100%;
+      height: fit-content;
     }
 
     .posts{

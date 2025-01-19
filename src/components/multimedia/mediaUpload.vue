@@ -26,13 +26,13 @@ const files = ref<{ id: string, file: File, previewUrl?: string, type: string }[
 const slotsMap = new Map([
   ['photo', 16],
   ['post', 10],
-  ['message', 8]
+  ['message', 10]
 ])
 
 const sizeMap = new Map([
   ['photo', 20],
   ['post', 150],
-  ['message', 200]
+  ['message', 100]
 ])
 
 const SLOTS = slotsMap.get(props.sender) || 10;
@@ -130,7 +130,7 @@ const handleFileUpload = async (event: DragEvent | Event) => {
         })
     );
 
-    if (props.sender === 'post' && files.value.length) {
+    if ((props.sender === 'post'  || props.sender === 'message') && files.value.length) {
       emit('slPostMedia', files.value);
     }
   }
@@ -177,7 +177,7 @@ const deleteFile = (id: string) => {
   files.value = files.value.filter((file) => file.id !== id);
   selectedList.value = selectedList.value.filter((fileId) => fileId !== id);
 
-  if (props.sender === 'post'){
+  if (props.sender === 'post' || props.sender === 'message'){
     emit('slPostMedia', files.value)
   }
 };

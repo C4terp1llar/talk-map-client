@@ -56,7 +56,10 @@ onMounted(async () => {
       if(payload.act === 'change' && payload.mode === 'comments' && payload.comment && comments.value){
         const index  = comments.value.findIndex(i => i._id === payload.comment_id);
         if (index !== -1){
-          comments.value[index] = payload.comment
+          comments.value[index].isEdited = payload.comment.isEdited;
+          comments.value[index].isDeleted = payload.comment.isDeleted;
+          comments.value[index].text = payload.comment.text;
+          comments.value[index].updatedAt = payload.comment.updatedAt;
         }
       }
     })

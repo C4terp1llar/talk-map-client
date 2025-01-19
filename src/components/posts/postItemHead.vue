@@ -40,7 +40,7 @@ const props = defineProps<Props>();
     </div>
   </div>
 
-  <post-head-actions :mode="props.mode" :post="props.post" :post-owner-info="props.postOwnerInfo" :is-global="props.isGlobal"/>
+  <post-head-actions @deletePost="emit('deletePost')" :mode="props.mode" :post="props.post" :post-owner-info="props.postOwnerInfo" :is-global="props.isGlobal"/>
 </div>
 </template>
 
