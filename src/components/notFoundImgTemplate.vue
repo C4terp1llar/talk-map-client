@@ -12,7 +12,6 @@ withDefaults(defineProps<Props>(), {
 
 <template>
   <div class="template__not-found__img">
-    <img src="../assets/stickers/match.png">
     <v-img :src="imgPath"></v-img>
     <h6 class="ma-0">{{ text }}</h6>
   </div>
