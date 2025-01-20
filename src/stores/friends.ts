@@ -145,6 +145,21 @@ export const useFriendsStore = defineStore('friends', () => {
         }
     }
 
+
+    const getFriends = async (page: number, limit: number, q?: string) => {
+        try {
+            const response = await apiAuth.get('user/friend', {
+                params: {
+                    q, page, limit
+                }
+            })
+
+            console.log(response)
+        } catch (e: any) {
+            console.error(e);
+        }
+    }
+
     return{
         pending,
         error,
@@ -170,5 +185,7 @@ export const useFriendsStore = defineStore('friends', () => {
         oneUserPending,
         oneUserError,
         getOneUser,
+
+        getFriends
     }
 })

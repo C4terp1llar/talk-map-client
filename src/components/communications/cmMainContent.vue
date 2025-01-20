@@ -1,11 +1,14 @@
 <script setup lang="ts">
 
 import CreateMessage from "@/components/communications/createMessage.vue";
+import CmCreateGroup from "@/components/communications/cmCreateGroup.vue";
 </script>
 
 <template>
   <div class="cm-main-content__wrapper">
     <create-message/>
+
+    <cm-create-group/>
   </div>
 </template>
 

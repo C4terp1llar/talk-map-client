@@ -81,7 +81,7 @@ const handleSubmit = async () => {
             :disabled="secureStore.pending"
         />
         <div class="password-indicator">
-          <pass-indicator :match="oldPassMatch"/>
+          <pass-indicator :pending="secureStore.pending" :match="oldPassMatch"/>
         </div>
       </div>
     </div>
