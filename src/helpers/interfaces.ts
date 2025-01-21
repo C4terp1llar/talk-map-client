@@ -86,6 +86,13 @@ export interface ShortMutualUserFriend{
     },
 }
 
+export interface ShortFriend{
+    user_id: string,
+    nickname: string,
+    nickname_color: string | null,
+    avatar: string;
+}
+
 export interface MainUserInfo {
     _id: string;
     email: string;

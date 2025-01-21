@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
-import type {FriendRequest, ShortMutualUserFriend} from "@/helpers/interfaces";
+import type {FriendRequest, ShortFriend, ShortMutualUserFriend} from "@/helpers/interfaces";
 
 
 export const useFriendsStore = defineStore('friends', () => {
@@ -146,7 +146,7 @@ export const useFriendsStore = defineStore('friends', () => {
     }
 
 
-    const getFriends = async (page: number, limit: number, q?: string) => {
+    const getFriends = async (page: number, limit: number, q?: string): Promise<{friends: ShortFriend[] | null, hasMore: boolean}> => {
         try {
             const response = await apiAuth.get('user/friend', {
                 params: {
@@ -154,9 +154,13 @@ export const useFriendsStore = defineStore('friends', () => {
                 }
             })
 
-            console.log(response)
+            if (response.status === 200 && response.data){
+                return {friends: response.data.friends, hasMore: response.data.hasMore}
+            }
+            return {friends: null, hasMore: false}
         } catch (e: any) {
             console.error(e);
+            return {friends: null, hasMore: false}
         }
     }
 
@@ -186,6 +190,7 @@ export const useFriendsStore = defineStore('friends', () => {
         oneUserError,
         getOneUser,
 
-        getFriends
+        getFriends,
+
     }
 })
