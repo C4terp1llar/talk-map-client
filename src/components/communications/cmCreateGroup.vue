@@ -6,19 +6,33 @@ import FriendsList from "@/components/friends/friendsList.vue";
 import CmCreateGroupMembers from "@/components/communications/cmCreateGroupMembers.vue";
 import {lockScroll, unlockScroll} from "@/helpers/popup";
 import {onClickOutside} from "@vueuse/core";
+import {useFriendsStore} from "@/stores/friends";
+import type {ShortFriend} from "@/helpers/interfaces";
+import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
+import {useCmStore} from "@/stores/cmStore";
 
 const emit = defineEmits<{
   (e: 'close'): void
 }>()
+
+const frStore = useFriendsStore();
+const cmStore = useCmStore();
 
 const newGroupCover = ref<string | ArrayBuffer | null>(null);
 const newGroupTitle = ref<string>('');
 const newGroupDescription = ref<string>('');
 const newGroupMembers = ref<string[]>([]);
 
-onMounted(() => {
+const prePending = ref<boolean>(false);
+const preFriends = ref<ShortFriend[] | null>(null);
+
+onMounted(async() => {
   document.documentElement.style.overflow = 'hidden';
   lockScroll();
+  prePending.value = true
+  const {friends} = await frStore.getFriends(1, 10);
+  preFriends.value = friends;
+  prePending.value = false
 })
 
 onUnmounted(() => {
@@ -31,23 +45,59 @@ const clickOutside = () => {
   emit('close')
 };
 onClickOutside(createGroupRef, clickOutside);
+
+const membersErrors = ref<string[]>([]);
+
+const handleUpdateMembers = (m: string[]) => {
+  newGroupMembers.value = m;
+  membersErrors.value = []
+}
+
+const handleCreateGroup = async () => {
+  if (newGroupMembers.value && newGroupMembers.value.length < 2){
+    membersErrors.value.push('Добавьте не менее двух пользователей')
+    return
+  }
+  if (!newGroupTitle.value) return
+
+  emit('close')
+  await cmStore.createGroup(newGroupTitle.value, newGroupDescription.value, newGroupMembers.value, newGroupCover.value || '');
+}
 </script>
 
 <template>
   <div class="g-create-group__wrapper">
     <div class="create-group-content__wrapper" ref="createGroupRef">
-      <h5 class="text-center">Создание группы</h5>
-      <cm-create-group-cover @cover-select="img => newGroupCover = img"/>
-      <cm-create-group-title @title-select="title => newGroupTitle = title"/>
-      <div class="field">
-        <label class="inp-default-label">Описание:</label>
-        <v-textarea variant="outlined" hide-details rows="3" no-resize counter v-model="newGroupDescription"></v-textarea>
+
+      <div class="create-group-content__preload" v-if="prePending">
+        <lazy-placeholder-loader/>
       </div>
-      <cm-create-group-members @select-member-update="members => newGroupMembers = members"/>
-      <div class="controls">
-        <v-btn class="text-none" variant="outlined">Создать</v-btn>
-        <v-btn class="text-none" variant="text" color="green">Отмена</v-btn>
+
+      <div class="create-group-content" v-if="!prePending && preFriends && preFriends.length >= 2">
+        <v-form @submit.prevent="handleCreateGroup">
+          <h5 class="text-center">Создание группы</h5>
+          <cm-create-group-cover @cover-select="img => newGroupCover = img"/>
+          <cm-create-group-title @title-select="title => newGroupTitle = title"/>
+          <div class="field">
+            <label class="inp-default-label">Описание:</label>
+            <v-textarea variant="outlined" hide-details rows="3" no-resize counter v-model="newGroupDescription"></v-textarea>
+          </div>
+          <cm-create-group-members :errors="membersErrors" @select-member-update="members => handleUpdateMembers(members)"/>
+          <div class="controls">
+            <v-btn class="text-none" type="submit" variant="outlined">Создать</v-btn>
+            <v-btn class="text-none" variant="text" color="green" @click="clickOutside">Отмена</v-btn>
+          </div>
+        </v-form>
       </div>
+
+      <div class="create-group-content__no-friends" v-if="!preFriends && !prePending">
+        <span>Произошла ошибка, попробуйте позже</span>
+      </div>
+
+      <div class="create-group-content__no-friends" v-if="!prePending && preFriends && preFriends.length < 2">
+        <span v-if="preFriends && preFriends.length < 2">{{preFriends.length ? 'У вас всего 1 друг, для создания группы нужно не меньше двух 🥺' : 'У вас нет друзей, для создания группы нужно не меньше двух 🥺'}}</span>
+      </div>
+
       <button class="close-btn" @click="clickOutside">
         <v-icon>mdi-close</v-icon>
       </button>
@@ -77,11 +127,19 @@ onClickOutside(createGroupRef, clickOutside);
   z-index: 10003;
   width: 100%;
   height: 100%;
+  backdrop-filter: blur(10px);
+  overflow-y: scroll;
   display: grid;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
-  overflow-y: scroll;
+
+  .create-group-content__preload, .create-group-content__no-friends{
+    height: 50vh;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
 
   .create-group-content__wrapper{
     position: relative;
@@ -104,6 +162,9 @@ onClickOutside(createGroupRef, clickOutside);
     box-shadow: 0 1px 10px currentColor;
     border-radius: 15px;
     background: rgb(var(--v-theme-background));
+    .create-group-content{
+
+    }
   }
 
 }

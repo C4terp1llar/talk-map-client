@@ -59,6 +59,7 @@ const debouncedOperation = debounce(async () => {
             @input="handleInput"
             hide-details="auto"
             :error-messages="errorMessages"
+            maxlength="30"
         />
         <div class="title-indicator">
           <pass-indicator :pending="cmStore.checkGroupPending" :match="titleOk"/>

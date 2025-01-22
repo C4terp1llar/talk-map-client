@@ -51,11 +51,35 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const createGroupPending = ref<boolean>(false);
+
+    const createGroup = async (title: string, description: string, members: string[], cover: string | ArrayBuffer) => {
+        createGroupPending.value = true;
+
+        try {
+            const response = await apiAuth.post(`user/group`, {
+                title,
+                description,
+                members,
+                cover,
+            })
+
+            console.log(response)
+        } catch (e: any) {
+            console.error(e);
+            ntfStore.addNotification('error', 'Произошла ошибка при создании группы, попробуйте позже')
+        } finally {
+            createGroupPending.value = false;
+        }
+    }
+
     return{
         pending,
         error,
         createMsg,
         checkGroupPending,
         checkGroup,
+        createGroupPending,
+        createGroup,
     }
 });

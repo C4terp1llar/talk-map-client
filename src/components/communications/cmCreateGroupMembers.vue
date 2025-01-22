@@ -10,6 +10,12 @@ import CmGroupMembersItem from "@/components/communications/cmGroupMembersItem.v
 import TextDivider from "@/components/common/textDivider.vue";
 import {debounce} from "perfect-debounce";
 
+interface Props{
+  errors?: string[]
+}
+
+defineProps<Props>()
+
 const emit = defineEmits<{
   (e: 'selectMemberUpdate', members: string[]): void
 }>()
@@ -123,11 +129,12 @@ const debouncedOperation = debounce(async () => {
           variant="outlined"
           @keydown.enter="q ? debouncedOperation : false"
           @input="debouncedOperation"
-          hide-details
+          hide-details="auto"
           placeholder="Поиск"
           :append-inner-icon="!q ? 'mdi-magnify' : 'mdi-close'"
           @click:append-inner="filterInpIconClick"
           :loading="qPending"
+          :error-messages="errors"
       />
 
       <div class="cm-create-group-members__content-members styled-scroll __list" v-if="friends.length">
