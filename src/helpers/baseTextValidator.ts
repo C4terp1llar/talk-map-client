@@ -33,6 +33,9 @@ export const rules = {
     fieldSymbols: (value: string) => {
         return /^[a-zA-Z0-9!@#$%^&*()_+\-={}\[\]|:;'",.<>/?]*$/.test(value) || 'Поле может содержать только латинские буквы, цифры и спец символы';
     },
+    fieldSymbolsEditorField: (value: string) => {
+        return /^[a-zA-Zа-яА-Я0-9!@#$%^&*()_+\-={}\[\]|:;'",.<>/?\s]*$/.test(value) || 'Поле может содержать только латинские и русские буквы, цифры, пробелы и спецсимволы';
+    },
     onlyNumbers: (value: string) => {
         return /^[0-9]*$/.test(value) || 'Поле может содержать только цифры';
     },

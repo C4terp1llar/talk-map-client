@@ -199,12 +199,14 @@ export interface UserComment{
     updatedAt: Date,
     repliesCount: number,
     mode: 'internal' | 'external',
-    user: {
-        _id: string,
-        nickname: string,
-        nickname_color: string | null,
-        avatar: string,
-    }
+    user: ShortUserInfo
+}
+
+export interface ShortUserInfo{
+    _id: string,
+    nickname: string,
+    nickname_color: string | null,
+    avatar: string,
 }
 
 export interface UserSession{
@@ -212,4 +214,33 @@ export interface UserSession{
     user_id: string,
     device: string,
     created: Date
+}
+
+export interface LastDialogMessage{
+    _id: string,
+    sender: string,
+    content: string,
+    sendTime: Date,
+    messageType: "default" | 'system',
+    mode: 'internal' | 'external',
+    isRead: boolean
+}
+
+export interface PersonalConv{
+    _id: string,
+    messageCount: number,
+    unreadMessagesCount: number,
+    updatedAt: Date,
+    lastMessage: LastDialogMessage,
+    opponent: ShortUserInfo,
+}
+export interface GroupConv{
+    _id: string,
+    owner_id: string,
+    title: string,
+    cover_url: string,
+    messageCount: number,
+    unreadMessagesCount: number,
+    updatedAt: Date,
+    lastMessage: LastDialogMessage,
 }

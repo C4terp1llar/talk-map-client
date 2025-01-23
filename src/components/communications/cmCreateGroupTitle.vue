@@ -17,10 +17,9 @@ const title = ref<string>('');
 const errorMessages = ref<string[]>([]);
 
 const handleInput = () => {
-  title.value = replaceSymbols(title.value);
   titleOk.value = null;
 
-  if (!title.value.length || rules.fieldSymbols(title.value) !== true) {
+  if (!title.value.length || rules.fieldSymbolsEditorField(title.value) !== true) {
     errorMessages.value = [];
     return
   }else{
@@ -32,7 +31,7 @@ const handleInput = () => {
 const titleOk = ref<boolean | null>(null)
 
 const debouncedOperation = debounce(async () => {
-  if (!title.value.length || rules.fieldSymbols(title.value) !== true) return;
+  if (!title.value.trim().length || rules.fieldSymbolsEditorField(title.value) !== true) return;
 
   const {match} = await cmStore.checkGroup(title.value)
 
@@ -53,8 +52,8 @@ const debouncedOperation = debounce(async () => {
 
       <div class="position-relative">
         <v-text-field
-            v-model.trim="title"
-            :rules="[rules.required, rules.fieldSymbols(title)]"
+            v-model="title"
+            :rules="[rules.required, rules.fieldSymbolsEditorField(title)]"
             variant="outlined"
             @input="handleInput"
             hide-details="auto"

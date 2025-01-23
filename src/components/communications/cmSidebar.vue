@@ -2,11 +2,13 @@
 
 import CmSidebarTabs from "@/components/communications/cmSidebarTabs.vue";
 import CmSidebarList from "@/components/communications/cmSidebarList.vue";
+import CmSidebarListSearch from "@/components/communications/cmSidebarListSearch.vue";
 </script>
 
 <template>
   <div class="cm-sidebar__wrapper">
-    <cm-sidebar-tabs class="mb-2"/>
+<!--    мб контролы по типу создания группы или карандаша чтобы выбрать кому написать -->
+    <v-divider/>
     <cm-sidebar-list/>
   </div>
 </template>

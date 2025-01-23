@@ -2,6 +2,7 @@ import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
 import {useNotificationStore} from "@/stores/notifications";
+import type {GroupConv, PersonalConv} from "@/helpers/interfaces";
 
 export const useCmStore = defineStore('cm', () => {
     const ntfStore = useNotificationStore();
@@ -73,6 +74,32 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const conversations = ref<[PersonalConv | GroupConv] | null>(null);
+    const hasMoreConv = ref<boolean>(false);
+
+    const getConversations = async (page: number, limit: number, q?: string) => {
+        try {
+            const response = await apiAuth.get('user/conv', {
+                params: {
+                    q, page, limit
+                }
+            })
+
+            if (response.status === 200 && response.data){
+                hasMoreConv.value = response.data.hasMore;
+                if (page < 2){
+                    conversations.value = response.data.conversations;
+                }else if(page >= 2 && conversations.value){
+                    conversations.value.push(response.data.conversations);
+                }
+            }
+
+        } catch (e: any) {
+            console.error(e);
+            ntfStore.addNotification('error', 'Произошла ошибка при получении диалогов, попробуйте позже')
+        }
+    }
+
     return{
         pending,
         error,
@@ -81,5 +108,8 @@ export const useCmStore = defineStore('cm', () => {
         checkGroup,
         createGroupPending,
         createGroup,
+        getConversations,
+        conversations,
+        hasMoreConv,
     }
 });
