@@ -219,6 +219,7 @@ export interface UserSession{
 export interface LastDialogMessage{
     _id: string,
     sender: string,
+    sender_nickname: string,
     content: string,
     sendTime: Date,
     messageType: "default" | 'system',

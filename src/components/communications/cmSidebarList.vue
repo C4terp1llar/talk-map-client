@@ -5,6 +5,9 @@ import {onMounted, ref} from "vue";
 import ConvItemSkeleton from "@/components/skeletons/convItemSkeleton.vue";
 import CmSidebarListSearch from "@/components/communications/cmSidebarListSearch.vue";
 import {debounce} from "perfect-debounce";
+import CmPersonalConversationItem from "@/components/communications/cmPersonalConversationItem.vue";
+import CmGroupConversationItem from "@/components/communications/cmGroupConversationItem.vue";
+import type {GroupConv, PersonalConv} from "@/helpers/interfaces";
 
 const cmStore = useCmStore()
 
@@ -44,6 +47,10 @@ const debouncedOperation = debounce(async () => {
   await uploadData('load');
 }, 500);
 
+
+function isGroupConv(conv: any): conv is GroupConv {
+  return 'owner_id' in conv;
+}
 </script>
 
 <template>
@@ -57,11 +64,13 @@ const debouncedOperation = debounce(async () => {
         <span v-if="querySearchFlag">Ничего не нашлось 🔍</span>
         <span v-else>У вас нет диалогов. Напишите кому-нибудь ✏️</span>
       </div>
-      <div class="cm-conversations-list" v-for="c in cmStore.conversations" :key="c._id" v-else>
-        <!--
-        сделать логику по которой групповой диалог передается в пропсах в компонент групповой а личный в личный
-
-        -->
+      <div class="cm-conversations-list" v-else>
+        <component
+            v-for="c in cmStore.conversations"
+            :key="c._id"
+            :is="isGroupConv(c) ? CmGroupConversationItem : CmPersonalConversationItem"
+            v-bind="isGroupConv(c) ? { conv: c as GroupConv } : { conv: c as PersonalConv }"
+        />
       </div>
     </div>
   </div>
@@ -76,6 +85,13 @@ const debouncedOperation = debounce(async () => {
 
   .cm-sidebar-list__content {
     height: 100%;
+
+    .cm-conversations-list{
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 5px;
+    }
 
     .cm-conversations-list__not-found {
       height: 100%;
