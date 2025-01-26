@@ -18,7 +18,6 @@ export interface FrNotification {
 }
 
 
-
 export interface Address {
     display_name: string;
     lat: number;
@@ -77,7 +76,7 @@ export interface SearchFoundFriend {
     address: ExternalUserInfoAddress
 }
 
-export interface ShortMutualUserFriend{
+export interface ShortMutualUserFriend {
     _id: string,
     nickname: string,
     nickname_color: string | null,
@@ -86,7 +85,7 @@ export interface ShortMutualUserFriend{
     },
 }
 
-export interface ShortFriend{
+export interface ShortFriend {
     user_id: string,
     nickname: string,
     nickname_color: string | null,
@@ -176,7 +175,7 @@ export interface Post {
     comments_count: number,
     liked: boolean,
     mode: 'internal' | 'external',
-    media: {id: string, url: string, type: string}[] | []
+    media: { id: string, url: string, type: string }[] | []
 }
 
 export interface PostOwner {
@@ -187,7 +186,7 @@ export interface PostOwner {
     match: boolean
 }
 
-export interface UserComment{
+export interface UserComment {
     _id: string,
     entityId: string,
     entityType: 'Publication' | 'Post' | 'Comment',
@@ -202,32 +201,41 @@ export interface UserComment{
     user: ShortUserInfo
 }
 
-export interface ShortUserInfo{
+export interface ShortUserInfo {
     _id: string,
     nickname: string,
     nickname_color: string | null,
     avatar: string,
 }
 
-export interface UserSession{
+export interface UserSession {
     _id: string,
     user_id: string,
     device: string,
     created: Date
 }
 
-export interface LastDialogMessage{
+export interface LastDialogMessage {
     _id: string,
     sender: string,
     sender_nickname: string,
-    content: string,
+    content?: string,
     sendTime: Date,
     messageType: "default" | 'system',
     mode: 'internal' | 'external',
     isRead: boolean
+    media: ShortMediaDialogMessage[]
 }
 
-export interface PersonalConv{
+export interface ShortMediaDialogMessage {
+    _id: string,
+    name: string,
+    type: string,
+    size: number,
+    url: string
+}
+
+export interface PersonalConv {
     _id: string,
     messageCount: number,
     unreadMessagesCount: number,
@@ -235,7 +243,8 @@ export interface PersonalConv{
     lastMessage: LastDialogMessage,
     opponent: ShortUserInfo,
 }
-export interface GroupConv{
+
+export interface GroupConv {
     _id: string,
     owner_id: string,
     title: string,

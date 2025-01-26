@@ -58,10 +58,14 @@ PersonalConv{
         </div>
       </div>
       <div class="cm-personal-conv-item__detail-msg">
-        <span class="cm-personal-conv-item__detail-msg__content __no-wrap-txt">
-          {{ conv.lastMessage.mode === 'internal' ? 'Вы: ' : `${conv.opponent.nickname}: ` }}
-          {{conv.lastMessage.content}}
-        </span>
+
+        <div class="cm-personal-conv-item__detail-msg__content">
+          <span class="msg-sender">{{ conv.lastMessage.mode === 'internal' ? 'Вы: ' : `${conv.opponent.nickname}: ` }}</span>
+          <span v-if="conv.lastMessage.content" class="msg-content __no-wrap-txt">{{ conv.lastMessage.content }}</span>
+          <div class="msg-media cm-personal-conv-item__detail-msg__content_media" v-if="conv.lastMessage.media.length" >
+            <span v-for="m in conv.lastMessage.media" :key="m._id" class="__no-wrap-txt text-green">{{ m.name }}</span>
+          </div>
+        </div>
         <div class="cm-personal-conv-item__detail-msg__unread-counter" v-if="conv.unreadMessagesCount">
           <span class="cm-personal-conv-item__detail-msg__unread-counter__content">
             {{conv.unreadMessagesCount}}
@@ -121,8 +125,17 @@ PersonalConv{
       align-items: center;
       .cm-personal-conv-item__detail-msg__content{
         grid-column: span 1;
-        font-size: 14px;
-        opacity: .9;
+        display: flex;
+        gap: 5px;
+        .msg-sender,
+        .msg-content,
+        .msg-media{
+          width: fit-content;
+        }
+        .cm-personal-conv-item__detail-msg__content_media{
+          display: grid;
+          gap: 5px;
+        }
       }
       .cm-personal-conv-item__detail-msg__unread-counter{
         grid-column: span 1;

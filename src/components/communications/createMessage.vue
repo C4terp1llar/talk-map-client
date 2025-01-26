@@ -13,7 +13,7 @@ const msgFiles = ref<PostF[]>([]);
 const msgText = ref<string>('');
 
 const handleMsg = async () => {
-  if (!msgText.value.trim().length) return;
+  if (!msgText.value.trim().length && !msgFiles.value.length) return;
 
   let data = new FormData();
 
