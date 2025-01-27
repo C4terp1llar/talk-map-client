@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import type {GroupConv, PersonalConv} from "@/helpers/interfaces";
+import type {GroupConv, LastDialogMessage, PersonalConv, ShortMediaDialogMessage} from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {computed} from "vue";
 import {formatSmartDate} from "@/helpers/dateHelper";
+import {adaptSystemMessages} from "@/helpers/cmSystemMessagesMap";
+import {getMediaNames, getMsgContent} from "../../helpers/cmHelpers";
 
 interface Props{
   conv: PersonalConv
@@ -58,14 +60,14 @@ PersonalConv{
         </div>
       </div>
       <div class="cm-personal-conv-item__detail-msg">
-
         <div class="cm-personal-conv-item__detail-msg__content">
-          <span class="msg-sender">{{ conv.lastMessage.mode === 'internal' ? 'Вы: ' : `${conv.opponent.nickname}: ` }}</span>
-          <span v-if="conv.lastMessage.content" class="msg-content __no-wrap-txt">{{ conv.lastMessage.content }}</span>
-          <div class="msg-media cm-personal-conv-item__detail-msg__content_media" v-if="conv.lastMessage.media.length" >
-            <span v-for="m in conv.lastMessage.media" :key="m._id" class="__no-wrap-txt text-green">{{ m.name }}</span>
-          </div>
+          <span class="msg-wrapper">
+            <span v-if="conv.lastMessage.mode === 'internal' && conv.lastMessage.messageType !== 'system'" class="msg-sender">Вы: </span>
+            <span v-if="conv.lastMessage.media.length" class="msg-media text-green mr-1">{{ getMediaNames(conv.lastMessage.media) }}</span>
+            <span v-if="conv.lastMessage.content" :class="['msg-content', conv.lastMessage.messageType === 'system' ? '__system-msg' : '']">{{ getMsgContent(conv.lastMessage) }}</span>
+          </span>
         </div>
+
         <div class="cm-personal-conv-item__detail-msg__unread-counter" v-if="conv.unreadMessagesCount">
           <span class="cm-personal-conv-item__detail-msg__unread-counter__content">
             {{conv.unreadMessagesCount}}
@@ -77,6 +79,10 @@ PersonalConv{
 </template>
 
 <style scoped lang="scss">
+.__system-msg{
+  font-style: italic;
+}
+
 .cm-personal-conv-item{
   width: 100%;
   display: grid;
@@ -123,20 +129,28 @@ PersonalConv{
       display: grid;
       grid-template-columns: 1fr auto;
       align-items: center;
-      .cm-personal-conv-item__detail-msg__content{
-        grid-column: span 1;
+      .cm-personal-conv-item__detail-msg__content {
         display: flex;
-        gap: 5px;
-        .msg-sender,
-        .msg-content,
-        .msg-media{
-          width: fit-content;
-        }
-        .cm-personal-conv-item__detail-msg__content_media{
-          display: grid;
-          gap: 5px;
+        align-items: center;
+        overflow: hidden;
+        .msg-wrapper {
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 100%;
+
+          .msg-sender,
+          .msg-media,
+          .msg-content{
+            display: inline;
+            white-space: nowrap;
+            font-size: 14px;
+            opacity: .8;
+          }
         }
       }
+
       .cm-personal-conv-item__detail-msg__unread-counter{
         grid-column: span 1;
         border-radius: 8px;

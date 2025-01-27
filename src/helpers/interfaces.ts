@@ -223,8 +223,9 @@ export interface LastDialogMessage {
     sendTime: Date,
     messageType: "default" | 'system',
     mode: 'internal' | 'external',
-    isRead: boolean
-    media: ShortMediaDialogMessage[]
+    additionalInfo: string | null,
+    isRead: boolean,
+    media: ShortMediaDialogMessage[],
 }
 
 export interface ShortMediaDialogMessage {

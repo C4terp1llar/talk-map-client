@@ -4,6 +4,7 @@ import Main from "@/layouts/main.vue";
 import {checkTokenValidity} from "@/stores/sync";
 import Login from '@/views/login.vue';
 import Home from '@/views/home.vue';
+import NotFound from "@/views/notFound.vue";
 import {setPendingEnd, setPendingStart} from "@/utils/refreshStore";
 
 const router = createRouter({
@@ -84,6 +85,11 @@ const router = createRouter({
                     component: () => import('../views/settings.vue'),
                 },
             ]
+        },
+        {
+            path: '/:pathMatch(.*)*',
+            name: 'not-found',
+            component: NotFound,
         }
     ]
 });

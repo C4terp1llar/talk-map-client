@@ -7,8 +7,6 @@ import CmSidebarListSearch from "@/components/communications/cmSidebarListSearch
 
 <template>
   <div class="cm-sidebar__wrapper">
-<!--    мб контролы по типу создания группы или карандаша чтобы выбрать кому написать -->
-    <v-divider/>
     <cm-sidebar-list/>
   </div>
 </template>
