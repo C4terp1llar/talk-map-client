@@ -17,7 +17,7 @@ import CmMainContent from "@/components/communications/cmMainContent.vue";
   height: 100%;
   display: grid;
   gap: 10px;
-  grid-template-columns: auto 400px;
+  grid-template-columns: minmax(200px, 300px) 1fr;
   grid-template-rows: 1fr;
 }
 </style>

@@ -35,8 +35,10 @@ const sizeMap = new Map([
   ['message', 100]
 ])
 
+
 const SLOTS = slotsMap.get(props.sender) || 10;
 const MAX_FILE_SIZE_MB = sizeMap.get(props.sender) || 100;
+const MAX_FILES_SIZE_MB = 500;
 
 const handleFileUpload = async (event: DragEvent | Event) => {
   event.preventDefault();
@@ -48,7 +50,6 @@ const handleFileUpload = async (event: DragEvent | Event) => {
   } else if (event instanceof Event) {
     filesList = (event.target as HTMLInputElement).files;
   }
-
   if (filesList && filesList.length > 0) {
     if (props.sender === 'photo') {
       for (const file of Array.from(filesList)) {
@@ -68,6 +69,15 @@ const handleFileUpload = async (event: DragEvent | Event) => {
       }
     }
 
+    const currentTotalSizeMB = files.value.reduce((sum, file) => sum + file.file.size, 0) / (1024 * 1024);
+    const newFilesTotalSizeMB = Array.from(filesList).reduce((sum, file) => sum + file.size, 0) / (1024 * 1024);
+    const totalSizeMB = currentTotalSizeMB + newFilesTotalSizeMB;
+
+    if (totalSizeMB > MAX_FILES_SIZE_MB) {
+      notificationStore.addNotification('warning', `Общий размер файлов превышает допустимый лимит в ${MAX_FILES_SIZE_MB} Мб`, 3000);
+      return;
+    }
+
     for (const file of Array.from(filesList)) {
       const fileSizeMB = file.size / (1024 * 1024);
       if (fileSizeMB > MAX_FILE_SIZE_MB) {
@@ -81,6 +91,7 @@ const handleFileUpload = async (event: DragEvent | Event) => {
       notificationStore.addNotification('warning', `Вы можете загрузить не более ${SLOTS} файлов!`, 3000);
       return;
     }
+
 
     await Promise.all(
         Array.from(filesList).map(async (file) => {
@@ -195,7 +206,7 @@ const getAcceptType = (sender:string) => {
 </script>
 
 <template>
-  <div :class="['modal-block', props.sender === 'post' ? '__post' : '']" @dragover.prevent @drop="handleFileUpload">
+  <div :class="['modal-block', `${props.sender}`]" @dragover.prevent @drop="handleFileUpload">
 
     <div class="file-drop-area" @click="openFileDialog">
       <input :accept="getAcceptType(props.sender)"  ref="fileInput" type="file" @change="handleFileUpload" :disabled="multimediaStore.pending || photoStore.pending" multiple class="file-input"/>
@@ -203,8 +214,8 @@ const getAcceptType = (sender:string) => {
     </div>
 
     <scrollable-container v-if="files.length" :use-scroll-bar="true" mode="filter">
-      <div class="files-preview__wrapper">
-        <multimedia-item @handle-delete="(id) => deleteFile(id)" :files="files"/>
+      <div :class="['files-preview__wrapper', `${props.sender}`]">
+        <multimedia-item :sender="props.sender" @handle-delete="(id) => deleteFile(id)" :files="files"/>
       </div>
     </scrollable-container>
 
@@ -212,7 +223,7 @@ const getAcceptType = (sender:string) => {
       <span>{{ `Добавлено ${files.length} из 10` }}</span>
     </div>
 
-    <div class="controls" v-if="files.length && props.sender !== 'post'">
+    <div class="controls" v-if="files.length && props.sender !== 'post' && props.sender !== 'message'">
       <hr>
       <div v-if="!isMenuVisible" class="head-controls d-flex align-items-center justify-content-between position-relative">
         <span>{{ `Добавлено ${files.length}` }}</span>
@@ -240,7 +251,7 @@ const getAcceptType = (sender:string) => {
       />
     </div>
 
-    <div class="actions" v-if="props.sender !== 'post'">
+    <div class="actions" v-if="props.sender !== 'post' && props.sender !== 'message'">
       <v-btn variant="outlined" @click="uploadFiles" :disabled="multimediaStore.pending || photoStore.pending" class="text-none w-100">
         <template v-if="!multimediaStore.pending && !photoStore.pending">
           Готово
@@ -282,7 +293,11 @@ const getAcceptType = (sender:string) => {
   width: 100%;
   display: grid;
 
-  &.__post{
+  &.post{
+    padding: unset;
+    box-shadow: unset;
+  }
+  &.message{
     padding: unset;
     box-shadow: unset;
   }
@@ -304,7 +319,10 @@ const getAcceptType = (sender:string) => {
   display: flex;
   flex-wrap: nowrap;
   gap: 10px;
-  margin: 20px 5px 0 5px;
+  margin: 5px 5px 0 5px;
+  &:not(.message){
+    margin: 20px 5px 0 5px;
+  }
 }
 
 .actions {

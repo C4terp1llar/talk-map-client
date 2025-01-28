@@ -30,7 +30,8 @@ const getFileIcon = (fileName: string) => {
 };
 
 interface Props {
-  files: { id: string, file: File, previewUrl?: string, type: string }[]
+  files: { id: string, file: File, previewUrl?: string, type: string }[],
+  sender: 'photo' | 'post' | 'message'
 }
 
 const props = defineProps<Props>();
@@ -38,7 +39,7 @@ const emit = defineEmits(['handle-delete'])
 </script>
 
 <template>
-  <div v-for="fileEntry in props.files" :key="fileEntry.id" class="file-preview">
+  <div v-for="fileEntry in props.files" :key="fileEntry.id" :class="['file-preview', `${props.sender}`]">
 
     <div class="file-preview__img" v-if="fileEntry.type === 'image'" >
       <v-img :src="fileEntry.previewUrl" alt="Превью изображения" class="image-preview" cover/>
@@ -77,6 +78,15 @@ const emit = defineEmits(['handle-delete'])
 
 .file-preview {
   position: relative;
+  &.message{
+    .file-preview__audio, .file-preview__video, .file-preview__img,  .file-preview__other{
+      height: 100px;
+      width: 150px;
+    }
+    .image-preview, .audio-preview, .video-preview{
+      height: 70%;
+    }
+  }
 }
 
 .file-preview__audio, .file-preview__video, .file-preview__img,  .file-preview__other{
@@ -126,19 +136,18 @@ const emit = defineEmits(['handle-delete'])
 
 .delete-img {
   position: absolute;
-  right: 5px;
-  top: 5px;
+  right: 3px;
+  top: 3px;
   padding: 5px 5px;
-  border-radius: 5px;
-  background-color: rgba(211, 211, 211, 0.25);
+  border-radius: 50%;
+  background-color: currentColor;
 
-  opacity: .7;
   transition: 0.3s;
   display: flex;
   align-items: center;
 
   &:hover {
-    opacity: 1;
+    filter: drop-shadow(0 0 2px red);
   }
 }
 </style>

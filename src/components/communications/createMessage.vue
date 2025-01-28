@@ -21,10 +21,6 @@ const handleMsg = async () => {
   data.append("recipient", '671a46cedbe33a4302032e96');
   data.append("chatType", 'personal');
 
-  // data.append("convId", msgText.value.trim());
-  // data.append("replyTo", msgText.value.trim());
-
-
   if (msgFiles.value.length > 0){
     msgFiles.value.forEach(fileEntry => {
       data.append(fileEntry.file.name, fileEntry.file);
@@ -42,9 +38,12 @@ const handleMsg = async () => {
 
 <template>
   <div class="create-message__wrapper">
+<!--    флаг будет -  длина файлов || драговер __ при удалении файлов будем чекать на длину, если она 0 тогда выкл флаг -->
     <media-upload @sl-post-media="(m: PostF[] | []) => msgFiles = m" sender="message"/>
+<!-- отдельная компонента под текст в ней кнопка скрепки + емоджи -> будет эмитить текст -->
     <v-text-field variant="outlined" v-model="msgText"/>
 
+<!--    кнопка будет в текст компоненте выше, будет эмитить хендл сенд мессадж, валидация здесь -->
     <v-btn @click="handleMsg">go</v-btn>
   </div>
 </template>
@@ -54,6 +53,6 @@ const handleMsg = async () => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
 }
 </style>

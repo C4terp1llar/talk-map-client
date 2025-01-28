@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
 import {useNotificationStore} from "@/stores/notifications";
-import type {GroupConv, PersonalConv} from "@/helpers/interfaces";
+import type {FullMessage, GroupConv, PersonalConv} from "@/helpers/interfaces";
 
 export const useCmStore = defineStore('cm', () => {
     const ntfStore = useNotificationStore();
@@ -100,6 +100,44 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const messages = ref<FullMessage[] | null>(null);
+    const hasMoreMessages = ref<boolean>(false);
+    const messagesPend = ref<boolean>(false);
+    const messagesPendMore = ref<boolean>(false);
+
+    const getMessages = async (convId: string, page: number, limit: number) => {
+        try {
+            const curPending = page <= 1 ? messagesPend : messagesPendMore;
+            curPending.value = true;
+
+            const response = await apiAuth.get('user/message', {
+                params: {
+                    convId, page, limit
+                }
+            })
+
+            if (response.status === 200 && response.data){
+                hasMoreMessages.value = response.data.hasMore;
+
+                if (page < 2){
+                    messages.value = response.data.messages;
+                }else if(page >= 2 && messages.value){
+                    messages.value.unshift(response.data.messages);
+                }
+            }
+        } catch (e: any) {
+            console.error(e);
+            ntfStore.addNotification('error', 'Произошла ошибка при получении сообщений, попробуйте позже')
+        }
+    }
+
+    const unmountMsgClear = () => {
+        messages.value = null
+        hasMoreMessages.value = false
+        messagesPend.value = false
+        messagesPendMore.value = false
+    }
+
     return{
         pending,
         error,
@@ -111,5 +149,11 @@ export const useCmStore = defineStore('cm', () => {
         getConversations,
         conversations,
         hasMoreConv,
+        messages,
+        hasMoreMessages,
+        messagesPend,
+        messagesPendMore,
+        getMessages,
+        unmountMsgClear,
     }
 });

@@ -5,11 +5,12 @@ import {computed} from "vue";
 import {formatSmartDate} from "@/helpers/dateHelper";
 import {adaptSystemMessages} from "@/helpers/cmSystemMessagesMap";
 import {getMediaNames, getMsgContent} from "../../helpers/cmHelpers";
+import {useRouter} from "vue-router";
 
 interface Props{
   conv: GroupConv
 }
-
+const router = useRouter();
 const props = defineProps<Props>()
 
 const crSendTime = computed(() => formatSmartDate(props.conv.lastMessage.sendTime))
@@ -55,6 +56,7 @@ const crSendTime = computed(() => formatSmartDate(props.conv.lastMessage.sendTim
         </div>
       </div>
     </div>
+    <button class="redirect_to-conv" @click="router.push({query: {conv: conv._id}})"></button>
   </div>
 </template>
 
@@ -64,6 +66,12 @@ const crSendTime = computed(() => formatSmartDate(props.conv.lastMessage.sendTim
 }
 
 .cm-group-conv-item{
+  position: relative;
+  overflow: hidden;
+  .redirect_to-conv{
+    position: absolute;
+    inset: 0;
+  }
   width: 100%;
   display: grid;
   gap: 10px;

@@ -255,3 +255,27 @@ export interface GroupConv {
     updatedAt: Date,
     lastMessage: LastDialogMessage,
 }
+
+export interface FullMessage {
+    _id: string,
+    conversation_id: string,
+    conversationType: "PersonalConversation" | "GroupConversation",
+    messageType: "default" | "system",
+    content: string | null,
+    replyTo: string | null,
+    isEdited: boolean,
+    isDeleted: boolean,
+    isForwarded: boolean,
+    createdAt: Date,
+    updatedAt: Date,
+    readers: ReadersFullInfo[],
+    sender: ShortUserInfo,
+    mode: 'internal' | 'external',
+    mediaInfo: ShortMediaDialogMessage
+}
+
+export interface ReadersFullInfo{
+    user_id: string,
+    read: boolean,
+    userInfo: Omit<ShortUserInfo, '_id'>
+}
