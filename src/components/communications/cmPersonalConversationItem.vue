@@ -6,6 +6,7 @@ import {formatSmartDate} from "@/helpers/dateHelper";
 import {adaptSystemMessages} from "@/helpers/cmSystemMessagesMap";
 import {getMediaNames, getMsgContent} from "../../helpers/cmHelpers";
 import {useRouter} from "vue-router";
+import {useCmStore} from "@/stores/cmStore";
 
 interface Props{
   conv: PersonalConv
@@ -15,7 +16,13 @@ const props = defineProps<Props>()
 
 const crSendTime = computed(() => formatSmartDate(props.conv.lastMessage.sendTime))
 
+const cmStore = useCmStore();
 
+const handleSelectDialog = () => {
+  cmStore.selectedDialogId = props.conv._id;
+  cmStore.selectedDialog = props.conv;
+  router.push({query: {conv: props.conv._id}})
+}
 /*
 PersonalConv{
     _id: string,
@@ -76,7 +83,7 @@ PersonalConv{
         </div>
       </div>
     </div>
-    <button class="redirect_to-conv" @click="router.push({query: {conv: conv._id}})"></button>
+    <button class="redirect_to-conv" @click="handleSelectDialog"></button>
   </div>
 </template>
 

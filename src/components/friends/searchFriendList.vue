@@ -65,21 +65,24 @@ const router = useRouter()
     <lazy-placeholder-loader v-if="userStore.findUserPending"/>
 
     <div class="h-100 d-flex flex-column" v-else>
-      <not-found-template v-if="!userStore.foundUsers && props.mode === 'not-preload__search'"
-                          text="Найдите новых друзей" icon="mdi-account-search-outline" :icon-size="28"
-                          icon-color="green" class="ma-auto align-self-center"
-      />
 
       <div class="search-friend-list-item__wrapper">
-        <div class="d-flex flex-column align-items-center ga-1" v-if="userStore.foundUsers && !userStore.foundUsers.length">
+        <not-found-template v-if="!userStore.foundUsers && props.mode === 'not-preload__search'"
+                            text="Найдите новых друзей" icon="mdi-account-search-outline" :icon-size="28"
+                            icon-color="green" class="ma-auto align-self-center"
+        />
+
+        <div class="__not-found" v-if="userStore.foundUsers && !userStore.foundUsers.length">
           <not-found-template :text="props.mode === 'friends-preload' ? 'Друзей пока нет' : 'Никого не нашлось'"
                               :icon="props.mode === 'friends-preload' ? 'mdi-account-cancel-outline' : 'mdi-magnify-remove-outline'"
                               :icon-size="28" icon-color="green"
           />
           <v-btn v-if="props.mode === 'friends-preload'" class="text-none" @click="router.push({name: 'friends', query:{tab: 'search'}})">Найти друзей</v-btn>
         </div>
+
         <search-friend-list-item v-for="user in userStore.foundUsers" :key="user._id" :user="user" v-else/>
       </div>
+
     </div>
 
     <pagination-dot-loader class="mb-2 mt-2" v-if="userStore.loadMoreUsersFlag"/>
@@ -91,7 +94,17 @@ const router = useRouter()
   height: 100%;
 }
 
+.__not-found{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+
 .search-friend-list-item__wrapper {
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;

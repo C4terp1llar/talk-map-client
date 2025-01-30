@@ -213,7 +213,7 @@ const getAcceptType = (sender:string) => {
       <span class="file-drop-text">Перетащите файлы сюда или нажмите, чтобы выбрать</span>
     </div>
 
-    <scrollable-container v-if="files.length" :use-scroll-bar="true" mode="filter">
+    <scrollable-container v-if="files.length" :use-scroll-bar="true" mode="phShort">
       <div :class="['files-preview__wrapper', `${props.sender}`]">
         <multimedia-item :sender="props.sender" @handle-delete="(id) => deleteFile(id)" :files="files"/>
       </div>
@@ -298,8 +298,8 @@ const getAcceptType = (sender:string) => {
     box-shadow: unset;
   }
   &.message{
-    padding: unset;
-    box-shadow: unset;
+    padding: 5px;
+    box-shadow: 0 0 5px currentColor;
   }
 }
 

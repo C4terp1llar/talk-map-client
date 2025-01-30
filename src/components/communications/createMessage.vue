@@ -3,11 +3,14 @@ import MediaUpload from "@/components/multimedia/mediaUpload.vue";
 import {ref} from "vue";
 import {useCmStore} from "@/stores/cmStore";
 import {useNotificationStore} from "@/stores/notifications";
+import CreateMessageText from "@/components/communications/createMessageText.vue";
 
 interface PostF { id: string, file: File, previewUrl?: string, type: string }
 
 const cmStore = useCmStore();
 const ntfStore = useNotificationStore();
+
+const showAttachments = ref<boolean>(false);
 
 const msgFiles = ref<PostF[]>([]);
 const msgText = ref<string>('');
@@ -18,7 +21,7 @@ const handleMsg = async () => {
   let data = new FormData();
 
   data.append("content", msgText.value.trim());
-  data.append("recipient", '671a46cedbe33a4302032e96');
+  data.append("recipient", '671a457fdbe33a4302032e5d');
   data.append("chatType", 'personal');
 
   if (msgFiles.value.length > 0){
@@ -34,17 +37,19 @@ const handleMsg = async () => {
   }
 }
 
+const actAttachments = () => {
+  if (showAttachments.value){
+    !msgFiles.value.length ? showAttachments.value = false : false
+  }else{
+    showAttachments.value = true
+  }
+}
 </script>
 
 <template>
   <div class="create-message__wrapper">
-<!--    флаг будет -  длина файлов || драговер __ при удалении файлов будем чекать на длину, если она 0 тогда выкл флаг -->
-    <media-upload @sl-post-media="(m: PostF[] | []) => msgFiles = m" sender="message"/>
-<!-- отдельная компонента под текст в ней кнопка скрепки + емоджи -> будет эмитить текст -->
-    <v-text-field variant="outlined" v-model="msgText"/>
-
-<!--    кнопка будет в текст компоненте выше, будет эмитить хендл сенд мессадж, валидация здесь -->
-    <v-btn @click="handleMsg">go</v-btn>
+    <media-upload v-if="showAttachments" @sl-post-media="(m: PostF[] | []) => msgFiles = m" sender="message"/>
+    <create-message-text @act-attachments="actAttachments" @send-message="handleMsg" v-model="msgText"/>
   </div>
 </template>
 

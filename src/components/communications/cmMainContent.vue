@@ -6,6 +6,9 @@ import {useRoute} from "vue-router";
 import {useCmStore} from "@/stores/cmStore";
 import CmMessageListHead from "@/components/communications/cmMessageListHead.vue";
 import CmMessageList from "@/components/communications/cmMessageList.vue";
+import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
+import NotFoundTemplate from "@/components/notFoundTemplate.vue";
+import DialogNotFound from "@/components/communications/dialogNotFound.vue";
 
 const route = useRoute();
 const cmStore = useCmStore();
@@ -20,13 +23,19 @@ onUnmounted(() => {
 
 onMounted(async () => {
   if (route.query.conv){
-    await uploadData(route.query.conv.toString())
+    await Promise.all([
+      uploadData(route.query.conv.toString()),
+      uploadDialogInfo(route.query.conv.toString())
+    ])
   }
   watch(
       () => route.query.conv,
       async (newConvId, oldConvId) => {
         if (newConvId !== oldConvId && newConvId) {
-          await uploadData(newConvId.toString())
+          await Promise.all([
+            uploadData(newConvId.toString()),
+            uploadDialogInfo(newConvId.toString())
+          ])
         }
       }
   );
@@ -36,12 +45,24 @@ const uploadData = async (convId: string) => {
   await cmStore.getMessages(convId, page.value, LIMIT)
 }
 
+const uploadDialogInfo = async (convId: string) => {
+  await cmStore.getDialogInfo(convId)
+}
+
 </script>
 
 <template>
   <div class="cm-main-content__wrapper">
-    <cm-message-list-head/>
-    <cm-message-list v-if="cmStore.messages && cmStore.messages.length" :messages="cmStore.messages"/>
+    <div class="cm-main-content" v-if="route.query.conv">
+      <lazy-placeholder-loader v-if="cmStore.getDialogPend || cmStore.messagesPend"/>
+
+      <cm-message-list v-if="cmStore.messages && (!cmStore.getDialogPend && !cmStore.messagesPend)" :messages="cmStore.messages"/>
+
+      <dialog-not-found class="__not-found" v-if="!cmStore.messages && !cmStore.getDialogPend && !cmStore.messagesPend"/>
+    </div>
+    <div class="cm-main-content__choose" v-if="!route.query.conv && !cmStore.compositeDialogPend">
+      <h6 class="ma-0">Выберите нужный диалог 💬</h6>
+    </div>
   </div>
 </template>
 
@@ -49,13 +70,31 @@ const uploadData = async (convId: string) => {
 .cm-main-content__wrapper {
   height: 100%;
   width: 100%;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 10px;
 
   box-shadow: 0 1px 10px currentColor;
   border-radius: 15px;
   background: rgb(var(--v-theme-background));
   padding: 5px;
+
+  .cm-main-content{
+    height: 100%;
+    width: 100%;
+
+    .__not-found {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .cm-main-content__choose{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 </style>

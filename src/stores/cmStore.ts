@@ -3,8 +3,10 @@ import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
 import {useNotificationStore} from "@/stores/notifications";
 import type {FullMessage, GroupConv, PersonalConv} from "@/helpers/interfaces";
+import {useRoute} from "vue-router";
 
 export const useCmStore = defineStore('cm', () => {
+    const route = useRoute();
     const ntfStore = useNotificationStore();
 
     const pending = ref<boolean>(false);
@@ -106,10 +108,11 @@ export const useCmStore = defineStore('cm', () => {
     const messagesPendMore = ref<boolean>(false);
 
     const getMessages = async (convId: string, page: number, limit: number) => {
-        try {
-            const curPending = page <= 1 ? messagesPend : messagesPendMore;
-            curPending.value = true;
+        const curPending = page <= 1 ? messagesPend : messagesPendMore;
 
+        curPending.value = true;
+
+        try {
             const response = await apiAuth.get('user/message', {
                 params: {
                     convId, page, limit
@@ -127,15 +130,48 @@ export const useCmStore = defineStore('cm', () => {
             }
         } catch (e: any) {
             console.error(e);
-            ntfStore.addNotification('error', 'Произошла ошибка при получении сообщений, попробуйте позже')
+            if (e.response.status !== 400){
+                ntfStore.addNotification('error', 'Произошла ошибка при получении сообщений, попробуйте позже')
+            }
+        }finally{
+            curPending.value = false;
         }
     }
+
+
+    const selectedDialogId = ref<string | null>(route.query.conv ? route.query.conv.toString() : null);
+    const selectedDialog = ref<PersonalConv | GroupConv | null>(null);
+
+    const getDialogPend = ref<boolean>(false);
+
+    const getDialogInfo = async (convId: string) => {
+        getDialogPend.value = true;
+
+        try {
+            const response = await apiAuth.get(`user/conv/${convId}`)
+
+            if (response.status === 200 && response.data){
+                selectedDialog.value = response.data.dialog
+            }
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status !== 400){
+                ntfStore.addNotification('error', 'Произошла ошибка при получении диалога, попробуйте позже')
+            }
+        }finally{
+            getDialogPend.value = false;
+        }
+    }
+
+    const compositeDialogPend = ref<boolean>(messagesPend.value || getDialogPend.value);
 
     const unmountMsgClear = () => {
         messages.value = null
         hasMoreMessages.value = false
         messagesPend.value = false
         messagesPendMore.value = false
+        selectedDialogId.value = null
+        selectedDialog.value = null
     }
 
     return{
@@ -155,5 +191,10 @@ export const useCmStore = defineStore('cm', () => {
         messagesPendMore,
         getMessages,
         unmountMsgClear,
+        selectedDialogId,
+        selectedDialog,
+        getDialogPend,
+        getDialogInfo,
+        compositeDialogPend,
     }
 });
