@@ -1,33 +1,7 @@
 <script setup lang="ts">
 
-const fileIcons: Record<string, string> = {
-  zip: 'mdi-archive-outline',
-  rar: 'mdi-archive-outline',
-  doc: 'mdi-file-word-outline',
-  docx: 'mdi-file-word-outline',
-  pdf: 'mdi-file-pdf-box',
-  jpg: 'mdi-file-image',
-  jpeg: 'mdi-file-image',
-  png: 'mdi-file-image',
-  gif: 'mdi-file-image',
-  mp4: 'mdi-multimedia',
-  avi: 'mdi-multimedia',
-  mov: 'mdi-multimedia',
-  flac: 'mdi-multimedia',
-  mp3: 'mdi-multimedia',
-  wav: 'mdi-multimedia',
-  xlsx: 'mdi-file-excel-outline',
-  pptx: 'mdi-file-powerpoint-outline',
-  xls: 'mdi-file-excel-outline',
-  ppt: 'mdi-file-powerpoint-outline',
-  odt: 'mdi-file-word-outline',
-  ods: 'mdi-file-excel-outline',
-};
-
-const getFileIcon = (fileName: string) => {
-  const extension = fileName.split('.').pop()?.toLowerCase();
-  return fileIcons[extension || ''] || 'mdi-file-outline';
-};
+import {getFileIcon} from "../../helpers/fileDisplayCover";
+import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 
 interface Props {
   files: { id: string, file: File, previewUrl?: string, type: string }[],
@@ -42,7 +16,11 @@ const emit = defineEmits(['handle-delete'])
   <div v-for="fileEntry in props.files" :key="fileEntry.id" :class="['file-preview', `${props.sender}`]">
 
     <div class="file-preview__img" v-if="fileEntry.type === 'image'" >
-      <v-img :src="fileEntry.previewUrl" alt="Превью изображения" class="image-preview" cover/>
+      <v-img :src="fileEntry.previewUrl" alt="Превью изображения" class="image-preview" cover>
+        <template v-slot:placeholder>
+          <skeleton-loader/>
+        </template>
+      </v-img>
       <span class="file__name">{{ fileEntry.file.name }}</span>
     </div>
 

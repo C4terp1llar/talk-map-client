@@ -13,7 +13,6 @@ import CmMainContent from "@/components/communications/cmMainContent.vue";
 
 <style scoped lang="scss">
 .communications__wrapper{
-  position: relative;
   width: 100%;
   height: 100%;
   display: grid;

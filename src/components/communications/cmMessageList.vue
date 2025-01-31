@@ -18,7 +18,7 @@ const props = defineProps<Props>()
       <cm-message-list-head/>
     </div>
 
-    <div class="cm-message-list__content">
+    <div class="cm-message-list__content styled-scroll__np">
       <message-item v-for="m in messages" :key="m._id" :m="m"/>
     </div>
 

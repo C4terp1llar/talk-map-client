@@ -271,7 +271,8 @@ export interface FullMessage {
     readers: ReadersFullInfo[],
     sender: ShortUserInfo,
     mode: 'internal' | 'external',
-    mediaInfo: ShortMediaDialogMessage
+    additionalInfo: string | null,
+    mediaInfo: ShortMediaDialogMessage[]
 }
 
 export interface ReadersFullInfo{

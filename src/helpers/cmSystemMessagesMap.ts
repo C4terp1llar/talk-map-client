@@ -1,44 +1,23 @@
-/*
+import type { FullMessage, LastDialogMessage } from "@/helpers/interfaces";
 
-export interface LastDialogMessage {
-    _id: string,
-    sender: string,
-    sender_nickname: string,
-    content?: string,
-    sendTime: Date,
-    messageType: "default" | 'system',
-    mode: 'internal' | 'external',
-    additionalInfo: string | null,
-    isRead: boolean,
-    media: ShortMediaDialogMessage[],
-}
-
-export interface ShortMediaDialogMessage {
-    _id: string,
-    name: string,
-    type: string,
-    size: number,
-    url: string
-}
-
-*/
-
-import type { LastDialogMessage } from "@/helpers/interfaces";
-
-type SystemMessageHandler = (msg: LastDialogMessage) => string;
+type SystemMessageHandler = (msg: LastDialogMessage | FullMessage) => string;
 
 const systemMessageHandlers: Record<string, SystemMessageHandler> = {
     default: () => "Системное сообщение",
 
     create_group: (msg) => {
-        if (msg.additionalInfo) return `${msg.sender_nickname} создал(а) группу ${msg.additionalInfo.split(":")[1] || ''}`;
-        return `${msg.sender_nickname} создал(а) группу`;
+        const senderName = "sender_nickname" in msg
+            ? msg.sender_nickname
+            : msg.sender.nickname;
+
+        if (msg.additionalInfo) {
+            return `${senderName} создал(а) группу ${msg.additionalInfo.split(":")[1] || ''}`;
+        }
+        return `${senderName} создал(а) группу`;
     },
-
-
 };
 
-export function adaptSystemMessages(msg: LastDialogMessage): string {
+export function adaptSystemMessages(msg: LastDialogMessage | FullMessage): string {
     if (msg.messageType === "system") {
         const handler = systemMessageHandlers[msg.content || "default"];
         return handler ? handler(msg) : "Неизвестное системное сообщение";

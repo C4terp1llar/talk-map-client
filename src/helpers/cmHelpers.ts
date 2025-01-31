@@ -1,4 +1,4 @@
-import type {LastDialogMessage, ShortMediaDialogMessage} from "@/helpers/interfaces";
+import type {FullMessage, LastDialogMessage, ShortMediaDialogMessage} from "@/helpers/interfaces";
 import {adaptSystemMessages} from "@/helpers/cmSystemMessagesMap";
 
 export const getMediaNames = (media: ShortMediaDialogMessage[]) => {
@@ -14,7 +14,7 @@ export const getMediaNames = (media: ShortMediaDialogMessage[]) => {
     return str
 }
 
-export const getMsgContent = (msg: LastDialogMessage) => {
+export const getMsgContent = (msg: LastDialogMessage | FullMessage) => {
     if (msg.messageType === 'system'){
         return adaptSystemMessages(msg)
     }
