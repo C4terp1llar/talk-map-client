@@ -268,7 +268,7 @@ export interface FullMessage {
     isForwarded: boolean,
     createdAt: Date,
     updatedAt: Date,
-    readers: ReadersFullInfo[],
+    isRead: boolean,
     sender: ShortUserInfo,
     mode: 'internal' | 'external',
     additionalInfo: string | null,

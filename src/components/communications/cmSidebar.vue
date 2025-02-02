@@ -17,7 +17,7 @@ import CmCreateGroupWrap from "@/components/communications/cmCreateGroupWrap.vue
 .cm-sidebar__wrapper {
   height: 100%;
   grid-column: span 1;
-  box-shadow: 0 1px 10px currentColor;
+  border: 1px solid gray;
   border-radius: 15px;
   background: rgb(var(--v-theme-background));
 

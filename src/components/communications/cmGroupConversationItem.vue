@@ -88,7 +88,7 @@ const handleSelectDialog = () => {
   grid-template-columns: auto 1fr;
   border-radius: 5px;
 
-  border: 1px solid currentColor;
+  border: 1px solid gray;
 
   .cm-group-conv-item__cover{
     grid-column: span 1;

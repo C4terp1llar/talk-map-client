@@ -3,6 +3,7 @@ import type {FullMessage} from "@/helpers/interfaces";
 import {getMsgContent} from "../../helpers/cmHelpers";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {getFileIcon} from "@/helpers/fileDisplayCover";
+import MessageItemMedia from "@/components/communications/messageItemMedia.vue";
 
 interface Props {
   m: FullMessage
@@ -12,7 +13,7 @@ const props = defineProps<Props>()
 </script>
 
 <template>
-  <div :class="['message-item__wrapper mt-2 mb-2']">
+  <div :class="['message-item__wrapper mt-1 mb-1']">
 
     <div class="message-item__system" v-if="m.messageType === 'system'">
       <div class="message-item__system-content">
@@ -23,7 +24,7 @@ const props = defineProps<Props>()
     <div :class="['message-item__default', m.mode]" v-else>
 
       <div class="message-item__avatar" v-if="m.conversationType === 'GroupConversation' && m.mode === 'external'">
-        <v-avatar :size="43">
+        <v-avatar :size="30">
           <v-img
               :src="m.sender.avatar"
               alt="sender avatar"
@@ -46,39 +47,10 @@ const props = defineProps<Props>()
           {{ m.sender.nickname }}
         </span>
 
-        <div class="message-item__media" v-if="m.mediaInfo && m.mediaInfo.length" v-for="i in m.mediaInfo" :key="i._id">
-
-          <div class="file-preview__img" v-if="i.type.startsWith('image/')">
-            <v-img :src="i.url" alt="Превью изображения" class="image-preview" cover>
-              <template v-slot:placeholder>
-                <skeleton-loader/>
-              </template>
-            </v-img>
-          </div>
-
-          <div class="file-preview__audio" v-else-if="i.type.startsWith('audio/')">
-            <audio  controls class="audio-preview">
-              <source :src="i.url" type="audio/mpeg"/>
-              Ваш браузер не поддерживает аудио.
-            </audio>
-            <v-icon :size="65" class="icon-audio">mdi-music</v-icon>
-          </div>
-
-          <div class="file-preview__video" v-else-if="i.type.startsWith('video/')">
-            <video controls class="video-preview">
-              <source :src="i.url" type="video/mp4"/>
-              Ваш браузер не поддерживает видео.
-            </video>
-          </div>
-
-          <div class="file-preview__other" v-else>
-            <v-icon :size="65" class="ma-auto">{{ getFileIcon(i.name) }}</v-icon>
-            <span class="file__name">{{ i.name }}</span>
-          </div>
-
-        </div>
+        <message-item-media :m="m.mediaInfo"/>
 
         <span class="msg-text" v-if="m.content">{{m.content}}</span>
+
       </div>
 
     </div>
@@ -111,6 +83,7 @@ const props = defineProps<Props>()
     }
 
     max-width: 50%;
+    min-width: 300px;
     width: auto;
     display: flex;
     gap: 10px;
@@ -122,6 +95,12 @@ const props = defineProps<Props>()
       padding: 5px;
       border-radius: 10px;
       box-shadow: 0 0 5px;
+
+      .message-item__media-wrap{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
     }
   }
 

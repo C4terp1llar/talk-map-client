@@ -70,11 +70,10 @@ const uploadDialogInfo = async (convId: string) => {
 .cm-main-content__wrapper {
   height: 100%;
   width: 100%;
-
-  box-shadow: 0 1px 10px currentColor;
+  border: 1px solid gray;
   border-radius: 15px;
   background: rgb(var(--v-theme-background));
-  padding: 5px;
+  overflow: hidden;
 
   .cm-main-content{
     height: 100%;

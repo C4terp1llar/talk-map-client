@@ -50,7 +50,7 @@ const data = computed(() => {
 <style scoped lang="scss">
 .cm-message-list-head__wrapper{
   width: 100%;
-  box-shadow: 0 1px 10px currentColor;
+  box-shadow: 0 0 5px currentColor;
   border-radius: 10px;
   background: rgb(var(--v-theme-background));
   padding: 10px;
