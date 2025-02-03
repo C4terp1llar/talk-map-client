@@ -74,7 +74,8 @@ const files = computed(() => ({
   flex-wrap: wrap;
 
   max-width: 700px;
-  min-width: 300px;
+  width: 300px;
+  min-width: 100px;
 }
 
 .media__photo-item,
@@ -93,6 +94,7 @@ const files = computed(() => ({
 
 .media__video{
   video{
+    min-width: 100px;
     max-width: 300px;
   }
 }

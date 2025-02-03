@@ -46,7 +46,7 @@ const handleReact = async () => {
       <span class="reactions__amount">{{ photo.likesCount }}</span>
     </div>
 
-    <span class="publish__date">в {{ formatShortDate(photo.createdAt) }}</span>
+    <span class="publish__date">{{ formatShortDate(photo.createdAt) }}</span>
   </div>
 </template>
 

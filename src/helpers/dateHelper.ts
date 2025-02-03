@@ -1,5 +1,6 @@
 import { format, isToday, isYesterday, subDays, isSameDay, isThisWeek, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import type {FullMessage} from "@/helpers/interfaces";
 
 export function formatShortDate(date: Date) {
     if (isToday(date)) {
@@ -26,3 +27,15 @@ export function formatSmartDate(date: Date) {
         return format(date, 'dd.MM.yyyy');
     }
 }
+
+export const formatCmDividerDate = (date: Date): string => {
+    if (isToday(date)) {
+        return 'Сегодня';
+    } else if (isYesterday(date)) {
+        return 'Вчера';
+    } else if (isSameDay(date, subDays(new Date(), 2))) {
+        return 'Позавчера';
+    } else {
+        return format(date, 'd MMMM', { locale: ru });
+    }
+};

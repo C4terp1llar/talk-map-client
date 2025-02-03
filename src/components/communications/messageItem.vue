@@ -2,14 +2,20 @@
 import type {FullMessage} from "@/helpers/interfaces";
 import {getMsgContent} from "../../helpers/cmHelpers";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
-import {getFileIcon} from "@/helpers/fileDisplayCover";
 import MessageItemMedia from "@/components/communications/messageItemMedia.vue";
+import {computed} from "vue";
+import {format} from "date-fns";
 
 interface Props {
   m: FullMessage
 }
 
 const props = defineProps<Props>()
+
+const crSendTime = computed(() => {
+  return format(new Date(props.m.createdAt), 'HH:mm');
+});
+
 </script>
 
 <template>
@@ -51,6 +57,13 @@ const props = defineProps<Props>()
 
         <span class="msg-text" v-if="m.content">{{m.content}}</span>
 
+        <div class="msg-send__detail">
+          <div class="msg-send___detail_read-status" v-if="m.mode === 'internal'">
+            <v-icon :size="12" color="green">{{ m.isRead ? 'mdi-check-all' : 'mdi-check'}}</v-icon>
+          </div>
+          <span class="msg-send___detail_time">{{ crSendTime }}</span>
+        </div>
+
       </div>
 
     </div>
@@ -82,8 +95,8 @@ const props = defineProps<Props>()
       justify-content: flex-start;
     }
 
-    max-width: 50%;
-    min-width: 300px;
+    max-width: 80%;
+    min-width: 100px;
     width: auto;
     display: flex;
     gap: 10px;
@@ -91,7 +104,6 @@ const props = defineProps<Props>()
     .message-item__content{
       display: flex;
       flex-direction: column;
-      gap: 5px;
       padding: 5px;
       border-radius: 10px;
       box-shadow: 0 0 5px;
@@ -101,25 +113,29 @@ const props = defineProps<Props>()
         flex-wrap: wrap;
         gap: 5px;
       }
+
+      .msg-send__detail{
+        height: 18px;
+        display: flex;
+        gap: 5px;
+        margin-left: auto;
+        align-items: center;
+        .msg-send___detail_time{
+          font-size: 11px;
+          opacity: .8;
+        }
+      }
     }
   }
 
 }
 
 .msg-text{
-  font-size: 15px;
+  font-size: 14px;
 }
 .nickname-text{
   font-weight: 500;
 }
 
-.file-preview__audio, .file-preview__video, .file-preview__img,  .file-preview__other{
-  width: 200px;
 
-  video{
-    height: inherit;
-    width: inherit;
-  }
-
-}
 </style>
