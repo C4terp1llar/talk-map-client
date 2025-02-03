@@ -55,13 +55,15 @@ const crSendTime = computed(() => {
 
         <message-item-media :m="m.mediaInfo"/>
 
-        <span class="msg-text" v-if="m.content">{{m.content}}</span>
+        <div class="msg-text__wrapper">
+          <span class="msg-text" v-if="m.content">{{ m.content }}</span>
 
-        <div class="msg-send__detail">
-          <div class="msg-send___detail_read-status" v-if="m.mode === 'internal'">
-            <v-icon :size="12" color="green">{{ m.isRead ? 'mdi-check-all' : 'mdi-check'}}</v-icon>
+          <div class="msg-send__detail">
+            <span class="msg-send___detail_time">{{ crSendTime }}</span>
+            <div class="msg-send___detail_read-status" v-if="m.mode === 'internal'">
+              <v-icon :size="12" color="green">{{ m.isRead ? 'mdi-check-all' : 'mdi-check' }}</v-icon>
+            </div>
           </div>
-          <span class="msg-send___detail_time">{{ crSendTime }}</span>
         </div>
 
       </div>
@@ -115,15 +117,23 @@ const crSendTime = computed(() => {
       }
 
       .msg-send__detail{
-        height: 18px;
+        height: 17px;
         display: flex;
-        gap: 5px;
-        margin-left: auto;
+        gap: 3px;
         align-items: center;
+        flex-wrap: wrap;
+        margin-left: auto;
+        margin-top: auto;
+        padding-left: 10px;
         .msg-send___detail_time{
           font-size: 11px;
-          opacity: .8;
+          opacity: .7;
         }
+      }
+
+      .msg-text__wrapper{
+        display: flex;
+        flex-wrap: wrap;
       }
     }
   }

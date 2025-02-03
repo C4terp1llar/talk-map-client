@@ -17,12 +17,13 @@ const msgText = ref<string>('');
 
 const handleMsg = async () => {
   if (!msgText.value.trim().length && !msgFiles.value.length) return;
+  if (!cmStore.selectedDialogId || !cmStore.messages || !cmStore.messages.length) return;
 
   let data = new FormData();
 
   data.append("content", msgText.value.trim());
-  data.append("recipient", '671a457fdbe33a4302032e5d');
-  data.append("chatType", 'personal');
+  data.append("recipient", cmStore.selectedDialogId);
+  data.append("chatType", cmStore.messages[0].conversationType === 'PersonalConversation' ? 'personal' : 'group');
 
   if (msgFiles.value.length > 0){
     msgFiles.value.forEach(fileEntry => {

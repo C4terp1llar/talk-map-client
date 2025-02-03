@@ -32,16 +32,6 @@ const checkScrollPosition = () => {
   isAtBottom.value = scrollHeight - scrollTop - clientHeight < 20;
 };
 
-watch(
-    () => props.messages,
-    () => {
-      if (isAtBottom.value) {
-        scrollToBottom(true);
-      }
-    },
-    { deep: true }
-);
-
 onMounted(() => {
   if (!messageListRef.value) return;
 
@@ -78,7 +68,7 @@ const shouldShowDateDivider = (index: number) => {
       <template v-for="(message, index) in props.messages" :key="message._id">
         <div v-if="shouldShowDateDivider(index)" class="msg__date-divider">
           <div class="date-divider__content">
-            <span>{{ formatCmDividerDate(new Date(message.createdAt)) }}</span>
+            <span>{{ formatCmDividerDate(message.createdAt) }}</span>
           </div>
         </div>
 

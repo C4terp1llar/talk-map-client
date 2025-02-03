@@ -21,7 +21,7 @@ const qPending = ref<boolean>(false);
 const morePending = ref<boolean>(false);
 
 onMounted(async () => {
-  await cmStore.getConversations(page.value, LIMIT)
+  await uploadData('load')
 })
 
 const uploadData = async (mode: 'load' | 'load-more') => {
@@ -43,7 +43,9 @@ const queryUpdate = async (val: string) => {
   await debouncedOperation();
 }
 const debouncedOperation = debounce(async () => {
-  qPending.value = true;
+  if (queryStr.value){
+    qPending.value = true;
+  }
   await uploadData('load');
 }, 500);
 
