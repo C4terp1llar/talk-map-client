@@ -46,7 +46,7 @@ const crSendTime = computed(() => {
       <div class="message-item__content">
 
         <span
-            v-if="m.conversationType === 'GroupConversation'"
+            v-if="m.conversationType === 'GroupConversation' && m.mode === 'external'"
             :style="{color: m.sender.nickname_color ? m.sender.nickname_color : 'currentColor'}"
             class="nickname-text"
         >
@@ -91,15 +91,16 @@ const crSendTime = computed(() => {
     &.internal{
       margin-left: auto;
       justify-content: flex-end;
+      padding-left: 20px;
     }
     &.external{
       margin-right: auto;
       justify-content: flex-start;
+      padding-right: 20px;
     }
 
-    max-width: 80%;
+    max-width: 350px;
     min-width: 100px;
-    width: auto;
     display: flex;
     gap: 10px;
 

@@ -107,10 +107,12 @@ export const useCmStore = defineStore('cm', () => {
     const messagesPend = ref<boolean>(false);
     const messagesPendMore = ref<boolean>(false);
 
-    const getMessages = async (convId: string, page: number, limit: number) => {
+    const getMessages = async (convId: string, page: number, limit: number, withoutPending?: boolean) => {
         const curPending = page <= 1 ? messagesPend : messagesPendMore;
 
-        curPending.value = true;
+        if (!withoutPending){
+            curPending.value = true;
+        }
 
         try {
             const response = await apiAuth.get('user/message', {
@@ -144,14 +146,20 @@ export const useCmStore = defineStore('cm', () => {
 
     const getDialogPend = ref<boolean>(false);
 
-    const getDialogInfo = async (convId: string) => {
-        getDialogPend.value = true;
+    const getDialogInfo = async (convId: string, returns?: boolean, withoutPending?: boolean) : Promise<PersonalConv | GroupConv | void> => {
+       if (!withoutPending){
+           getDialogPend.value = true;
+       }
 
         try {
             const response = await apiAuth.get(`user/conv/${convId}`)
 
             if (response.status === 200 && response.data){
-                selectedDialog.value = response.data.dialog
+                if (returns){
+                    return response.data.dialog
+                }else{
+                    selectedDialog.value = response.data.dialog;
+                }
             }
         } catch (e: any) {
             console.error(e);

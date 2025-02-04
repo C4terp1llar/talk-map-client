@@ -23,11 +23,8 @@ const files = computed(() => ({
 
     <div class="media__photo" v-if="files.images.length">
       <div class="media__photo-item" v-for="i in files.images" :key="i._id">
-        <v-img :src="i.url" alt="Фото" class="image-preview" cover>
-          <template v-slot:placeholder>
-            <skeleton-loader />
-          </template>
-        </v-img>
+
+        <img :src="i.url" alt="Фото" class="image-preview">
       </div>
     </div>
 
@@ -51,8 +48,11 @@ const files = computed(() => ({
 
     <div class="media__other" v-if="files.others.length">
       <div class="media__other-item" v-for="i in files.others" :key="i._id">
-        <v-icon :size="40">{{ getFileIcon(i.name) }}</v-icon>
-        <span class="file__name">{{ i.name }}</span>
+        <div class="media__other-item__download">
+          <v-icon>mdi-download</v-icon>
+          <a :href="i.url" target="_blank"></a>
+        </div>
+        <span class="file__name __no-wrap-txt">{{i.name}}</span>
       </div>
     </div>
 
@@ -61,9 +61,8 @@ const files = computed(() => ({
 
 <style scoped lang="scss">
 .message-item__media-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .media__photo,
@@ -73,29 +72,51 @@ const files = computed(() => ({
   display: flex;
   flex-wrap: wrap;
 
-  max-width: 700px;
-  width: 300px;
-  min-width: 100px;
+  width: 100%;
+}
+
+img{
+  max-width: 100%;
 }
 
 .media__photo-item,
 .media__video-item,
 .media__audio-item,
 .media__other-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-  margin: 2px;
-
+  margin: 2px 0;
   width: 100%;
+  max-width: 100%;
+}
+
+.media__other-item{
+  border: 1px solid lightgrey;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  padding: 5px;
+  .media__other-item__download{
+    position: relative;
+    padding: 5px;
+    margin-right: 10px;
+    border-radius: 50%;
+    border: 1px solid lightgrey;
+    transition: .3s;
+
+    &:hover{
+      background-color: #7777;
+    }
+    a{
+      position: absolute;
+      inset: 0;
+    }
+  }
 }
 
 .media__video{
   video{
     min-width: 100px;
-    max-width: 300px;
+    max-width: inherit;
   }
 }
 
@@ -105,10 +126,22 @@ const files = computed(() => ({
   border-radius: 8px;
 }
 
+.media__audio-item{
+  display: flex;
+  audio{
+    width: 100%;
+  }
+}
+
 .file__name {
   font-size: 12px;
-  text-align: center;
-  max-width: 100px;
-  word-wrap: break-word;
+  text-align: left;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
+
+
 </style>
