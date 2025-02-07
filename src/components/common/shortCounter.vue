@@ -47,7 +47,7 @@ const displayCount = (val: number) => {
   }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
   .counter__wrapper:not(.__friends-tab) {
     position: absolute;
     right: 5px;

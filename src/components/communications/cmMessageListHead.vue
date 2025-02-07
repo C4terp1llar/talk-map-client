@@ -3,6 +3,7 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {useCmStore} from "@/stores/cmStore";
 import {computed} from "vue";
 import type {GroupConv, PersonalConv} from "@/helpers/interfaces";
+import {useRoute, useRouter} from "vue-router";
 
 const cmStore = useCmStore();
 
@@ -22,10 +23,15 @@ const data = computed(() => {
   }
 });
 
+const router = useRouter();
 </script>
 
 <template>
   <div class="cm-message-list-head__wrapper" v-if="cmStore.selectedDialog">
+    <button class="btn__back" @click="router.push({query: {conv: undefined}})">
+      <v-icon :size="24" color="green">mdi-arrow-left-bold-outline</v-icon>
+    </button>
+
     <div class="cm-message-list-head__title">
       <v-avatar :size="43">
         <v-img
@@ -48,23 +54,37 @@ const data = computed(() => {
 </template>
 
 <style scoped lang="scss">
+.btn__back{
+  padding: 5px 5px 5px 0;
+  margin-right: 5px;
+  display: none;
+  transition: .3s;
+  &:hover{
+    filter: drop-shadow(0 0 2px #4caf50);
+  }
+  @media (max-width: 950px){
+    display: block;
+  }
+}
+
 .cm-message-list-head__wrapper{
   width: 100%;
   box-shadow: 0 0 5px currentColor;
   border-radius: 10px;
   background: rgb(var(--v-theme-background));
   padding: 10px;
-  display: grid;
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  grid-template-columns: repeat(2, auto);
 
   .cm-message-list-head__title{
     width: 100%;
-    display: grid;
+    display: flex;
     grid-template-columns: repeat(2, auto);
     align-items: center;
     gap: 10px;
+  }
+  .load-more-btn__link{
+    margin-left: auto;
   }
 }
 

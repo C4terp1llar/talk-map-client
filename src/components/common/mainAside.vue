@@ -118,7 +118,7 @@ const isActive = (path: string) => computed(() => route.path.includes(`/app/${pa
     }
 
     span {
-      @media (max-width: 1000px) {
+      @media (max-width: 1100px) {
         display: none;
       }
     }

@@ -81,9 +81,10 @@ const crSendTime = computed(() => {
     display: flex;
     justify-content: center;
     .message-item__system-content{
-      padding: 5px 10px;
+      padding: 2px 10px;
       border-radius: 15px;
       box-shadow: 0 0 5px;
+      text-align: center;
     }
   }
 
