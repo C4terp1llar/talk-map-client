@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
 import {useNotificationStore} from "@/stores/notifications";
-import type {FullMessage, GroupConv, PersonalConv} from "@/helpers/interfaces";
+import type {FullMessage, GroupConv, PersonalConv, ShortUserInfo} from "@/helpers/interfaces";
 import {useRoute} from "vue-router";
 
 export const useCmStore = defineStore('cm', () => {
@@ -77,6 +77,8 @@ export const useCmStore = defineStore('cm', () => {
     }
 
     const conversations = ref<[PersonalConv | GroupConv] | null>(null);
+    const withoutConversations = ref<ShortUserInfo[] | null>(null);
+
     const hasMoreConv = ref<boolean>(false);
 
     const getConversations = async (page: number, limit: number, q?: string) => {
@@ -91,8 +93,11 @@ export const useCmStore = defineStore('cm', () => {
                 hasMoreConv.value = response.data.hasMore;
                 if (page < 2){
                     conversations.value = response.data.conversations;
+                    withoutConversations.value = response.data.withoutConversations;
                 }else if(page >= 2 && conversations.value){
                     conversations.value.push(response.data.conversations);
+                }else if(page >= 2 && withoutConversations.value){
+                    withoutConversations.value.push(response.data.withoutConversations);
                 }
             }
 
@@ -182,6 +187,8 @@ export const useCmStore = defineStore('cm', () => {
         selectedDialog.value = null
     }
 
+    const newPersonalConvOpponentUid = ref<string | null>(route.query.nConv ? route.query.nConv.toString() : null);
+
     return{
         pending,
         error,
@@ -192,6 +199,7 @@ export const useCmStore = defineStore('cm', () => {
         createGroup,
         getConversations,
         conversations,
+        withoutConversations,
         hasMoreConv,
         messages,
         hasMoreMessages,
@@ -204,5 +212,7 @@ export const useCmStore = defineStore('cm', () => {
         getDialogPend,
         getDialogInfo,
         compositeDialogPend,
+        newPersonalConvOpponentUid,
+
     }
 });

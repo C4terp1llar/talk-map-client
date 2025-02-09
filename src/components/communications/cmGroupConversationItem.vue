@@ -4,9 +4,13 @@ import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {computed} from "vue";
 import {formatSmartDate} from "@/helpers/dateHelper";
 import {adaptSystemMessages} from "@/helpers/cmSystemMessagesMap";
-import {getMediaNames, getMsgContent} from "../../helpers/cmHelpers";
+import {getMediaNames, getMsgContent} from "@/helpers/cmHelpers";
 import {useRouter} from "vue-router";
 import {useCmStore} from "@/stores/cmStore";
+
+const emit = defineEmits<{
+  (e: 'selectDialog'): void
+}>()
 
 interface Props{
   conv: GroupConv
@@ -20,7 +24,9 @@ const cmStore = useCmStore();
 
 const handleSelectDialog = () => {
   cmStore.selectedDialogId = props.conv._id;
+  cmStore.newPersonalConvOpponentUid = null;
   cmStore.selectedDialog = props.conv;
+  emit('selectDialog')
   router.push({query: {conv: props.conv._id}})
 }
 </script>
@@ -89,6 +95,11 @@ const handleSelectDialog = () => {
   border-radius: 5px;
 
   border: 1px solid gray;
+
+  transition: .3s;
+  &:hover{
+    border: 1px solid currentColor;
+  }
 
   .cm-group-conv-item__cover{
     grid-column: span 1;

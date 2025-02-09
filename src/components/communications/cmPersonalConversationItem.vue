@@ -1,27 +1,47 @@
 <script setup lang="ts">
-import type {GroupConv, LastDialogMessage, PersonalConv, ShortMediaDialogMessage} from "@/helpers/interfaces";
+import type {
+  GroupConv,
+  LastDialogMessage,
+  PersonalConv,
+  ShortMediaDialogMessage,
+  ShortUserInfo
+} from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {computed} from "vue";
 import {formatSmartDate} from "@/helpers/dateHelper";
-import {adaptSystemMessages} from "@/helpers/cmSystemMessagesMap";
-import {getMediaNames, getMsgContent} from "../../helpers/cmHelpers";
+import {getMediaNames, getMsgContent} from "@/helpers/cmHelpers";
 import {useRouter} from "vue-router";
 import {useCmStore} from "@/stores/cmStore";
 
 interface Props{
-  conv: PersonalConv
+  conv?: PersonalConv,
+  withoutDialogs?: ShortUserInfo,
+  withoutDialogsMode?: boolean
 }
 const router = useRouter();
 const props = defineProps<Props>()
 
-const crSendTime = computed(() => formatSmartDate(props.conv.lastMessage.sendTime))
+const emit = defineEmits<{
+  (e: 'selectDialog'): void,
+  (e: 'selectWithoutDialog', uid: string): void
+}>()
+
+const crSendTime = computed(() => {
+  if (props.conv){
+    return formatSmartDate(props.conv.lastMessage.sendTime)
+  }
+})
 
 const cmStore = useCmStore();
 
 const handleSelectDialog = () => {
-  cmStore.selectedDialogId = props.conv._id;
-  cmStore.selectedDialog = props.conv;
-  router.push({query: {conv: props.conv._id}})
+  if (props.conv){
+    cmStore.selectedDialogId = props.conv._id;
+    cmStore.newPersonalConvOpponentUid = null;
+    cmStore.selectedDialog = props.conv;
+    emit('selectDialog')
+    router.push({query: {conv: props.conv._id}})
+  }
 }
 /*
 PersonalConv{
@@ -43,7 +63,7 @@ PersonalConv{
 </script>
 
 <template>
-  <div class="cm-personal-conv-item">
+  <div class="cm-personal-conv-item" v-if="conv">
     <div class="cm-personal-conv-item__cover">
       <v-avatar :size="43">
         <v-img
@@ -85,6 +105,36 @@ PersonalConv{
     </div>
     <button class="redirect_to-conv" @click="handleSelectDialog"></button>
   </div>
+
+  <!-- новый персональный диалог, если еще не создан и нет истории  -->
+  <div class="cm-personal-conv-item" v-if="withoutDialogsMode && withoutDialogs">
+    <div class="cm-personal-conv-item__cover">
+      <v-avatar :size="43">
+        <v-img
+            :src="withoutDialogs.avatar"
+            alt="conversation cover"
+            cover
+        >
+          <template v-slot:placeholder>
+            <skeleton-loader/>
+          </template>
+        </v-img>
+      </v-avatar>
+    </div>
+    <div class="cm-personal-conv-item__detail">
+      <div class="cm-personal-conv-item__detail-head">
+        <span :style="{color: withoutDialogs.nickname_color ? withoutDialogs.nickname_color : 'currentColor'}" class="nickname __no-wrap-txt">{{ withoutDialogs.nickname }}</span>
+      </div>
+      <div class="cm-personal-conv-item__detail-msg">
+        <div class="cm-personal-conv-item__detail-msg__content">
+          <span class="msg-wrapper">
+            <span class="msg-content __system-msg">Сообщений пока нет</span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <button class="redirect_to-conv" @click="emit('selectWithoutDialog', withoutDialogs._id)"></button>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -107,6 +157,12 @@ PersonalConv{
   border-radius: 5px;
 
   border: 1px solid gray;
+
+  transition: .3s;
+  &:hover{
+    border: 1px solid currentColor;
+  }
+
 
   .cm-personal-conv-item__cover{
     grid-column: span 1;

@@ -22,23 +22,25 @@ onUnmounted(() => {
 })
 
 onMounted(async () => {
-  if (route.query.conv){
-    await Promise.all([
-      uploadData(route.query.conv.toString()),
-      uploadDialogInfo(route.query.conv.toString())
-    ])
-  }
-  watch(
-      () => route.query.conv,
-      async (newConvId, oldConvId) => {
-        if (newConvId !== oldConvId && newConvId) {
-          await Promise.all([
-            uploadData(newConvId.toString()),
-            uploadDialogInfo(newConvId.toString())
-          ])
+  if (!cmStore.newPersonalConvOpponentUid){
+    if (route.query.conv){
+      await Promise.all([
+        uploadData(route.query.conv.toString()),
+        uploadDialogInfo(route.query.conv.toString())
+      ])
+    }
+    watch(
+        () => route.query.conv,
+        async (newConvId, oldConvId) => {
+          if (newConvId !== oldConvId && newConvId) {
+            await Promise.all([
+              uploadData(newConvId.toString()),
+              uploadDialogInfo(newConvId.toString())
+            ])
+          }
         }
-      }
-  );
+    );
+  }
 })
 
 const uploadData = async (convId: string) => {
@@ -52,7 +54,7 @@ const uploadDialogInfo = async (convId: string) => {
 </script>
 
 <template>
-  <div class="cm-main-content__wrapper">
+  <div class="cm-main-content__wrapper" v-if="!cmStore.newPersonalConvOpponentUid">
     <div class="cm-main-content" v-if="route.query.conv">
       <lazy-placeholder-loader v-if="cmStore.getDialogPend || cmStore.messagesPend"/>
 
@@ -63,6 +65,9 @@ const uploadDialogInfo = async (convId: string) => {
     <div class="cm-main-content__choose" v-if="!route.query.conv && !cmStore.compositeDialogPend">
       <h6 class="ma-0">Выберите нужный диалог 💬</h6>
     </div>
+  </div>
+  <div class="cm-main-content__wrapper" v-else>
+    новый перс диалог
   </div>
 </template>
 

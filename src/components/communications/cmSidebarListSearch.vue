@@ -1,42 +1,37 @@
 <script setup lang="ts">
-import { ref } from "vue";
-
-interface Props{
-  pending: boolean
+interface Props {
+  pending: boolean;
+  modelValue: string;
 }
-defineProps<Props>()
+
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: "updateQueryValue", value: string): void;
+  (e: "update:modelValue", value: string): void;
 }>();
 
-const q = ref<string>("");
-
 const appendSearchIconClick = () => {
-  if (q.value) {
-    q.value = "";
-    emit('updateQueryValue', q.value)
+  if (props.modelValue) {
+    emit("update:modelValue", "");
   }
 };
-
 </script>
 
 <template>
   <div class="sm-sidebar-list-search__wrapper">
     <v-text-field
-        v-model.trim="q"
+        :model-value="modelValue"
+        @update:model-value="emit('update:modelValue', $event)"
         variant="outlined"
         @keydown.enter="appendSearchIconClick"
         hide-details
         placeholder="Поиск"
-        :append-inner-icon="!q ? 'mdi-magnify' : 'mdi-close'"
+        :append-inner-icon="!modelValue ? 'mdi-magnify' : 'mdi-close'"
         @click:append-inner="appendSearchIconClick"
-        @input="emit('updateQueryValue', q)"
         :loading="pending"
     />
   </div>
 </template>
 
 <style scoped lang="scss">
-
 </style>
