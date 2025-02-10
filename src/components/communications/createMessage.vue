@@ -4,9 +4,19 @@ import {ref} from "vue";
 import {useCmStore} from "@/stores/cmStore";
 import {useNotificationStore} from "@/stores/notifications";
 import CreateMessageText from "@/components/communications/createMessageText.vue";
-import type {PersonalConv} from "@/helpers/interfaces";
+import type {FullMessage, PersonalConv, ShortUserInfo} from "@/helpers/interfaces";
+import {useRouter} from "vue-router";
+
+interface Props {
+  newConvMode?: boolean;
+  newDialogOpponent?: ShortUserInfo
+}
+
+const props = defineProps<Props>();
 
 interface PostF { id: string, file: File, previewUrl?: string, type: string }
+
+const router = useRouter()
 
 const cmStore = useCmStore();
 const ntfStore = useNotificationStore();
@@ -18,6 +28,13 @@ const msgText = ref<string>('');
 
 const handleMsg = async () => {
   if (!msgText.value.trim().length && !msgFiles.value.length) return;
+
+  if (props.newConvMode && props.newDialogOpponent) {
+    console.log('qwe')
+    await handleNewMsg()
+    return
+  }
+
   if (!cmStore.selectedDialogId || !cmStore.selectedDialog || !cmStore.messages || !cmStore.messages.length) return;
 
   let data = new FormData();
@@ -44,6 +61,30 @@ const handleMsg = async () => {
     await successSendMessage()
   }
 
+}
+
+const handleNewMsg = async () => {
+  if (!props.newConvMode || !props.newDialogOpponent) return;
+
+  let data = new FormData();
+
+  data.append("content", msgText.value.trim());
+  data.append("chatType", 'personal');
+  data.append("recipient", props.newDialogOpponent._id);
+
+  if (msgFiles.value.length > 0){
+    msgFiles.value.forEach(fileEntry => {
+      data.append(fileEntry.file.name, fileEntry.file);
+    });
+  }
+
+  const newConvData = await cmStore.createMsg(data);
+
+  if (cmStore.error){
+    ntfStore.addNotification('error', cmStore.error, 3000)
+  }else if (newConvData && !cmStore.error){
+    await router.push({query: {conv: newConvData.conversation_id}})
+  }
 }
 
 const actAttachments = () => {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FullMessage } from "@/helpers/interfaces";
+import type {FullMessage, ShortUserInfo} from "@/helpers/interfaces";
 import CreateMessage from "@/components/communications/createMessage.vue";
 import CmMessageListHead from "@/components/communications/cmMessageListHead.vue";
 import MessageItem from "@/components/communications/messageItem.vue";
@@ -7,7 +7,9 @@ import { nextTick, onMounted, ref, watch } from "vue";
 import {formatCmDividerDate} from "@/helpers/dateHelper";
 
 interface Props {
-  messages: FullMessage[];
+  messages?: FullMessage[];
+  newConvMode?: boolean;
+  newDialogOpponent?: ShortUserInfo
 }
 
 const props = defineProps<Props>();
@@ -49,6 +51,8 @@ onMounted(() => {
 });
 
 const shouldShowDateDivider = (index: number) => {
+  if (!props.messages || !props.messages.length) return
+
   if (index === 0) {
     return true;
   }
@@ -61,10 +65,10 @@ const shouldShowDateDivider = (index: number) => {
 <template>
   <div class="cm-message-list__wrapper">
     <div class="cm-message-list__head-wrap">
-      <cm-message-list-head />
+      <cm-message-list-head :new-conv-mode="newConvMode" :new-dialog-opponent="newDialogOpponent"/>
     </div>
 
-    <div class="cm-message-list__content styled-scroll__cm" ref="messageListRef">
+    <div class="cm-message-list__content styled-scroll__cm" ref="messageListRef" v-if="!newConvMode">
       <template v-for="(message, index) in props.messages" :key="message._id">
         <div v-if="shouldShowDateDivider(index)" class="msg__date-divider">
           <div class="date-divider__content">
@@ -75,9 +79,12 @@ const shouldShowDateDivider = (index: number) => {
         <message-item :m="message" />
       </template>
     </div>
+    <div class="cm-message-list__content __new_dialog" v-else>
+       <span>Сообщений пока нет</span>
+    </div>
 
     <div class="cm-message-list__create-msg-wrap">
-      <create-message />
+      <create-message :new-dialog-opponent="newDialogOpponent" :new-conv-mode="newConvMode"/>
     </div>
   </div>
 </template>
@@ -106,6 +113,14 @@ const shouldShowDateDivider = (index: number) => {
   flex-direction: column;
   overflow-y: auto;
   padding: 5px;
+
+  &.__new_dialog{
+    justify-content: center;
+    align-items: center;
+    span{
+      font-style: italic;
+    }
+  }
 }
 
 .msg__date-divider{

@@ -29,19 +29,35 @@ onMounted(async () => {
         uploadDialogInfo(route.query.conv.toString())
       ])
     }
-    watch(
-        () => route.query.conv,
-        async (newConvId, oldConvId) => {
-          if (newConvId !== oldConvId && newConvId) {
-            await Promise.all([
-              uploadData(newConvId.toString()),
-              uploadDialogInfo(newConvId.toString())
-            ])
-          }
-        }
-    );
+  }else{
+    console.log('qwe')
+    if (route.query.nConv){
+      console.log('qwe')
+      await cmStore.getNewPersonalDialogInfo(route.query.nConv.toString())
+    }
   }
 })
+
+watch(
+    () => route.query.conv,
+    async (newConvId, oldConvId) => {
+      if (newConvId !== oldConvId && newConvId) {
+        await Promise.all([
+          uploadData(newConvId.toString()),
+          uploadDialogInfo(newConvId.toString())
+        ])
+      }
+    }
+);
+
+watch(
+    () => route.query.nConv,
+    async (newNConvUid, oldNConvUid) => {
+      if (newNConvUid !== oldNConvUid && newNConvUid) {
+        await cmStore.getNewPersonalDialogInfo(newNConvUid.toString())
+      }
+    }
+);
 
 const uploadData = async (convId: string) => {
   await cmStore.getMessages(convId, page.value, LIMIT)
@@ -67,7 +83,13 @@ const uploadDialogInfo = async (convId: string) => {
     </div>
   </div>
   <div class="cm-main-content__wrapper" v-else>
-    новый перс диалог
+    <div class="cm-main-content">
+      <lazy-placeholder-loader v-if="cmStore.getNewDialogPend"/>
+
+      <cm-message-list v-if="cmStore.newDialogOpponent && !cmStore.getNewDialogPend" :new-conv-mode="true" :new-dialog-opponent="cmStore.newDialogOpponent"/>
+
+      <dialog-not-found class="__not-found" v-if="!cmStore.newDialogOpponent && !cmStore.getNewDialogPend" :new-dialog-mode="true"/>
+    </div>
   </div>
 </template>
 

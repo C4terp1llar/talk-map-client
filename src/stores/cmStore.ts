@@ -24,7 +24,7 @@ export const useCmStore = defineStore('cm', () => {
             });
 
             if (response.data && response.status === 200) {
-                console.log(response.data);
+                return response.data.message
             }
         } catch (e: any) {
             error.value = "Произошла ошибка при отправке сообщения, попробуйте позже";
@@ -152,7 +152,7 @@ export const useCmStore = defineStore('cm', () => {
     const getDialogPend = ref<boolean>(false);
 
     const getDialogInfo = async (convId: string, returns?: boolean, withoutPending?: boolean) : Promise<PersonalConv | GroupConv | void> => {
-       if (!withoutPending){
+        if (!withoutPending){
            getDialogPend.value = true;
        }
 
@@ -185,9 +185,33 @@ export const useCmStore = defineStore('cm', () => {
         messagesPendMore.value = false
         selectedDialogId.value = null
         selectedDialog.value = null
+        newDialogOpponent.value = null
     }
 
     const newPersonalConvOpponentUid = ref<string | null>(route.query.nConv ? route.query.nConv.toString() : null);
+
+    // /conv/new/:uid
+
+    const getNewDialogPend = ref<boolean>(false);
+    const newDialogOpponent = ref<ShortUserInfo | null>(null);
+
+    const getNewPersonalDialogInfo = async (opponent: string) => {
+        getNewDialogPend.value = true;
+
+        try {
+            const response = await apiAuth.get(`user/conv/new/${opponent}`)
+
+            if (response.status === 200 && response.data){
+                newDialogOpponent.value = response.data.user
+            }
+
+        } catch (e: any) {
+            console.error(e);
+            ntfStore.addNotification('error', 'Произошла ошибка при получении пользователя для нового диалога, попробуйте позже')
+        } finally {
+            getNewDialogPend.value = false;
+        }
+    }
 
     return{
         pending,
@@ -213,6 +237,8 @@ export const useCmStore = defineStore('cm', () => {
         getDialogInfo,
         compositeDialogPend,
         newPersonalConvOpponentUid,
-
+        getNewPersonalDialogInfo,
+        getNewDialogPend,
+        newDialogOpponent
     }
 });

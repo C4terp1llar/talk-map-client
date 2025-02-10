@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 
+interface Props {
+  newDialogMode?: boolean
+}
+
+defineProps<Props>()
+
 const router = useRouter();
 </script>
 

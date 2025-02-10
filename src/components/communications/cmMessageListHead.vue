@@ -2,8 +2,15 @@
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import {useCmStore} from "@/stores/cmStore";
 import {computed} from "vue";
-import type {GroupConv, PersonalConv} from "@/helpers/interfaces";
+import type {FullMessage, GroupConv, PersonalConv, ShortUserInfo} from "@/helpers/interfaces";
 import {useRoute, useRouter} from "vue-router";
+
+interface Props {
+  newConvMode?: boolean;
+  newDialogOpponent?: ShortUserInfo
+}
+
+const props = defineProps<Props>();
 
 const cmStore = useCmStore();
 
@@ -12,14 +19,24 @@ function isPersonalConv(dialog: PersonalConv | GroupConv): dialog is PersonalCon
 }
 
 const data = computed(() => {
-  const dialog = cmStore.selectedDialog;
-  if (!dialog) return null;
+  if (!props.newConvMode){
+    const dialog = cmStore.selectedDialog;
 
-  return {
-    cover: isPersonalConv(dialog) ? dialog.opponent.avatar : dialog.cover_url,
-    title: isPersonalConv(dialog) ? dialog.opponent.nickname : dialog.title,
-    titleColor: isPersonalConv(dialog) ? dialog.opponent.nickname_color : null,
-    type: isPersonalConv(dialog) ? 'personal' : 'group',
+    if (!dialog) return null;
+
+    return {
+      cover: isPersonalConv(dialog) ? dialog.opponent.avatar : dialog.cover_url,
+      title: isPersonalConv(dialog) ? dialog.opponent.nickname : dialog.title,
+      titleColor: isPersonalConv(dialog) ? dialog.opponent.nickname_color : null,
+      type: isPersonalConv(dialog) ? 'personal' : 'group',
+    }
+  }else if (props.newConvMode && props.newDialogOpponent){
+    return {
+      cover: props.newDialogOpponent.avatar,
+      title:props.newDialogOpponent.nickname,
+      titleColor: props.newDialogOpponent.nickname_color,
+      type: 'personal',
+    }
   }
 });
 
@@ -27,7 +44,7 @@ const router = useRouter();
 </script>
 
 <template>
-  <div class="cm-message-list-head__wrapper" v-if="cmStore.selectedDialog">
+  <div class="cm-message-list-head__wrapper" v-if="data">
     <button class="btn__back" @click="router.push({query: {conv: undefined}})">
       <v-icon :size="24" color="green">mdi-arrow-left-bold-outline</v-icon>
     </button>
@@ -47,7 +64,7 @@ const router = useRouter();
       <span :style="{color: data?.titleColor ? data?.titleColor : 'currentColor'}" class="nickname __no-wrap-txt">{{ data?.title }}</span>
     </div>
 
-    <button class="load-more-btn__link">
+    <button class="load-more-btn__link" v-if="!newConvMode">
       <v-icon>mdi-dots-horizontal</v-icon>
     </button>
   </div>
