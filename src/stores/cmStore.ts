@@ -23,7 +23,7 @@ export const useCmStore = defineStore('cm', () => {
                 }
             });
 
-            if (response.data && response.status === 200) {
+            if (response.data && response.status === 201) {
                 return response.data.message
             }
         } catch (e: any) {
@@ -207,7 +207,9 @@ export const useCmStore = defineStore('cm', () => {
 
         } catch (e: any) {
             console.error(e);
-            ntfStore.addNotification('error', 'Произошла ошибка при получении пользователя для нового диалога, попробуйте позже')
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при получении пользователя для нового диалога, попробуйте позже')
+            }
         } finally {
             getNewDialogPend.value = false;
         }

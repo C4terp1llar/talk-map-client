@@ -30,7 +30,6 @@ const handleMsg = async () => {
   if (!msgText.value.trim().length && !msgFiles.value.length) return;
 
   if (props.newConvMode && props.newDialogOpponent) {
-    console.log('qwe')
     await handleNewMsg()
     return
   }
@@ -80,10 +79,16 @@ const handleNewMsg = async () => {
 
   const newConvData = await cmStore.createMsg(data);
 
+  console.log(newConvData)
+
   if (cmStore.error){
     ntfStore.addNotification('error', cmStore.error, 3000)
   }else if (newConvData && !cmStore.error){
     await router.push({query: {conv: newConvData.conversation_id}})
+    cmStore.selectedDialogId = newConvData.conversation_id
+    cmStore.newPersonalConvOpponentUid = null
+    cmStore.newDialogOpponent = null
+    await cmStore.getConversations(1, 30)
   }
 }
 

@@ -42,6 +42,8 @@ watch(
     () => route.query.conv,
     async (newConvId, oldConvId) => {
       if (newConvId !== oldConvId && newConvId) {
+        cmStore.selectedDialogId = newConvId.toString();
+        cmStore.newPersonalConvOpponentUid = null;
         await Promise.all([
           uploadData(newConvId.toString()),
           uploadDialogInfo(newConvId.toString())
@@ -54,6 +56,8 @@ watch(
     () => route.query.nConv,
     async (newNConvUid, oldNConvUid) => {
       if (newNConvUid !== oldNConvUid && newNConvUid) {
+        cmStore.newPersonalConvOpponentUid= newNConvUid.toString();
+        cmStore.selectedDialogId = null;
         await cmStore.getNewPersonalDialogInfo(newNConvUid.toString())
       }
     }
