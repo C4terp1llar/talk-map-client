@@ -4,12 +4,13 @@ import CmSidebarTabs from "@/components/communications/cmSidebarTabs.vue";
 import CmSidebarList from "@/components/communications/cmSidebarList.vue";
 import CmSidebarListSearch from "@/components/communications/cmSidebarListSearch.vue";
 import CmCreateGroupWrap from "@/components/communications/cmCreateGroupWrap.vue";
+import CmSidebarHead from "@/components/communications/cmSidebarHead.vue";
 
 </script>
 
 <template>
   <div class="cm-sidebar__wrapper">
-    <cm-create-group-wrap/>
+    <cm-sidebar-head/>
     <cm-sidebar-list/>
   </div>
 </template>

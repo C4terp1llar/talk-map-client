@@ -38,6 +38,15 @@ const adjustTextareaHeight = (e: Event) => {
     textareaRef.value.style.height = `${newHeight}px`;
   }
 };
+
+const handleSendMessage = () => {
+  emit('sendMessage')
+  nextTick(() => {
+    if (textareaRef.value) {
+      textareaRef.value.style.height = "auto";
+    }
+  });
+}
 </script>
 
 <template>
@@ -62,7 +71,7 @@ const adjustTextareaHeight = (e: Event) => {
           :maxlength="1000"
       ></textarea>
 
-      <button class="create-message__action-btn" @click="emit('sendMessage')">
+      <button class="create-message__action-btn" @click="handleSendMessage">
         <v-icon :size="24">mdi-send-variant-outline</v-icon>
       </button>
     </div>

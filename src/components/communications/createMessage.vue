@@ -104,6 +104,7 @@ const clearFields = () => {
   showAttachments.value = false
   showAttachments.value = false
   msgFiles.value = []
+  msgText.value = '.'
   msgText.value = ''
 }
 
