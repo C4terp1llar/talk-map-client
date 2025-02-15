@@ -280,3 +280,11 @@ export interface ReadersFullInfo{
     read: boolean,
     userInfo: Omit<ShortUserInfo, '_id'>
 }
+
+export interface ConvMemberInfo {
+    _id: string,
+    nickname: string,
+    nickname_color: string | null,
+    avatar: string,
+    role: 'owner' | 'admin' | 'member'
+}

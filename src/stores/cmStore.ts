@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
 import {useNotificationStore} from "@/stores/notifications";
-import type {FullMessage, GroupConv, PersonalConv, ShortUserInfo} from "@/helpers/interfaces";
+import type {ConvMemberInfo, FullMessage, GroupConv, PersonalConv, ShortUserInfo} from "@/helpers/interfaces";
 import {useRoute} from "vue-router";
 
 export const useCmStore = defineStore('cm', () => {
@@ -215,6 +215,28 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const getGroupMembers = async (convId: string, page: number, limit: number) :Promise<{members: ConvMemberInfo[], sender: ConvMemberInfo, hasMore: boolean} | void> => {
+
+        try {
+            const response = await apiAuth.get(`user/conv/${convId}/members`, {
+                params: {
+                    page, limit
+                }
+            })
+
+            if (response.status === 200 && response.data){
+                console.log(response.data)
+                return response.data;
+            }
+
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при получении участников группы, попробуйте позже')
+            }
+        }
+    }
+
     return{
         pending,
         error,
@@ -241,6 +263,7 @@ export const useCmStore = defineStore('cm', () => {
         newPersonalConvOpponentUid,
         getNewPersonalDialogInfo,
         getNewDialogPend,
-        newDialogOpponent
+        newDialogOpponent,
+        getGroupMembers
     }
 });

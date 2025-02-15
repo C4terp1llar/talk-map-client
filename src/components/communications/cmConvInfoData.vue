@@ -29,12 +29,14 @@ const componentsMap: Record<Tab, Component> = {
 </script>
 
 <template>
-  <div class="cm-conv-info-data__wrapper">
+  <div class="cm-conv-info-data__wrapper styled-scroll__np">
 
     <div class="cm-conv-info-data__content">
-      <cm-conv-info-tabs :conv-id="convId" :conv-type="convType"/>
+      <cm-conv-info-tabs class="conv-info__tabs" :conv-id="convId" :conv-type="convType"/>
 
-      <component :is="componentsMap[activeTab]" />
+      <div class="conv-info__data">
+        <component :is="componentsMap[activeTab]" v-bind="{ convId, convType }"/>
+      </div>
     </div>
 
   </div>
@@ -46,8 +48,10 @@ const componentsMap: Record<Tab, Component> = {
   width: 100%;
   padding: 0 5px 5px 5px;
   display: grid;
-  .cm-conv-info-data__content{
 
+  .cm-conv-info-data__content{
+    display: grid;
+    grid-template-rows: auto 1fr;
   }
 }
 </style>

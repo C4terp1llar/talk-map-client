@@ -42,7 +42,7 @@ const route = useRoute()
 </script>
 
 <template>
-  <div class="cm-conv-info__wrapper" v-if="currentConv">
+  <div class="cm-conv-info__wrapper styled-scroll" v-if="currentConv">
     <div class="back__btn">
       <button @click="router.push({query: {...route.query, info: undefined}})"></button>
       <v-icon :size="24" color="green">mdi-arrow-left-bold-outline</v-icon>
@@ -59,6 +59,7 @@ const route = useRoute()
   width: 100%;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .back__btn{
