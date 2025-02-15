@@ -41,6 +41,8 @@ const data = computed(() => {
 });
 
 const router = useRouter();
+const route = useRoute();
+
 </script>
 
 <template>
@@ -64,7 +66,7 @@ const router = useRouter();
       <span :style="{color: data?.titleColor ? data?.titleColor : 'currentColor'}" class="nickname __no-wrap-txt">{{ data?.title }}</span>
     </div>
 
-    <button class="load-more-btn__link" v-if="!newConvMode">
+    <button class="load-more-btn__link" v-if="!newConvMode" @click="router.push({query: { ...route.query ,info: 'true'}})">
       <v-icon>mdi-dots-horizontal</v-icon>
     </button>
   </div>

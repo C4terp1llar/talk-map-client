@@ -9,6 +9,7 @@ import CmMessageList from "@/components/communications/cmMessageList.vue";
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 import NotFoundTemplate from "@/components/notFoundTemplate.vue";
 import DialogNotFound from "@/components/communications/dialogNotFound.vue";
+import CmConvInfo from "@/components/communications/cmConvInfo.vue";
 
 const route = useRoute();
 const cmStore = useCmStore();
@@ -30,9 +31,7 @@ onMounted(async () => {
       ])
     }
   }else{
-    console.log('qwe')
     if (route.query.nConv){
-      console.log('qwe')
       await cmStore.getNewPersonalDialogInfo(route.query.nConv.toString())
     }
   }
@@ -78,7 +77,8 @@ const uploadDialogInfo = async (convId: string) => {
     <div class="cm-main-content" v-if="route.query.conv">
       <lazy-placeholder-loader v-if="cmStore.getDialogPend || cmStore.messagesPend"/>
 
-      <cm-message-list v-if="cmStore.messages && (!cmStore.getDialogPend && !cmStore.messagesPend)" :messages="cmStore.messages"/>
+      <cm-message-list v-if="cmStore.messages && (!cmStore.getDialogPend && !cmStore.messagesPend) && !route.query.info" :messages="cmStore.messages"/>
+      <cm-conv-info v-if="cmStore.messages && (!cmStore.getDialogPend && !cmStore.messagesPend) && route.query.info"/>
 
       <dialog-not-found class="__not-found" v-if="!cmStore.messages && !cmStore.getDialogPend && !cmStore.messagesPend"/>
     </div>
