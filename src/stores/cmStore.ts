@@ -237,6 +237,62 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const changeMemberRole = async (convId: string, targetMember: string, role: 'admin' | 'owner' | 'member') => {
+
+        try {
+            const response = await apiAuth.patch(`user/conv/${convId}/members/role`, {
+                targetMember, role
+            })
+
+            if (response.status === 200 && response.data){
+                console.log(response.data)
+            }
+
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при изменении роли участника, попробуйте позже')
+            }
+        }
+    }
+
+    const kickGroupMember = async (convId: string, targetMember: string) => {
+
+        try {
+            const response = await apiAuth.delete(`user/conv/${convId}/members/${targetMember}`)
+
+            if (response.status === 200 && response.data){
+                console.log(response.data)
+            }
+
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при исключении участника, попробуйте позже')
+            }
+        }
+    }
+
+    const reloadMessagesAndDialogs = async () => {
+        if (!selectedDialogId.value || !selectedDialog.value || !messages.value || !messages.value.length || !conversations.value || !conversations.value.length) return;
+
+        const [dialog] = await Promise.all([
+            getDialogInfo(selectedDialogId.value, true, true),
+            getMessages(selectedDialogId.value, 1 ,200 , true)
+        ])
+
+        if (dialog) {
+            const index = conversations.value.findIndex((conv) => conv._id === selectedDialogId.value);
+
+            if (index !== -1) {
+                conversations.value.splice(index, 1);
+                conversations.value.unshift(dialog);
+            } else {
+                conversations.value.unshift(dialog);
+            }
+        }
+    }
+
     return{
         pending,
         error,
@@ -264,6 +320,9 @@ export const useCmStore = defineStore('cm', () => {
         getNewPersonalDialogInfo,
         getNewDialogPend,
         newDialogOpponent,
-        getGroupMembers
+        getGroupMembers,
+        changeMemberRole,
+        kickGroupMember,
+        reloadMessagesAndDialogs
     }
 });

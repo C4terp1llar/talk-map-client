@@ -2,14 +2,20 @@
 import type {ConvMemberInfo, ShortFriend} from "@/helpers/interfaces";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import TextDivider from "@/components/common/textDivider.vue";
-import {computed} from "vue";
+import {computed, ref} from "vue";
 import GroupMembersItemMenu from "@/components/communications/groupMembersItemMenu.vue";
 
+const emit = defineEmits<{
+  (e: 'reload'): void,
+}>()
+
+const isMenuVisible = ref(false);
 
 interface Props {
   member: ConvMemberInfo,
   mode: 'me' | 'other',
   senderRole: 'owner' | 'admin' | 'member';
+  convId: string;
 }
 
 const props = defineProps<Props>()
@@ -33,6 +39,12 @@ const userRolesMap = {
 };
 
 const roleInfo = computed(() => userRolesMap[props.member.role] || {});
+
+const handleMenuClose = () => {
+  setTimeout(() => {
+    isMenuVisible.value = false
+  })
+}
 </script>
 
 <template>
@@ -69,14 +81,14 @@ const roleInfo = computed(() => userRolesMap[props.member.role] || {});
       </div>
     </div>
 
-    <div class="members-actions" v-if="mode === 'me' || senderRole === 'admin' || senderRole === 'owner'">
-      <v-btn icon density="compact" class="ml-3" variant="text">
+    <div class="members-actions" v-if="mode === 'me' || (senderRole === 'admin' && member.role === 'member') || senderRole === 'owner'">
+      <v-btn icon density="compact" class="ml-3" variant="text" @click="isMenuVisible = true">
         <v-icon>mdi-dots-horizontal</v-icon>
       </v-btn>
     </div>
 
-    <div class="members-actions__menu">
-      <group-members-item-menu :mode="mode" :member="member" :sender-role="senderRole"/>
+    <div class="members-actions__menu" v-if="isMenuVisible">
+      <group-members-item-menu @reload="emit('reload')" :conv-id="convId" @close="handleMenuClose" :mode="mode" :member="member" :sender-role="senderRole"/>
     </div>
   </div>
 </template>
@@ -93,7 +105,9 @@ const roleInfo = computed(() => userRolesMap[props.member.role] || {});
 
   .members-actions__menu{
     position: absolute;
-    top: 110%;
+    top: 80%;
+    right: 0;
+    z-index: 10;
   }
 
   .cm-group-members-item__main-content {

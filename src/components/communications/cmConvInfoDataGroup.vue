@@ -32,25 +32,32 @@ const hasMore = ref<boolean>(false);
 const sender = ref<ConvMemberInfo | null>(null);
 const members = ref<ConvMemberInfo[] | null>(null);
 
-const uploadData = async (mode: 'load' | 'more') => {
-  if (mode === 'more'){
+const uploadData = async (mode: 'load' | 'more', withoutPending?: boolean) => {
+  if (mode === 'more') {
     page.value += 1;
   }
+
   const currPending = page.value < 2 ? pending : pendingMore;
 
-  currPending.value = true;
+  if (!withoutPending) {
+    currPending.value = true;
+  }
   const data = await cmStore.getGroupMembers(props.convId, page.value, LIMIT)
   currPending.value = false;
 
   if (data && data.members && data.members.length && data.sender) {
     sender.value = data.sender;
     hasMore.value = data.hasMore;
-    if (page.value < 2){
+    if (page.value < 2) {
       members.value = data.members;
-    }else if (members.value && page.value >= 2){
+    } else if (members.value && page.value >= 2) {
       members.value.push(...data.members);
     }
   }
+}
+
+const reloadData = async () => {
+  await uploadData('load', true)
 }
 </script>
 
@@ -60,10 +67,12 @@ const uploadData = async (mode: 'load' | 'more') => {
     <lazy-placeholder-loader v-if="pending"/>
 
     <div class="members-list" v-if="!pending && members && members.length && sender">
-      <group-members-item mode="me" :sender-role="sender.role" :member="sender"/>
+      <group-members-item @reload="reloadData" mode="me" :conv-id="convId" :sender-role="sender.role"
+                          :member="sender"/>
 
       <text-divider text="Участники"/>
-      <group-members-item mode="other" :sender-role="sender.role" v-for="m in members" :member="m" :key="m._id"/>
+      <group-members-item @reload="reloadData" mode="other" :conv-id="convId" :sender-role="sender.role"
+                          v-for="m in members" :member="m" :key="m._id"/>
 
       <div class="controls  mt-1 d-flex justify-content-center">
         <v-btn
@@ -87,7 +96,7 @@ const uploadData = async (mode: 'load' | 'more') => {
 </template>
 
 <style scoped lang="scss">
-.cm-conv-info-data-group{
+.cm-conv-info-data-group {
   display: grid;
   height: 100%;
 }
