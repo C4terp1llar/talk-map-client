@@ -67,6 +67,9 @@ const activeTab = computed(() => route.query.tab as Tab || (props.convType === '
 .wrapper-settings-tabs__main  {
   width: 100%;
   display: grid;
+  position: sticky;
+  top: 5px;
+  background: rgb(var(--v-theme-background));
 
   .tabs {
     height: auto;

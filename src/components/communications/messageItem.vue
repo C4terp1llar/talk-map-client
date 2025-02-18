@@ -80,10 +80,11 @@ const crSendTime = computed(() => {
   .message-item__system{
     display: flex;
     justify-content: center;
+    margin: 5px 0;
     .message-item__system-content{
       padding: 2px 10px;
       border-radius: 15px;
-      box-shadow: 0 0 5px;
+      border: 1px solid seagreen;
       text-align: center;
     }
   }
@@ -110,7 +111,7 @@ const crSendTime = computed(() => {
       flex-direction: column;
       padding: 5px;
       border-radius: 10px;
-      box-shadow: 0 0 5px;
+      border: 1px solid grey;
 
       .message-item__media-wrap{
         display: flex;

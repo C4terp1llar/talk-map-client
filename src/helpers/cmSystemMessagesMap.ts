@@ -58,6 +58,14 @@ const systemMessageHandlers: Record<string, SystemMessageHandler> = {
         return `${senderName} исключил(а) участника из группы`;
     },
 
+    leave_group: (msg) => {
+        const senderName = "sender_nickname" in msg
+            ? msg.sender_nickname
+            : msg.sender.nickname;
+
+        return `${senderName} вышел(а) из группы`;
+    },
+
 };
 
 export function adaptSystemMessages(msg: LastDialogMessage | FullMessage): string {

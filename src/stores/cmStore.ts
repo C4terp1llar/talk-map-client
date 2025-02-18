@@ -2,7 +2,14 @@ import {defineStore} from "pinia";
 import {ref} from "vue";
 import apiAuth from "@/utils/apiAuth";
 import {useNotificationStore} from "@/stores/notifications";
-import type {ConvMemberInfo, FullMessage, GroupConv, PersonalConv, ShortUserInfo} from "@/helpers/interfaces";
+import type {
+    ConvMemberInfo,
+    FullMessage,
+    GroupConv,
+    MediaConvInfo,
+    PersonalConv,
+    ShortUserInfo
+} from "@/helpers/interfaces";
 import {useRoute} from "vue-router";
 
 export const useCmStore = defineStore('cm', () => {
@@ -225,7 +232,6 @@ export const useCmStore = defineStore('cm', () => {
             })
 
             if (response.status === 200 && response.data){
-                console.log(response.data)
                 return response.data;
             }
 
@@ -245,7 +251,7 @@ export const useCmStore = defineStore('cm', () => {
             })
 
             if (response.status === 200 && response.data){
-                console.log(response.data)
+                return response.data
             }
 
         } catch (e: any) {
@@ -262,13 +268,46 @@ export const useCmStore = defineStore('cm', () => {
             const response = await apiAuth.delete(`user/conv/${convId}/members/${targetMember}`)
 
             if (response.status === 200 && response.data){
-                console.log(response.data)
+                return response.data
             }
 
         } catch (e: any) {
             console.error(e);
             if (e.response.status === 500){
                 ntfStore.addNotification('error', 'Произошла ошибка при исключении участника, попробуйте позже')
+            }
+        }
+    }
+
+    const leaveGroup = async (convId: string) => {
+        try {
+            const response = await apiAuth.delete(`user/conv/${convId}/leave`)
+
+            if (response.status === 200 && response.data){
+                return response.data
+            }
+
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при выходе из группы, попробуйте позже')
+            }
+        }
+    }
+
+
+    const getGroupMedia = async (convId: string, mode: 'image' | 'video' | 'files', page: number, limit: number) :Promise<{media: MediaConvInfo[], hasMore: boolean} | void> => {
+        try {
+            const response = await apiAuth.get(`user/conv/${convId}/media`, {params: {mode, page, limit}})
+
+            if (response.status === 200 && response.data){
+                return response.data
+            }
+
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при получении медиа из диалога, попробуйте позже')
             }
         }
     }
@@ -280,6 +319,23 @@ export const useCmStore = defineStore('cm', () => {
             getDialogInfo(selectedDialogId.value, true, true),
             getMessages(selectedDialogId.value, 1 ,200 , true)
         ])
+
+        if (dialog) {
+            const index = conversations.value.findIndex((conv) => conv._id === selectedDialogId.value);
+
+            if (index !== -1) {
+                conversations.value.splice(index, 1);
+                conversations.value.unshift(dialog);
+            } else {
+                conversations.value.unshift(dialog);
+            }
+        }
+    }
+
+    const reloadDialogs = async () =>  {
+        if (!selectedDialogId.value || !selectedDialog.value || !conversations.value || !conversations.value.length) return;
+
+        const dialog = await getDialogInfo(selectedDialogId.value, true, true)
 
         if (dialog) {
             const index = conversations.value.findIndex((conv) => conv._id === selectedDialogId.value);
@@ -323,6 +379,9 @@ export const useCmStore = defineStore('cm', () => {
         getGroupMembers,
         changeMemberRole,
         kickGroupMember,
-        reloadMessagesAndDialogs
+        leaveGroup,
+        getGroupMedia,
+        reloadMessagesAndDialogs,
+        reloadDialogs
     }
 });

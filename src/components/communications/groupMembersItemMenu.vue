@@ -3,6 +3,7 @@ import type {ConvMemberInfo} from "@/helpers/interfaces";
 import {ref} from "vue";
 import {onClickOutside} from "@vueuse/core";
 import {useCmStore} from "@/stores/cmStore";
+import {useRouter} from "vue-router";
 
 const emit = defineEmits<{
   (e: 'close'): void,
@@ -41,6 +42,19 @@ const handleKickMember = async (pendString: string) => {
   await end()
 }
 
+const router = useRouter();
+const handleGroupOut = async (pendString: string) => {
+  disableFlag.value = true;
+  pending.value = `${pendString}&${props.member._id}`;
+  await cmStore.leaveGroup(props.convId);
+  emit('close')
+  await router.push({query: undefined})
+  await cmStore.getConversations(1, 30)
+  pending.value = '';
+  disableFlag.value = false;
+}
+
+
 const start = (pendString: string) => {
   disableFlag.value = true;
   pending.value = `${pendString}&${props.member._id}`;
@@ -49,6 +63,7 @@ const end = async () => {
   emit('reload')
   emit('close')
   await cmStore.reloadMessagesAndDialogs();
+  pending.value = ''
   disableFlag.value = false;
 }
 </script>
@@ -60,7 +75,7 @@ const end = async () => {
            v-if="member.role === 'member' && senderRole === 'owner' && mode === 'other'"
            @click="handleChangeRole('admin', 'make_admin')" :loading="pending === `make_admin&${member._id}`"
     >
-      Сделать админом
+      Дать админа
     </v-btn>
 
     <v-btn class="text-none" density="comfortable" variant="outlined" color="warning" :disabled="disableFlag"
@@ -77,7 +92,11 @@ const end = async () => {
       Исключить
     </v-btn>
 
-    <v-btn class="text-none" density="comfortable" variant="outlined" v-if="mode === 'me'" :disabled="disableFlag" :loading="pending === `out_group&${member._id}`" color="danger">Выйти</v-btn>
+    <v-btn class="text-none" density="comfortable" variant="outlined" v-if="mode === 'me'" :disabled="disableFlag"
+           :loading="pending === `out_group&${member._id}`" color="danger" @click="handleGroupOut"
+    >
+      Выйти
+    </v-btn>
   </div>
 </template>
 
@@ -89,7 +108,7 @@ const end = async () => {
   padding: 8px;
   display: flex;
   flex-direction: column;
-  width: 200px;
+  width: 150px;
   gap: 5px;
 }
 </style>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useCmStore} from "@/stores/cmStore";
-import {onMounted, ref} from "vue";
+import {type Component, onMounted, ref} from "vue";
 import type {ConvMemberInfo} from "@/helpers/interfaces";
 import LazyPlaceholderLoader from "@/components/common/lazyPlaceholderLoader.vue";
 import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
@@ -8,6 +8,7 @@ import PhotosNotFound from "@/components/photos/photosNotFound.vue";
 import PhotosListItem from "@/components/photos/photosListItem.vue";
 import GroupMembersItem from "@/components/communications/groupMembersItem.vue";
 import TextDivider from "@/components/common/textDivider.vue";
+import CmConvInfoDataMedias from "@/components/communications/cmConvInfoDataMedias.vue";
 
 interface Props {
   convId: string,
@@ -59,6 +60,7 @@ const uploadData = async (mode: 'load' | 'more', withoutPending?: boolean) => {
 const reloadData = async () => {
   await uploadData('load', true)
 }
+
 </script>
 
 <template>
@@ -66,13 +68,13 @@ const reloadData = async () => {
 
     <lazy-placeholder-loader v-if="pending"/>
 
-    <div class="members-list" v-if="!pending && members && members.length && sender">
+    <div class="members-list" v-if="!pending && members && sender">
       <group-members-item @reload="reloadData" mode="me" :conv-id="convId" :sender-role="sender.role"
                           :member="sender"/>
 
-      <text-divider text="Участники"/>
+      <text-divider text="Участники" v-if="members.length"/>
       <group-members-item @reload="reloadData" mode="other" :conv-id="convId" :sender-role="sender.role"
-                          v-for="m in members" :member="m" :key="m._id"/>
+                          v-for="m in members" :member="m" :key="m._id" v-if="members.length"/>
 
       <div class="controls  mt-1 d-flex justify-content-center">
         <v-btn
@@ -89,15 +91,23 @@ const reloadData = async () => {
       <pagination-dot-loader class="mt-1" v-if="pendingMore"/>
     </div>
 
-    <div class="__no d-flex align-self-center text-center" v-if="pending && members && !members.length && !sender">
+    <div class="__no d-flex align-self-center text-center" v-if="!pending && !members && !sender">
       <h6>Что-то пошло не так...</h6>
     </div>
   </div>
+
 </template>
 
 <style scoped lang="scss">
 .cm-conv-info-data-group {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   height: 100%;
+}
+.qwe{
+  position: absolute;
+  height: 100%;
+  inset: 0;
+  background-color: #4caf50;
 }
 </style>

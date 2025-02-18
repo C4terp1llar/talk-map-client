@@ -288,3 +288,15 @@ export interface ConvMemberInfo {
     avatar: string,
     role: 'owner' | 'admin' | 'member'
 }
+
+export interface MediaConvInfo {
+    _id: string,
+    user_id: string,
+    conversation_id: string,
+    client_filename: string,
+    client_file_size: number,
+    store_url: string,
+    createdAt: Date
+    sender: ShortUserInfo
+}
+
