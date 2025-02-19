@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {MediaConvInfo} from "@/helpers/interfaces";
+import {getFileSize} from "../../../helpers/getFileSize";
 
 interface Props {
   m: MediaConvInfo;
@@ -15,6 +16,7 @@ const props = defineProps<Props>();
       <a :href="m.store_url" target="_blank"></a>
     </div>
     <span class="file__name">{{ m.client_filename }}</span>
+    <div class="file__size"><span>{{getFileSize(m.client_file_size)}}</span></div>
   </div>
 </template>
 
@@ -23,7 +25,7 @@ const props = defineProps<Props>();
   border: 1px solid grey;
   border-radius: 5px;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   padding: 5px;
 
@@ -45,6 +47,11 @@ const props = defineProps<Props>();
     }
   }
 
+  .file__size{
+    margin-left: 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
 }
 
 .file__name {

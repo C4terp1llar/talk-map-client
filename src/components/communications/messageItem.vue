@@ -53,7 +53,7 @@ const crSendTime = computed(() => {
           {{ m.sender.nickname }}
         </span>
 
-        <message-item-media :m="m.mediaInfo"/>
+        <message-item-media class="mb-1" :m="m.mediaInfo"/>
 
         <div class="msg-text__wrapper">
           <span class="msg-text" v-if="m.content">{{ m.content }}</span>
@@ -137,6 +137,7 @@ const crSendTime = computed(() => {
       .msg-text__wrapper{
         display: flex;
         flex-wrap: wrap;
+        margin-left: 5px;
       }
     }
   }
