@@ -59,7 +59,12 @@ onUnmounted(() => {
   box-shadow: 0 1px 10px currentColor;
 
   @media (max-width: 650px) {
-    padding: 5px 5px 90px 5px;
+    :not(.communications__wrapper){
+      padding: 5px 5px 90px 5px;
+      margin: 5px;
+    }
+    padding: 0 0 80px 0;
+    margin: 0 5px 5px 5px;
   }
 }
 

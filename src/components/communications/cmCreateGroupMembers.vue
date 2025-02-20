@@ -9,18 +9,22 @@ import PaginationDotLoader from "@/components/common/paginationDotLoader.vue";
 import CmGroupMembersItem from "@/components/communications/cmGroupMembersItem.vue";
 import TextDivider from "@/components/common/textDivider.vue";
 import {debounce} from "perfect-debounce";
+import {useCmStore} from "@/stores/cmStore";
 
 interface Props{
-  errors?: string[]
+  errors?: string[],
+  addNewMembers?: boolean,
+  convId?: string,
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
   (e: 'selectMemberUpdate', members: string[]): void
 }>()
 
 const frStore = useFriendsStore();
+const cmStore = useCmStore();
 
 const LIMIT = 10
 const page = ref<number>(1);
@@ -47,7 +51,12 @@ const uploadData = async (mode: 'load' | 'load-more') => {
 
   if (!q.value) crPending.value = true;
 
-  const data = await frStore.getFriends(crPage, LIMIT, q.value);
+  let data
+  if (props.addNewMembers && props.convId){
+    data = await cmStore.getNewMembers(props.convId, crPage, LIMIT, q.value)
+  }else{
+    data = await frStore.getFriends(crPage, LIMIT, q.value);
+  }
 
   crPending.value = false;
   qPending.value = false;
@@ -110,18 +119,18 @@ const debouncedOperation = debounce(async () => {
 </script>
 
 <template>
-  <div class="cm-create-group-members">
+  <div :class="['cm-create-group-members', {'__exiting_group': addNewMembers}]">
     <short-friend-inline-skeleton v-for="i in 3" :key="i" class="mt-2 mb-2" v-if="pending && !firstLoadResulted"/>
 
-    <div class="cm-create-group-members__selected-members styled-scroll__np __list" v-if="newGroupMembersInfo.length">
-      <text-divider class="mt-2" text="Выбранные участники"/>
+    <div :class="['cm-create-group-members__selected-members styled-scroll__np __list', {'__add-new__added': addNewMembers}]" v-if="newGroupMembersInfo.length">
+      <text-divider class="mt-2" :text="addNewMembers ? 'Новые участники' : 'Выбранные участники'"/>
 
       <cm-group-members-item v-for="m in newGroupMembersInfo" :key="m.user_id" :member="m" :is-select-mode="true"
                              :group-members="newGroupMembers" @act-select-member="f => actSelectMember(f)"/>
     </div>
 
     <div class="cm-create-group-members__content" v-if="friends">
-      <text-divider text="Участники" class="mt-2 mb-2"/>
+      <text-divider v-if="!addNewMembers" text="Участники" class="mt-2 mb-2"/>
 
       <v-text-field
           v-if="firstLoadResulted"
@@ -137,7 +146,7 @@ const debouncedOperation = debounce(async () => {
           :error-messages="errors"
       />
 
-      <div class="cm-create-group-members__content-members styled-scroll __list" v-if="friends.length">
+      <div :class="['cm-create-group-members__content-members styled-scroll __list', {'__add-new': addNewMembers}]" v-if="friends.length">
         <cm-group-members-item v-for="f in friends" :key="f.user_id" :member="f" :is-select-mode="true"
                                :group-members="newGroupMembers" @act-select-member="m => actSelectMember(m)"/>
 
@@ -164,9 +173,24 @@ const debouncedOperation = debounce(async () => {
 </template>
 
 <style scoped lang="scss">
+.cm-create-group-members{
+  &.__exiting_group{
+    padding: 0 5px;
+  }
+}
+
 .__list{
+  &.__add-new{
+    max-height: unset;
+    overflow: unset;
+    padding: unset;
+  }
+  &.__add-new__added{
+    padding: 0 1px;
+  }
   max-height: 500px;
   overflow: auto;
   padding: 0 5px;
 }
+
 </style>

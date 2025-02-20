@@ -76,7 +76,7 @@ const handleSelectWithoutDialog = async (uid: string) => {
 
     <div class="cm-sidebar-list__content" v-if="!pending && cmStore.conversations">
 
-      <div class="cm-conversations-list__not-found" v-if="!cmStore.conversations.length && (cmStore.withoutConversations && !cmStore.withoutConversations.length)">
+      <div class="cm-conversations-list__not-found" v-if="!cmStore.conversations.length && (!cmStore.withoutConversations || (cmStore.withoutConversations && !cmStore.withoutConversations.length))">
         <span v-if="querySearchFlag">Ничего не нашлось 🔍</span>
         <span v-else>У вас нет диалогов. Напишите кому-нибудь ✏️</span>
       </div>
@@ -109,7 +109,6 @@ const handleSelectWithoutDialog = async (uid: string) => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 5px;
 
   .cm-sidebar-list__content {
     height: 100%;

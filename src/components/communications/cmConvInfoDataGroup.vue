@@ -68,6 +68,13 @@ const reloadData = async () => {
 
     <lazy-placeholder-loader v-if="pending"/>
 
+    <v-btn
+        v-if="!pending && sender && (sender.role === 'owner' || sender.role === 'admin')"
+        prepend-icon="mdi-account-multiple-plus" class="text-none mt-2"
+        rounded @click="cmStore.addMembersFlag = true" :loading="cmStore.addMembersPend"
+        :disabled="cmStore.addMembersPend"
+    >Добавить участников</v-btn>
+
     <div class="members-list" v-if="!pending && members && sender">
       <group-members-item @reload="reloadData" mode="me" :conv-id="convId" :sender-role="sender.role"
                           :member="sender"/>

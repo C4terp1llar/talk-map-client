@@ -27,7 +27,7 @@ const componentsMap: Record<Tab, Component> = {
 </script>
 
 <template>
-  <div class="cm-conv-info-data__wrapper styled-scroll__np">
+  <div class="cm-conv-info-data__wrapper">
     <div class="cm-conv-info-data__content">
       <cm-conv-info-tabs class="conv-info__tabs" :conv-id="convId" :conv-type="convType"/>
 

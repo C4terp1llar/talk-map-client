@@ -1,4 +1,4 @@
-import type { FullMessage, LastDialogMessage } from "@/helpers/interfaces";
+import type {FullMessage, LastDialogMessage} from "@/helpers/interfaces";
 
 type SystemMessageHandler = (msg: LastDialogMessage | FullMessage) => string;
 
@@ -64,6 +64,33 @@ const systemMessageHandlers: Record<string, SystemMessageHandler> = {
             : msg.sender.nickname;
 
         return `${senderName} вышел(а) из группы`;
+    },
+
+    add_members: (msg) => {
+        const senderName = "sender_nickname" in msg
+            ? msg.sender_nickname
+            : msg.sender.nickname;
+
+        if (msg.additionalInfo) {
+            const addedUsersInfo = msg.additionalInfo.split(":")[1];
+            if (addedUsersInfo) {
+                return `${senderName} добавил(а) ${addedUsersInfo} в группу`;
+            }
+        }
+        return `${senderName} добавил(а) новых участников в группу`;
+    },
+
+    change_title: (msg) => {
+        const senderName = "sender_nickname" in msg
+            ? msg.sender_nickname
+            : msg.sender.nickname;
+
+        if (msg.additionalInfo) {
+            const newTitle = msg.additionalInfo.split("^&^")[1] || "неизвестное название";
+            return `${senderName} изменил(а) название группы на «${newTitle}»`;
+        }
+
+        return `${senderName} изменил(а) название группы`;
     },
 
 };

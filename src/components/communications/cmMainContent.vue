@@ -106,6 +106,10 @@ const uploadDialogInfo = async (convId: string) => {
   background: rgb(var(--v-theme-background));
   overflow: hidden;
 
+  @media (max-width: 650px) {
+    border: 1px solid unset;
+  }
+
   .cm-main-content{
     height: 100%;
     width: 100%;

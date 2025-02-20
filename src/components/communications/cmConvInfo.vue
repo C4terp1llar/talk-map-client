@@ -5,6 +5,7 @@ import {computed} from "vue";
 import CmConvInfoHead from "@/components/communications/cmConvInfoHead.vue";
 import {useRoute, useRouter} from "vue-router";
 import CmConvInfoData from "@/components/communications/cmConvInfoData.vue";
+import AddGroupMembers from "@/components/communications/addGroupMembers.vue";
 
 const cmStore = useCmStore();
 
@@ -42,7 +43,7 @@ const route = useRoute()
 </script>
 
 <template>
-  <div class="cm-conv-info__wrapper styled-scroll" v-if="currentConv">
+  <div class="cm-conv-info__wrapper styled-scroll__cm" v-if="currentConv && !cmStore.addMembersFlag">
     <div class="back__btn">
       <button @click="router.push({query: {...route.query, info: undefined}})"></button>
       <v-icon :size="24" color="green">mdi-arrow-left-bold-outline</v-icon>
@@ -50,6 +51,9 @@ const route = useRoute()
     </div>
     <cm-conv-info-head :data="currentConv"/>
     <cm-conv-info-data :conv-type="currentConv.type" :conv-id="currentConv._id"/>
+  </div>
+  <div class="cm-conv-info__wrapper styled-scroll__cm" v-if="currentConv && cmStore.addMembersFlag">
+    <add-group-members :conv-id="currentConv._id"/>
   </div>
 </template>
 

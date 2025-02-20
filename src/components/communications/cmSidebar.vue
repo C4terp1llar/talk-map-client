@@ -19,11 +19,14 @@ import CmSidebarHead from "@/components/communications/cmSidebarHead.vue";
 .cm-sidebar__wrapper {
   height: 100%;
   grid-column: span 1;
-  border: 1px solid gray;
   border-radius: 15px;
   background: rgb(var(--v-theme-background));
 
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 650px) {
+    padding: 0 5px 0 5px;
+  }
 }
 </style>

@@ -7,7 +7,7 @@ import type {
     FullMessage,
     GroupConv,
     MediaConvInfo,
-    PersonalConv,
+    PersonalConv, ShortFriend,
     ShortUserInfo
 } from "@/helpers/interfaces";
 import {useRoute} from "vue-router";
@@ -349,6 +349,78 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const addMembersFlag = ref<boolean>(false)
+
+    const getNewMembers = async (convId: string, page: number, limit: number, q?: string): Promise<{friends: ShortFriend[] | null, hasMore: boolean}> => {
+        try {
+            const response = await apiAuth.get(`user/conv/${convId}/new/members`, {
+                params: {
+                    q, page, limit
+                }
+            })
+
+            if (response.status === 200 && response.data){
+                return {friends: response.data.friends, hasMore: response.data.hasMore}
+            }
+            return {friends: null, hasMore: false}
+        } catch (e: any) {
+            console.error(e);
+            return {friends: null, hasMore: false}
+        }
+    }
+
+    const addMembersPend = ref<boolean>(false)
+
+    const addNewMembers = async (convId: string, members: string[]) => {
+        try {
+            addMembersPend.value = true;
+            const response = await apiAuth.post(`user/conv/${convId}/new/members`, {
+                members
+            })
+
+            if(response.status === 200){
+                ntfStore.addNotification('success', `${members.length >= 2 ? 'Участники успешно добавлены!' : 'Участник успешно добавлен!'}`)
+            }
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при добавлении участников, попробуйте позже')
+            }
+        }finally{
+            addMembersPend.value = false;
+        }
+    }
+
+    const getMembersMe = async (convId: string) :Promise<{user_id: string, role: 'owner' | 'admin' | 'member', canChange: boolean} | void> => {
+        try {
+            const response = await apiAuth.get(`user/conv/${convId}/members/me`)
+
+            if(response.status === 200 && response.data){
+                return {...response.data, canChange: ((response.data.role === 'owner' || response.data.role === 'admin'))};
+            }
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при получении информации о учаснике, попробуйте позже')
+            }
+        }
+    }
+
+    const changeGroupTitle = async (convId: string, newTitle: string) :Promise<string | void> => {
+        try {
+            const response = await apiAuth.patch(`user/conv/${convId}/title`, {newTitle})
+
+            if(response.status === 200 && response.data){
+                return newTitle.trim()
+            }
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при изменении названия группы, попробуйте позже')
+            }
+        }
+    }
+
     return{
         pending,
         error,
@@ -382,6 +454,12 @@ export const useCmStore = defineStore('cm', () => {
         leaveGroup,
         getGroupMedia,
         reloadMessagesAndDialogs,
-        reloadDialogs
+        reloadDialogs,
+        addMembersFlag,
+        getNewMembers,
+        addNewMembers,
+        addMembersPend,
+        getMembersMe,
+        changeGroupTitle
     }
 });

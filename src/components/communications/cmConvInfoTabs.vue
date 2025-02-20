@@ -33,7 +33,7 @@ const activeTab = computed(() => route.query.tab as Tab || (props.convType === '
           @click="router.push({ query: {...route.query, tab: 'group' } })"
           value="group"
       >
-        Группа
+        Участники
       </v-tab>
       <v-tab
           class="text-none"
@@ -70,7 +70,7 @@ const activeTab = computed(() => route.query.tab as Tab || (props.convType === '
   position: sticky;
   top: 5px;
   background: rgb(var(--v-theme-background));
-
+  z-index: 10;
   .tabs {
     height: auto;
     padding: 5px 0;

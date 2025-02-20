@@ -50,7 +50,7 @@ onBeforeUnmount(() => {
   }
 
   @media (max-width: 650px) {
-    height: calc(100vh - 170px);
+    height: calc(100vh - 155px);
   }
 }
 </style>
