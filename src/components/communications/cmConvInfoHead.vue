@@ -5,6 +5,7 @@ import {onMounted, ref} from "vue";
 import ConvInfoHeadSkeleton from "@/components/skeletons/convInfoHeadSkeleton.vue";
 import ChangeGroupConvTitle from "@/components/communications/changeGroupConvTitle.vue";
 import type {GroupConv, PersonalConv} from "@/helpers/interfaces";
+import GroupConvCover from "@/components/communications/groupConvCover.vue";
 
 interface CmConvHeadData{
   _id: string,
@@ -69,19 +70,8 @@ function isPersonalConv(dialog: PersonalConv | GroupConv): dialog is PersonalCon
   <conv-info-head-skeleton v-if="pending"/>
 
   <div class="cm-conv-info__head" v-else>
-    <div class="head__cover">
-      <v-avatar class="__avatar">
-        <v-img
-            :src="data?.cover"
-            alt="conversation cover"
-            cover
-        >
-          <template v-slot:placeholder>
-            <skeleton-loader/>
-          </template>
-        </v-img>
-      </v-avatar>
-    </div>
+
+    <group-conv-cover :conv_id="data._id" :cover="data.cover" :can-change="canChange" :type="data.type"/>
     <div class="head__title" v-if="!isChangeTitle">
       <h4 v-if="!data.opponent" class="nickname __no-wrap-txt mt-2">{{ data?.title }}</h4>
 
@@ -90,7 +80,7 @@ function isPersonalConv(dialog: PersonalConv | GroupConv): dialog is PersonalCon
       </router-link>
 
       <v-btn @click="isChangeTitle = true" class="change__title" density="compact" :disabled="titlePending"
-             icon variant="tonal" v-if="data.type === 'group' && canChange" :loading="titlePending"
+             icon variant="elevated" v-if="data.type === 'group' && canChange" :loading="titlePending"
       >
         <v-icon color="green" :size="18">mdi-pencil</v-icon>
       </v-btn>
@@ -109,14 +99,6 @@ function isPersonalConv(dialog: PersonalConv | GroupConv): dialog is PersonalCon
   flex-direction: column;
   align-items: center;
   text-align: center;
-  .__avatar{
-    height: 150px;
-    width: 150px;
-    @media (max-width: 650px){
-      height: 100px;
-      width: 100px;
-    }
-  }
 
   .head__title{
     position: relative;

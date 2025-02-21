@@ -421,6 +421,21 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const changeGroupCover = async (convId: string, newCover: string | ArrayBuffer) :Promise<{cover_url: string, cover_id: string } | void> => {
+        try {
+            const response = await apiAuth.patch(`user/conv/${convId}/cover`, {newCover})
+
+            if(response.status === 200 && response.data){
+                return response.data
+            }
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при изменении аватара группы, попробуйте позже')
+            }
+        }
+    }
+
     return{
         pending,
         error,
@@ -460,6 +475,7 @@ export const useCmStore = defineStore('cm', () => {
         addNewMembers,
         addMembersPend,
         getMembersMe,
-        changeGroupTitle
+        changeGroupTitle,
+        changeGroupCover
     }
 });

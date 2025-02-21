@@ -1,36 +1,27 @@
 <script setup lang="ts">
 import {nextTick, onMounted, onUnmounted, ref} from "vue";
 import Cropper from "cropperjs";
+import {onClickOutside} from "@vueuse/core";
+
+const props = defineProps<{
+  image: string | ArrayBuffer
+}>()
 
 const emit = defineEmits<{
   (e: 'coverSelect', img: string | ArrayBuffer): void
+  (e: 'close'): void
 }>()
 
-const imageUrl = ref<string | ArrayBuffer | null>(null);
-const imageUrlOriginal = ref<string | ArrayBuffer | null>(null);
+const imageUrl = ref<string | ArrayBuffer | null>(props.image || null);
 
-const showModal = ref(false);
 const cropper = ref<Cropper | null>(null);
 const imageElement = ref<HTMLImageElement | null>(null);
-const fileInput = ref<HTMLInputElement | null>(null);
-
-const handleImageUpload = (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      imageUrl.value = reader.result;
-      imageUrlOriginal.value = reader.result;
-      showModal.value = true;
-    };
-    reader.readAsDataURL(file);
-  }
-};
 
 const initializeCropper = () => {
   nextTick(() => {
     if (imageElement.value && imageUrl.value) {
       cropper.value?.destroy();
+      //@ts-ignore
       cropper.value = new Cropper(imageElement.value, {
         background: false,
         dragMode: "move",
@@ -63,54 +54,35 @@ const cropperAvatarResize = () => {
 const handleCrop = () => {
   if (cropper.value) {
     imageUrl.value = cropper.value.getCroppedCanvas().toDataURL();
-    showModal.value = false;
     emit('coverSelect', imageUrl.value)
   }
 };
 
-const handleCancel = () => {
-  imageUrl.value = null;
-  showModal.value = false;
-  cropper.value = null;
-};
-
 onMounted(() => {
-  if (showModal.value) {
-    initializeCropper();
-  }
+  initializeCropper();
 });
 onUnmounted(() => {
   if (cropper.value) {
     cropper.value.destroy();
   }
 });
+
+const wrapperRef = ref<HTMLInputElement | null>(null);
+onClickOutside(wrapperRef, e => handleClose())
+const handleClose = () => {
+  emit('close')
+}
 </script>
 
 <template>
-  <div class="cm-create-group-avatar__wrapper">
-
-    <div v-if="!showModal" @click="fileInput ? fileInput.click() : false" class="avatar-wrapper align-self-center">
-      <div class="avatar-container">
-        <img v-if="imageUrl" class="avatar-preview" :src="typeof imageUrl === 'string' ? imageUrl : ''" alt="Аватарка"/>
-
-        <v-avatar v-else size="200" class="avatar-preview">
-          <v-icon color="green" size="large">mdi-camera</v-icon>
-        </v-avatar>
-
-        <div class="avatar-preview-overlay">
-          <v-icon color="green" size="large">mdi-camera</v-icon>
-        </div>
-      </div>
-      <input ref="fileInput" type="file" @change="handleImageUpload" accept="image/*" style="display: none;"/>
-    </div>
-
-    <div class="cropper-container__wrapper"v-if="showModal && imageUrl">
+  <div class="cm-change-group-avatar__wrapper" ref="wrapperRef">
+    <div class="cropper-container__wrapper" v-if="imageUrl">
       <div class="cropper-container">
         <img ref="imageElement" :src="typeof imageUrl === 'string' ? imageUrl : ''" alt="Preview" @load="initializeCropper"/>
       </div>
 
       <div class="cropper-container__controls">
-        <button class="cropper-container__control __close" @click="handleCancel">
+        <button class="cropper-container__control __close" @click="handleClose">
           <v-icon color="red">mdi-close</v-icon>
         </button>
         <button class="cropper-container__control __check" @click="handleCrop">
@@ -118,13 +90,13 @@ onUnmounted(() => {
         </button>
       </div>
     </div>
-
   </div>
 </template>
 
 <style scoped lang="scss">
 
-.cm-create-group-avatar__wrapper{
+.cm-change-group-avatar__wrapper{
+  margin: 5px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -132,12 +104,13 @@ onUnmounted(() => {
 }
 .cropper-container__controls{
   display: flex;
+  justify-content: space-between;
   width: 100%;
   gap: 5px;
   margin-top: 5px;
 
   .cropper-container__control{
-    width: 100%;
+    width: 30%;
     padding: 5px;
     transition: .3s;
     border-radius: 5px;

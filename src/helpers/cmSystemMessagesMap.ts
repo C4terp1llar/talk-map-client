@@ -93,6 +93,13 @@ const systemMessageHandlers: Record<string, SystemMessageHandler> = {
         return `${senderName} изменил(а) название группы`;
     },
 
+    change_cover: (msg) => {
+        const senderName = "sender_nickname" in msg
+            ? msg.sender_nickname
+            : msg.sender.nickname;
+
+        return `${senderName} изменил(а) аватар группы`;
+    },
 };
 
 export function adaptSystemMessages(msg: LastDialogMessage | FullMessage): string {

@@ -16,6 +16,11 @@ const crSendTime = computed(() => {
   return format(new Date(props.m.createdAt), 'HH:mm');
 });
 
+const getNewCoverUrl = () => {
+  if (props.m.messageType === "system" && props.m.content === "change_cover" && props.m.additionalInfo) {
+    return props.m.additionalInfo.split("^&^")[1];
+  }
+};
 </script>
 
 <template>
@@ -24,6 +29,18 @@ const crSendTime = computed(() => {
     <div class="message-item__system" v-if="m.messageType === 'system'">
       <div class="message-item__system-content">
         <span class="msg-text">{{getMsgContent(m)}}</span>
+
+        <v-avatar :size="50" class="new_avatar mt-1" v-if="m.messageType === 'system' && props.m.content === 'change_cover'">
+          <v-img
+              :src="getNewCoverUrl()"
+              alt="new cover"
+              cover
+          >
+            <template v-slot:placeholder>
+              <skeleton-loader />
+            </template>
+          </v-img>
+        </v-avatar>
       </div>
     </div>
 
@@ -86,6 +103,9 @@ const crSendTime = computed(() => {
       border-radius: 15px;
       border: 1px solid seagreen;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   }
 
