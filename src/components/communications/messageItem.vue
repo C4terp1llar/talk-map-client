@@ -3,8 +3,15 @@ import type {FullMessage} from "@/helpers/interfaces";
 import {getMsgContent} from "../../helpers/cmHelpers";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import MessageItemMedia from "@/components/communications/messageItemMedia.vue";
-import {computed} from "vue";
+import {computed, ref} from "vue";
 import {format} from "date-fns";
+import MessageItemMenu from "@/components/communications/messageItemMenu.vue";
+
+const emit = defineEmits<{
+  (e: "voidMessageMenu", m: FullMessage): void;
+  (e: "voidResponseMessage", m: FullMessage): void;
+}>();
+
 
 interface Props {
   m: FullMessage
@@ -21,27 +28,39 @@ const getNewCoverUrl = () => {
     return props.m.additionalInfo.split("^&^")[1];
   }
 };
+
+
+const handleContextMenu = (event: Event) => {
+  event.preventDefault();
+  emit('voidMessageMenu', props.m)
+};
+
+const handleSendResponse = (event: Event) => {
+  event.preventDefault();
+  emit('voidResponseMessage', props.m)
+};
+
 </script>
 
 <template>
-  <div :class="['message-item__wrapper mt-1 mb-1']">
+  <div :class="['message-item__wrapper mt-1 mb-1']" :data-message-id="m._id">
 
     <div class="message-item__system" v-if="m.messageType === 'system'">
       <div class="message-item__system-content">
-        <span class="msg-text">{{getMsgContent(m)}}</span>
-
-        <v-avatar :size="50" class="new_avatar mt-1" v-if="m.messageType === 'system' && props.m.content === 'change_cover'">
-          <v-img
-              :src="getNewCoverUrl()"
-              alt="new cover"
-              cover
-          >
-            <template v-slot:placeholder>
-              <skeleton-loader />
-            </template>
-          </v-img>
-        </v-avatar>
+        <span class="msg-text">{{ getMsgContent(m) }}</span>
       </div>
+      <v-avatar :size="50" class="new_avatar mt-2"
+                v-if="m.messageType === 'system' && props.m.content === 'change_cover'">
+        <v-img
+            :src="getNewCoverUrl()"
+            alt="new cover"
+            cover
+        >
+          <template v-slot:placeholder>
+            <skeleton-loader/>
+          </template>
+        </v-img>
+      </v-avatar>
     </div>
 
     <div :class="['message-item__default', m.mode]" v-else>
@@ -60,7 +79,13 @@ const getNewCoverUrl = () => {
         </v-avatar>
       </div>
 
-      <div class="message-item__content">
+      <!--      хендлер на нажатие пкм или холд при таче    -->
+      <div
+          class="message-item__content"
+          @contextmenu="handleContextMenu"
+          @touchstart="handleContextMenu"
+          @dblclick="handleSendResponse"
+      >
 
         <span
             v-if="m.conversationType === 'GroupConversation' && m.mode === 'external'"
@@ -84,38 +109,46 @@ const getNewCoverUrl = () => {
         </div>
 
       </div>
-
     </div>
 
   </div>
+
 </template>
 
 <style scoped lang="scss">
-.message-item__wrapper{
+.no_blurred__message{
+  filter: none;
+  position: relative;
+  z-index: 5;
+}
+
+.message-item__wrapper {
   width: 100%;
 
-  .message-item__system{
+  .message-item__system {
+    width: fit-content;
     display: flex;
-    justify-content: center;
-    margin: 5px 0;
-    .message-item__system-content{
+    align-items: center;
+    flex-direction: column;
+    margin: 5px auto;
+
+    .message-item__system-content {
       padding: 2px 10px;
       border-radius: 15px;
       border: 1px solid seagreen;
+      background-color: rgba(76, 175, 80, 0.15);
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
   }
 
-  .message-item__default{
-    &.internal{
+  .message-item__default {
+    &.internal {
       margin-left: auto;
       justify-content: flex-end;
       padding-left: 20px;
     }
-    &.external{
+
+    &.external {
       margin-right: auto;
       justify-content: flex-start;
       padding-right: 20px;
@@ -126,20 +159,21 @@ const getNewCoverUrl = () => {
     display: flex;
     gap: 10px;
 
-    .message-item__content{
+    .message-item__content {
+      position: relative;
       display: flex;
       flex-direction: column;
       padding: 5px;
       border-radius: 10px;
       border: 1px solid grey;
 
-      .message-item__media-wrap{
+      .message-item__media-wrap {
         display: flex;
         flex-wrap: wrap;
         gap: 5px;
       }
 
-      .msg-send__detail{
+      .msg-send__detail {
         height: 17px;
         display: flex;
         gap: 3px;
@@ -148,13 +182,14 @@ const getNewCoverUrl = () => {
         margin-left: auto;
         margin-top: auto;
         padding-left: 10px;
-        .msg-send___detail_time{
+
+        .msg-send___detail_time {
           font-size: 11px;
           opacity: .7;
         }
       }
 
-      .msg-text__wrapper{
+      .msg-text__wrapper {
         display: flex;
         flex-wrap: wrap;
         margin-left: 5px;
@@ -164,10 +199,11 @@ const getNewCoverUrl = () => {
 
 }
 
-.msg-text{
+.msg-text {
   font-size: 14px;
 }
-.nickname-text{
+
+.nickname-text {
   font-weight: 500;
 }
 

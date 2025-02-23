@@ -436,6 +436,19 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const deleteMessage = async (convId: string, mId: string) => {
+        try {
+            await apiAuth.delete(`user/message/${mId}`, {params: {convId}})
+
+        } catch (e: any) {
+            console.error(e);
+            if (e.response.status === 500){
+                ntfStore.addNotification('error', 'Произошла ошибка при удалении сообщения, попробуйте позже')
+            }
+        }
+    }
+
+
     return{
         pending,
         error,
@@ -476,6 +489,7 @@ export const useCmStore = defineStore('cm', () => {
         addMembersPend,
         getMembersMe,
         changeGroupTitle,
-        changeGroupCover
+        changeGroupCover,
+        deleteMessage
     }
 });

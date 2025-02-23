@@ -5,6 +5,7 @@ import CmMessageListHead from "@/components/communications/cmMessageListHead.vue
 import MessageItem from "@/components/communications/messageItem.vue";
 import { nextTick, onMounted, ref, watch } from "vue";
 import {formatCmDividerDate} from "@/helpers/dateHelper";
+import MessageItemMenu from "@/components/communications/messageItemMenu.vue";
 
 interface Props {
   messages?: FullMessage[];
@@ -60,15 +61,58 @@ const shouldShowDateDivider = (index: number) => {
   const previousDate = new Date(props.messages[index - 1].createdAt).toDateString();
   return currentDate !== previousDate;
 };
+
+const selectedMessageItem = ref<FullMessage | null>(null);
+const prevMId = ref<string | null>(null);
+
+
+const handleVoidMessageMenu = (msg: FullMessage) => {
+  if (prevMId.value && prevMId.value === msg._id){
+    prevMId.value = null;
+    handleCloseMenu()
+    return;
+  }
+  prevMId.value = msg._id;
+
+  if (selectedMessageItem.value) {
+    const prevMessageElement = document.querySelector(`[data-message-id="${selectedMessageItem.value._id}"]`);
+    if (prevMessageElement) {
+      prevMessageElement.classList.remove('no_blurred__message');
+    }
+  }
+
+  selectedMessageItem.value = msg;
+  const messageElement = document.querySelector(`[data-message-id="${msg._id}"]`);
+  if (messageElement) {
+    messageElement.classList.add('no_blurred__message');
+  }
+};
+
+const handleCloseMenu = () => {
+  if (selectedMessageItem.value) {
+    const messageElement = document.querySelector(`[data-message-id="${selectedMessageItem.value._id}"]`);
+    if (messageElement) {
+      messageElement.classList.remove('no_blurred__message');
+    }
+  }
+  selectedMessageItem.value = null;
+};
 </script>
 
 <template>
   <div class="cm-message-list__wrapper">
+    <div class="blur-overlay" v-if="selectedMessageItem"></div>
+
     <div class="cm-message-list__head-wrap">
       <cm-message-list-head :new-conv-mode="newConvMode" :new-dialog-opponent="newDialogOpponent"/>
+      <v-scroll-y-transition>
+        <div class="message-item-menu__wrapper" v-if="selectedMessageItem">
+          <message-item-menu :mode="selectedMessageItem.mode" :conv-id="selectedMessageItem.conversation_id" :m-id="selectedMessageItem._id" @close="handleCloseMenu"/>
+        </div>
+      </v-scroll-y-transition>
     </div>
 
-    <div class="cm-message-list__content styled-scroll__cm" ref="messageListRef" v-if="!newConvMode">
+    <div :class="['cm-message-list__content styled-scroll__cm', {'show-blur': selectedMessageItem}]" ref="messageListRef" v-if="!newConvMode" @contextmenu.prevent>
       <template v-for="(message, index) in props.messages" :key="message._id">
         <div v-if="shouldShowDateDivider(index)" class="msg__date-divider">
           <div class="date-divider__content">
@@ -76,7 +120,7 @@ const shouldShowDateDivider = (index: number) => {
           </div>
         </div>
 
-        <message-item :m="message" />
+        <message-item @void-message-menu="msg => handleVoidMessageMenu(msg)" :m="message" />
       </template>
     </div>
     <div class="cm-message-list__content __new_dialog" v-else>
@@ -90,11 +134,26 @@ const shouldShowDateDivider = (index: number) => {
 </template>
 
 <style scoped lang="scss">
+.message-item-menu__wrapper {
+  z-index: 10;
+  position: absolute;
+  top: calc(100% + 5px);
+  width: calc(100% - 5px);
+}
+
 .cm-message-list__wrapper {
   height: 100%;
   width: 100%;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  position: relative;
+
+  .blur-overlay{
+    backdrop-filter: blur(4px);
+    inset: 0;
+    z-index: 1;
+    position: absolute;
+  }
 
   .cm-message-list__head-wrap,
   .cm-message-list__content,
@@ -106,6 +165,9 @@ const shouldShowDateDivider = (index: number) => {
   .cm-message-list__create-msg-wrap {
     margin: 5px;
   }
+  .cm-message-list__head-wrap{
+    position: relative;
+  }
 }
 
 .cm-message-list__content {
@@ -113,6 +175,13 @@ const shouldShowDateDivider = (index: number) => {
   flex-direction: column;
   overflow-y: auto;
   padding: 5px;
+  position: relative;
+  transition: .3s;
+
+  &.show-blur{
+    transition: outline-color, .3s;
+    overflow-y: hidden;
+  }
 
   &.__new_dialog{
     justify-content: center;
@@ -137,4 +206,7 @@ const shouldShowDateDivider = (index: number) => {
     }
   }
 }
+
+
+
 </style>
