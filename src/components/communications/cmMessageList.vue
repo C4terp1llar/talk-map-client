@@ -3,9 +3,11 @@ import type {FullMessage, ShortUserInfo} from "@/helpers/interfaces";
 import CreateMessage from "@/components/communications/createMessage.vue";
 import CmMessageListHead from "@/components/communications/cmMessageListHead.vue";
 import MessageItem from "@/components/communications/messageItem.vue";
-import { nextTick, onMounted, ref, watch } from "vue";
+import {nextTick, onMounted, onUnmounted, ref, watch} from "vue";
 import {formatCmDividerDate} from "@/helpers/dateHelper";
 import MessageItemMenu from "@/components/communications/messageItemMenu.vue";
+import {useCmStore} from "@/stores/cmStore";
+import MessageChangeItem from "@/components/communications/messageChangeItem.vue";
 
 interface Props {
   messages?: FullMessage[];
@@ -14,6 +16,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const cmStore = useCmStore();
 
 const messageListRef = ref<HTMLElement | null>(null);
 const isAtBottom = ref(true);
@@ -97,6 +101,10 @@ const handleCloseMenu = () => {
   }
   selectedMessageItem.value = null;
 };
+
+onUnmounted(() => {
+  cmStore.changeMsgData = null;
+})
 </script>
 
 <template>
@@ -107,7 +115,7 @@ const handleCloseMenu = () => {
       <cm-message-list-head :new-conv-mode="newConvMode" :new-dialog-opponent="newDialogOpponent"/>
       <v-scroll-y-transition>
         <div class="message-item-menu__wrapper" v-if="selectedMessageItem">
-          <message-item-menu :mode="selectedMessageItem.mode" :conv-id="selectedMessageItem.conversation_id" :m-id="selectedMessageItem._id" @close="handleCloseMenu"/>
+          <message-item-menu :message="selectedMessageItem" :mode="selectedMessageItem.mode" :conv-id="selectedMessageItem.conversation_id" :m-id="selectedMessageItem._id" @close="handleCloseMenu"/>
         </div>
       </v-scroll-y-transition>
     </div>
@@ -127,8 +135,9 @@ const handleCloseMenu = () => {
        <span>Сообщений пока нет</span>
     </div>
 
+    <message-change-item v-if="cmStore.changeMsgData?.message" :m="cmStore.changeMsgData.message"/>
     <div class="cm-message-list__create-msg-wrap">
-      <create-message :new-dialog-opponent="newDialogOpponent" :new-conv-mode="newConvMode"/>
+      <create-message :change-data="cmStore.changeMsgData" :new-dialog-opponent="newDialogOpponent" :new-conv-mode="newConvMode"/>
     </div>
   </div>
 </template>

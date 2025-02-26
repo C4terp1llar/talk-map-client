@@ -21,13 +21,13 @@ const files = computed(() => ({
 <template>
   <div class="message-item__media-wrap" v-if="m.length">
 
-    <div class="media__gallery">
+    <div class="media__gallery" v-if="files.images.length">
       <div class="image-item__wrapper" v-for="i in files.images" :key="i._id">
         <img :src="i.url" alt="Фото" class="image-preview">
       </div>
     </div>
 
-    <div class="media__gallery __video">
+    <div class="media__gallery __video" v-if="files.videos.length">
       <div class="video-item__wrapper" v-for="i in files.videos" :key="i._id">
         <video controls class="video-preview">
           <source :src="i.url" type="video/mp4" />
@@ -109,7 +109,7 @@ const files = computed(() => ({
   align-items: center;
   padding: 5px;
   border-radius: 5px;
-  margin: 5px 0 ;
+  margin-bottom: 5px;
   .media__other-item__download{
     position: relative;
     padding: 5px;

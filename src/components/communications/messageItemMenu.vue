@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import {useCmStore} from "@/stores/cmStore";
+import type {FullMessage} from "@/helpers/interfaces";
 
 interface Props {
+  message: FullMessage;
   mId: string;
   convId: string;
   mode: 'internal' | 'external';
@@ -39,20 +41,46 @@ const handleDeleteMessage = async () => {
   emit("close", props.mId);
   await cmStore.reloadMessagesAndDialogs()
 }
+
+const changePending = ref<boolean>(false);
+const handleChangeMessage = async () => {
+  let files = null;
+  changePending.value = true;
+  if (props.message.mediaInfo.length) {
+    files = await cmStore.getAttachedFiles(props.message.mediaInfo);
+  }
+  changePending.value = false;
+  cmStore.changeMsgData = {
+    attaches: files || [],
+    message: props.message,
+  }
+  emit('close', props.mId)
+};
+
+const handleCopyMessage = async () => {
+  if (props.message.content){
+    await navigator.clipboard.writeText(props.message.content);
+    emit('close', props.mId)
+  }
+};
 </script>
 
 <template>
   <div class="message-item__menu" ref="menuRef">
+    <v-btn v-if="mode === 'internal'" prepend-icon="mdi-pen" class="text-none fz-12" density="compact" variant="tonal" @click="handleChangeMessage" :loading="changePending" :disabled="changePending || delPending">
+      Изменить
+    </v-btn>
+
     <v-btn prepend-icon="mdi-redo-variant" class="text-none fz-12" density="compact" variant="tonal">
       Ответить
     </v-btn>
 
-    <v-btn prepend-icon="mdi-pen" class="text-none fz-12" density="compact" variant="tonal">
-      Изменить
+    <v-btn v-if="mode === 'internal'" prepend-icon="mdi-delete-outline" class="text-none fz-12" density="compact" variant="tonal" @click="handleDeleteMessage" :loading="delPending" :disabled="delPending || changePending">
+      Удалить
     </v-btn>
 
-    <v-btn prepend-icon="mdi-delete-outline" class="text-none fz-12" density="compact" variant="tonal" @click="handleDeleteMessage" :loading="delPending" :disabled="delPending">
-      Удалить
+    <v-btn prepend-icon="mdi-content-copy" class="text-none fz-12" density="compact" variant="tonal" @click="handleCopyMessage" v-if="props.message.content">
+      Копировать
     </v-btn>
   </div>
 </template>
@@ -62,9 +90,9 @@ const handleDeleteMessage = async () => {
   border-radius: 10px;
   background: rgb(var(--v-theme-background));
   padding: 5px;
-  display: flex;
-  flex-direction: column;
   gap: 5px;
   border: 1px solid grey;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }
 </style>

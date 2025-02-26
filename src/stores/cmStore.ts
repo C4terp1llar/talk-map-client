@@ -7,8 +7,8 @@ import type {
     FullMessage,
     GroupConv,
     MediaConvInfo,
-    PersonalConv, ShortFriend,
-    ShortUserInfo
+    PersonalConv, ShortFriend, ShortMediaDialogMessage,
+    ShortUserInfo, UploadMediaFile
 } from "@/helpers/interfaces";
 import {useRoute} from "vue-router";
 
@@ -34,7 +34,7 @@ export const useCmStore = defineStore('cm', () => {
                 return response.data.message
             }
         } catch (e: any) {
-            error.value = "Произошла ошибка при отправке сообщения, попробуйте позже";
+            error.value = `Произошла ошибка при отправке сообщения, попробуйте позже`;
             console.error(e);
         } finally {
             pending.value = false;
@@ -332,6 +332,25 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const changeMsgReload = async () => {
+        if (!selectedDialogId.value || !conversations.value) return;
+
+        const [currDialog] = await Promise.all([
+            getDialogInfo(selectedDialogId.value, true, true),
+            getMessages(selectedDialogId.value, 1 ,200 , true)
+        ])
+
+        if (currDialog) {
+            const index = conversations.value.findIndex((conv) => conv._id === selectedDialogId.value);
+
+            if (index !== -1) {
+                conversations.value[index] = currDialog;
+            } else {
+                conversations.value.unshift(currDialog)
+            }
+        }
+    }
+
     const reloadDialogs = async () =>  {
         if (!selectedDialogId.value || !selectedDialog.value || !conversations.value || !conversations.value.length) return;
 
@@ -448,6 +467,63 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const getAttachedFiles = async (media: ShortMediaDialogMessage[]): Promise<UploadMediaFile[] | void> => {
+        try {
+            const filePromises = media.map(async (item) => {
+                const response = await fetch(item.url);
+
+                if (!response.ok) {
+                    throw new Error(`Ошибка загрузки файла: ${response.status}`);
+                }
+
+                const blob = await response.blob();
+                const file = new File([blob], item.name, { type: item.type });
+
+                // Используем URL.createObjectURL для видео и изображений
+                const previewUrl = (item.type.startsWith('image') || item.type.startsWith('video'))
+                    ? URL.createObjectURL(blob)
+                    : item.url; // Для других типов можно оставить URL как есть
+
+                return {
+                    id: item._id,
+                    file: file,
+                    previewUrl: previewUrl,
+                    type: item.type,
+                };
+            });
+
+            return await Promise.all(filePromises);
+        } catch (e: any) {
+            console.error(e);
+            if (e.response?.status === 500) {
+                ntfStore.addNotification('error', 'Произошла ошибка при получении вложений сообщения, попробуйте позже');
+            }
+        }
+    };
+
+    const changeMsgData = ref<{attaches: UploadMediaFile[] | [], message: FullMessage} | null>(null);
+
+    const changeMsg = async (data: FormData, mId: string) => {
+        pending.value = true;
+        error.value = null;
+
+        try {
+            const response = await apiAuth.put(`user/message/${mId}`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            });
+
+            if (response.data && response.status === 200) {
+                return response.data.message
+            }
+        } catch (e: any) {
+            error.value = `Произошла ошибка при изменении сообщения, попробуйте позже`;
+            console.error(e);
+        } finally {
+            pending.value = false;
+        }
+    };
 
     return{
         pending,
@@ -483,6 +559,7 @@ export const useCmStore = defineStore('cm', () => {
         getGroupMedia,
         reloadMessagesAndDialogs,
         reloadDialogs,
+        changeMsgReload,
         addMembersFlag,
         getNewMembers,
         addNewMembers,
@@ -490,6 +567,9 @@ export const useCmStore = defineStore('cm', () => {
         getMembersMe,
         changeGroupTitle,
         changeGroupCover,
-        deleteMessage
+        deleteMessage,
+        getAttachedFiles,
+        changeMsgData,
+        changeMsg
     }
 });

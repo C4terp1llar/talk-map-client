@@ -100,7 +100,8 @@ const handleSendResponse = (event: Event) => {
         <div class="msg-text__wrapper">
           <span class="msg-text" v-if="m.content">{{ m.content }}</span>
 
-          <div class="msg-send__detail">
+          <div :class="['msg-send__detail', {'__edited': m.isEdited}]">
+            <v-icon :size="12" color="warning" v-if="m.isEdited">mdi-lead-pencil</v-icon>
             <span class="msg-send___detail_time">{{ crSendTime }}</span>
             <div class="msg-send___detail_read-status" v-if="m.mode === 'internal'">
               <v-icon :size="12" color="green">{{ m.isRead ? 'mdi-check-all' : 'mdi-check' }}</v-icon>
@@ -181,7 +182,11 @@ const handleSendResponse = (event: Event) => {
         flex-wrap: wrap;
         margin-left: auto;
         margin-top: auto;
-        padding-left: 10px;
+        padding-left: 8px;
+
+        &.__edited{
+          padding-left: 5px;
+        }
 
         .msg-send___detail_time {
           font-size: 11px;

@@ -15,7 +15,7 @@ const emit = defineEmits(['handle-delete'])
 <template>
   <div v-for="fileEntry in props.files" :key="fileEntry.id" :class="['file-preview', `${props.sender}`]">
 
-    <div class="file-preview__img" v-if="fileEntry.type === 'image'" >
+    <div class="file-preview__img" v-if="fileEntry.type.startsWith('image')">
       <v-img :src="fileEntry.previewUrl" alt="Превью изображения" class="image-preview" cover>
         <template v-slot:placeholder>
           <skeleton-loader/>
@@ -24,16 +24,7 @@ const emit = defineEmits(['handle-delete'])
       <span class="file__name">{{ fileEntry.file.name }}</span>
     </div>
 
-    <div class="file-preview__audio" v-if="fileEntry.type === 'audio'">
-      <audio  controls class="audio-preview">
-        <source :src="fileEntry.previewUrl" type="audio/mpeg"/>
-        Ваш браузер не поддерживает аудио.
-      </audio>
-      <v-icon :size="65" class="icon-audio">mdi-music</v-icon>
-      <span class="file__name">{{ fileEntry.file.name }}</span>
-    </div>
-
-    <div class="file-preview__video" v-if="fileEntry.type === 'video'" >
+    <div class="file-preview__video" v-if="fileEntry.type.startsWith('video')" >
       <video controls class="video-preview">
         <source :src="fileEntry.previewUrl" type="video/mp4"/>
         Ваш браузер не поддерживает видео.
@@ -41,7 +32,7 @@ const emit = defineEmits(['handle-delete'])
       <span class="file__name">{{ fileEntry.file.name }}</span>
     </div>
 
-    <div class="file-preview__other" v-if="!fileEntry.previewUrl">
+    <div class="file-preview__other" v-if="!fileEntry.type.startsWith('video') && !fileEntry.type.startsWith('image')">
       <v-icon :size="65" class="ma-auto">{{ getFileIcon(fileEntry.file.name) }}</v-icon>
       <span class="file__name">{{ fileEntry.file.name }}</span>
     </div>

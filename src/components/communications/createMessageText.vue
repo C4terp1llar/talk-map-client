@@ -11,6 +11,7 @@ const emit = defineEmits<{
 
 interface Props {
   modelValue: string;
+  mode?: 'change' | 'default'
 }
 const props = defineProps<Props>();
 
@@ -72,7 +73,7 @@ const handleSendMessage = () => {
       ></textarea>
 
       <button class="create-message__action-btn" @click="handleSendMessage">
-        <v-icon :size="24">mdi-send-variant-outline</v-icon>
+        <v-icon :size="24">{{ mode === 'change' ? 'mdi-send-check' : 'mdi-send' }}</v-icon>
       </button>
     </div>
 

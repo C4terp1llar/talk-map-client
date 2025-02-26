@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import MediaUpload from "@/components/multimedia/mediaUpload.vue";
-import {ref} from "vue";
+import {onUnmounted, ref, watch} from "vue";
 import {useCmStore} from "@/stores/cmStore";
 import {useNotificationStore} from "@/stores/notifications";
 import CreateMessageText from "@/components/communications/createMessageText.vue";
-import type {FullMessage, PersonalConv, ShortUserInfo} from "@/helpers/interfaces";
+import type {FullMessage, ShortUserInfo, UploadMediaFile} from "@/helpers/interfaces";
 import {useRouter} from "vue-router";
 
 interface Props {
   newConvMode?: boolean;
-  newDialogOpponent?: ShortUserInfo
+  newDialogOpponent?: ShortUserInfo;
+  changeData?: {
+    attaches: UploadMediaFile[] | [],
+    message: FullMessage
+  };
 }
 
 const props = defineProps<Props>();
-
-interface PostF { id: string, file: File, previewUrl?: string, type: string }
 
 const router = useRouter()
 
@@ -23,14 +25,38 @@ const ntfStore = useNotificationStore();
 
 const showAttachments = ref<boolean>(false);
 
-const msgFiles = ref<PostF[]>([]);
+const msgFiles = ref<UploadMediaFile[]>([]);
 const msgText = ref<string>('');
+
+let tempMsgChangeAttachments: null | string | UploadMediaFile[] = null
+
+watch(
+    () => props.changeData,
+    (newData) => {
+      if (newData) {
+        msgText.value = newData.message.content || '';
+        msgFiles.value = newData.attaches || [];
+        showAttachments.value = msgFiles.value.length > 0;
+        tempMsgChangeAttachments = newData.attaches;
+      }else{
+        showAttachments.value = false;
+        msgText.value = '';
+        msgFiles.value = [];
+        tempMsgChangeAttachments = null
+      }
+    },
+    { immediate: true }
+);
 
 const handleMsg = async () => {
   if (!msgText.value.trim().length && !msgFiles.value.length) return;
 
   if (props.newConvMode && props.newDialogOpponent) {
     await handleNewMsg()
+    return
+  }
+
+  if (props.changeData && (props.changeData.message.content === msgText.value.trim() && JSON.stringify(tempMsgChangeAttachments) === JSON.stringify(msgFiles.value))) {
     return
   }
 
@@ -47,17 +73,33 @@ const handleMsg = async () => {
   }
 
   if (msgFiles.value.length > 0){
-    msgFiles.value.forEach(fileEntry => {
-      data.append(fileEntry.file.name, fileEntry.file);
-    });
+    if (props.changeData && JSON.stringify(tempMsgChangeAttachments) !== JSON.stringify(msgFiles.value)){
+      msgFiles.value.forEach(fileEntry => {
+        data.append(fileEntry.file.name, fileEntry.file);
+      });
+    }else if (!props.changeData ){
+      msgFiles.value.forEach(fileEntry => {
+        data.append(fileEntry.file.name, fileEntry.file);
+      });
+    }
   }
 
-  await cmStore.createMsg(data);
+  if (props.changeData){
+    await cmStore.changeMsg(data, props.changeData.message._id);
+  }else{
+    await cmStore.createMsg(data);
+  }
 
   if (cmStore.error){
     ntfStore.addNotification('error', cmStore.error, 3000)
   }else{
-    await successSendMessage()
+    if (props.changeData){
+      cmStore.changeMsgData = null;
+      tempMsgChangeAttachments = null;
+      await cmStore.changeMsgReload();
+    }else{
+      await successSendMessage()
+    }
   }
 
 }
@@ -79,8 +121,6 @@ const handleNewMsg = async () => {
 
   const newConvData = await cmStore.createMsg(data);
 
-  console.log(newConvData)
-
   if (cmStore.error){
     ntfStore.addNotification('error', cmStore.error, 3000)
   }else if (newConvData && !cmStore.error){
@@ -91,6 +131,7 @@ const handleNewMsg = async () => {
     await cmStore.getConversations(1, 30)
   }
 }
+
 
 const actAttachments = () => {
   if (showAttachments.value){
@@ -129,12 +170,18 @@ const successSendMessage = async () => {
   }
 
 }
+
+const updateMedia = (newMedia: UploadMediaFile[] | []) => {
+  msgFiles.value = newMedia
+}
+
+onUnmounted(() => tempMsgChangeAttachments = null)
 </script>
 
 <template>
   <div class="create-message__wrapper">
-    <media-upload v-if="showAttachments" @sl-post-media="(m: PostF[] | []) => msgFiles = m" sender="message"/>
-    <create-message-text @act-attachments="actAttachments" @send-message="handleMsg" v-model="msgText"/>
+    <media-upload v-if="showAttachments" :preload-files="msgFiles" @sl-post-media="m => updateMedia(m)" sender="message"/>
+    <create-message-text @act-attachments="actAttachments" :mode="changeData ? 'change' : 'default'" @send-message="handleMsg" v-model="msgText"/>
   </div>
 </template>
 

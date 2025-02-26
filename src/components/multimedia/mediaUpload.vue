@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {computed, ref} from "vue";
 import ScrollableContainer from "@/components/common/scrollableContainer.vue";
 import {useNotificationStore} from "@/stores/notifications";
 import MultimediaControlList from "@/components/multimedia/multimediaControlList.vue";
@@ -7,9 +7,12 @@ import {useMultimediaStore} from "@/stores/multimedia";
 import MultimediaItem from "@/components/multimedia/multimediaItem.vue";
 import CircularLoader from "@/components/common/circularLoader.vue";
 import {usePhotoStore} from "@/stores/photo";
+import type {FullMessage, UploadMediaFile} from "@/helpers/interfaces";
+import {useCmStore} from "@/stores/cmStore";
 
 interface Props {
-  sender: 'photo' | 'post' | 'message'
+  sender: 'photo' | 'post' | 'message',
+  preloadFiles?: UploadMediaFile[] | [],
 }
 
 const props = defineProps<Props>();
@@ -18,10 +21,9 @@ const emit = defineEmits(['slPhoto', 'slPostMedia'])
 
 const notificationStore = useNotificationStore();
 const multimediaStore = useMultimediaStore();
-
 const photoStore = usePhotoStore();
 
-const files = ref<{ id: string, file: File, previewUrl?: string, type: string }[]>([]);
+const files = ref<UploadMediaFile[]>(props.preloadFiles || []);
 
 const slotsMap = new Map([
   ['photo', 16],
@@ -208,9 +210,10 @@ const getAcceptType = (sender:string) => {
 <template>
   <div :class="['modal-block', `${props.sender}`]" @dragover.prevent @drop="handleFileUpload">
 
-    <div class="file-drop-area" @click="openFileDialog">
+    <div :class="['file-drop-area', {'__short_mode': files.length && sender === 'message'}]" @click="openFileDialog">
       <input :accept="getAcceptType(props.sender)"  ref="fileInput" type="file" @change="handleFileUpload" :disabled="multimediaStore.pending || photoStore.pending" multiple class="file-input"/>
       <span class="file-drop-text">Перетащите файлы сюда или нажмите, чтобы выбрать</span>
+      <v-btn v-if="files.length && sender === 'message'" variant="outlined" icon density="compact"><v-icon :size="20">mdi-file-image-plus-outline</v-icon></v-btn>
     </div>
 
     <scrollable-container v-if="files.length" :use-scroll-bar="true" mode="phShort">
@@ -292,6 +295,7 @@ const getAcceptType = (sender:string) => {
   padding: 15px;
   width: 100%;
   display: grid;
+  position: relative;
 
   &.post{
     padding: unset;
@@ -309,7 +313,20 @@ const getAcceptType = (sender:string) => {
   padding: 30px 20px;
   text-align: center;
   cursor: pointer;
+
+  &.__short_mode{
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    z-index: 10;
+    border: unset;
+    padding: 0;
+    span{
+      display: none;
+    }
+  }
 }
+
 
 .file-input {
   display: none;

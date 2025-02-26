@@ -300,3 +300,10 @@ export interface MediaConvInfo {
     sender: ShortUserInfo
 }
 
+export interface UploadMediaFile {
+    id: string,
+    file: File,
+    previewUrl?: string,
+    type: string
+}
+
