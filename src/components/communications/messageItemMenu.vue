@@ -67,19 +67,19 @@ const handleCopyMessage = async () => {
 
 <template>
   <div class="message-item__menu" ref="menuRef">
-    <v-btn v-if="mode === 'internal'" prepend-icon="mdi-pen" class="text-none fz-12" density="compact" variant="tonal" @click="handleChangeMessage" :loading="changePending" :disabled="changePending || delPending">
+    <v-btn v-if="mode === 'internal'" prepend-icon="mdi-pen" class="menu-btn text-none fz-12" density="compact" variant="tonal" @click="handleChangeMessage" :loading="changePending" :disabled="changePending || delPending">
       Изменить
     </v-btn>
 
-    <v-btn prepend-icon="mdi-redo-variant" class="text-none fz-12" density="compact" variant="tonal">
+    <v-btn prepend-icon="mdi-redo-variant" class="menu-btn text-none fz-12" density="compact" variant="tonal">
       Ответить
     </v-btn>
 
-    <v-btn v-if="mode === 'internal'" prepend-icon="mdi-delete-outline" class="text-none fz-12" density="compact" variant="tonal" @click="handleDeleteMessage" :loading="delPending" :disabled="delPending || changePending">
+    <v-btn v-if="mode === 'internal'" prepend-icon="mdi-delete-outline" class="menu-btn text-none fz-12" density="compact" variant="tonal" @click="handleDeleteMessage" :loading="delPending" :disabled="delPending || changePending">
       Удалить
     </v-btn>
 
-    <v-btn prepend-icon="mdi-content-copy" class="text-none fz-12" density="compact" variant="tonal" @click="handleCopyMessage" v-if="props.message.content">
+    <v-btn prepend-icon="mdi-content-copy" class="menu-btn text-none fz-12" density="compact" variant="tonal" @click="handleCopyMessage" v-if="props.message.content">
       Копировать
     </v-btn>
   </div>
@@ -94,5 +94,13 @@ const handleCopyMessage = async () => {
   border: 1px solid grey;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+}
+
+.message-item__menu .menu-btn:nth-child(3):last-child {
+  grid-column: span 2;
+}
+
+.message-item__menu .menu-btn:only-child {
+  grid-column: span 2;
 }
 </style>
