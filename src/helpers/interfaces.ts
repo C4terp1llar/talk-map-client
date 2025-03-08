@@ -8,7 +8,7 @@ export interface Notification {
 export interface FrNotification {
     id: number;
     type: 'receive' | 'abort' | 'decline' | 'submit' | 'delete' | 'react_Photo' | 'react_Post' | 'react_Comment' | 'publish_Photo' | 'publish_many_Photo' | 'publish_Post'
-        | 'comment_Photo' | 'comment_Post' | 'comment_Comment';
+        | 'comment_Photo' | 'comment_Post' | 'comment_Comment' | 'receive_Msg';
     message: string;
     timeout: number;
     detail: ShortMutualUserFriend;
@@ -272,7 +272,23 @@ export interface FullMessage {
     sender: ShortUserInfo,
     mode: 'internal' | 'external',
     additionalInfo: string | null,
-    mediaInfo: ShortMediaDialogMessage[]
+    mediaInfo: ShortMediaDialogMessage[],
+    replyMessage: MessageReply | null
+}
+
+export interface MessageReply {
+    _id: string,
+    user_id: string,
+    content: string | null,
+    mediaCount: number,
+    isEdited: boolean,
+    createdAt: Date,
+    updatedAt: Date,
+    sender: {
+        _id: string,
+        nickname: string,
+        nickname_color: string | null,
+    }
 }
 
 export interface ReadersFullInfo{

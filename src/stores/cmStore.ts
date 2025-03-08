@@ -127,6 +127,7 @@ export const useCmStore = defineStore('cm', () => {
         }
 
         try {
+
             const response = await apiAuth.get('user/message', {
                 params: {
                     convId, page, limit
@@ -332,6 +333,25 @@ export const useCmStore = defineStore('cm', () => {
         }
     }
 
+    const fullReloadMessagesAndDialogs = async (convId: string, dialogSelected?: boolean) => {
+
+        const [dialog] = await Promise.all([
+            getDialogInfo(convId, true, true),
+            dialogSelected ? getMessages(convId, 1 ,200 , true) : Promise.resolve()
+        ])
+
+        if (dialog && conversations.value) {
+            const index = conversations.value.findIndex((conv) => conv._id === convId);
+
+            if (index !== -1) {
+                conversations.value.splice(index, 1);
+                conversations.value.unshift(dialog);
+            } else {
+                conversations.value.unshift(dialog);
+            }
+        }
+    }
+
     const changeMsgReload = async () => {
         if (!selectedDialogId.value || !conversations.value) return;
 
@@ -525,6 +545,8 @@ export const useCmStore = defineStore('cm', () => {
         }
     };
 
+    const replyMessage = ref<FullMessage | null>(null);
+
     return{
         pending,
         error,
@@ -558,6 +580,7 @@ export const useCmStore = defineStore('cm', () => {
         leaveGroup,
         getGroupMedia,
         reloadMessagesAndDialogs,
+        fullReloadMessagesAndDialogs,
         reloadDialogs,
         changeMsgReload,
         addMembersFlag,
@@ -570,6 +593,7 @@ export const useCmStore = defineStore('cm', () => {
         deleteMessage,
         getAttachedFiles,
         changeMsgData,
-        changeMsg
+        changeMsg,
+        replyMessage
     }
 });

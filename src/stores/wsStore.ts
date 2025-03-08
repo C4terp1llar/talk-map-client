@@ -5,7 +5,7 @@ import { io, Socket } from "socket.io-client";
 import { checkTokenValidity, refreshToken } from "@/stores/sync";
 import {attachBaseWsHandlers} from "@/utils/wsBaseHandlers";
 import {useWsAddStore} from "@/stores/wsAddHandlers";
-import type {FriendRequest, Post} from "@/helpers/interfaces";
+import type {FriendRequest, FullMessage, Post} from "@/helpers/interfaces";
 import {useWsMdStore} from "@/stores/wsMediaHandlers";
 import {useAuthStore} from "@/stores/auth";
 import {decodeJWT} from "@/helpers/decodeJwt";
@@ -116,6 +116,10 @@ export const useWsStore = defineStore('ws', () => {
 
         userSocket.value.on('publish_comment', (payload: {text: string, entity_id: string, entity_type: 'Photo' | 'Post' | 'Comment', commentator: string, isReply?: boolean}) => {
             wsMd.publish_comment(payload)
+        })
+
+        userSocket.value.on('receive_msg', (payload: {createdMessage: FullMessage}) => {
+            wsMd.receive_msg(payload)
         })
     }
 

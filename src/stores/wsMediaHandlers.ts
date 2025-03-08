@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {useExternalUserStore} from "@/stores/externalUser";
 import {useFriendsStore} from "@/stores/friends";
-import type {FriendRequest, Post} from "@/helpers/interfaces";
+import type {FriendRequest, FullMessage, Post} from "@/helpers/interfaces";
 import {ref} from "vue";
 import {useUserStore} from "@/stores/user";
 import {useRoute, useRouter} from "vue-router";
@@ -12,6 +12,7 @@ import {usePostStore} from "@/stores/post";
 import {useSecurityStore} from "@/stores/security";
 import {decodeJWT} from "@/helpers/decodeJwt";
 import {useAuthStore} from "@/stores/auth";
+import {useCmStore} from "@/stores/cmStore";
 
 export const useWsMdStore = defineStore('wsMd', () => {
 
@@ -23,6 +24,7 @@ export const useWsMdStore = defineStore('wsMd', () => {
     const soundStore = useSoundsStore();
     const secureStore = useSecurityStore()
     const authStore = useAuthStore();
+    const cmStore = useCmStore();
 
     const route = useRoute();
     const router = useRouter();
@@ -119,8 +121,18 @@ export const useWsMdStore = defineStore('wsMd', () => {
         soundStore.addSound({soundType: 'default', soundCaller: 'publish_comment'})
     }
 
+    const receive_msg = async (payload: {createdMessage: FullMessage}) => {
+        if (route.name === 'communications'){
+            await cmStore.fullReloadMessagesAndDialogs(payload.createdMessage.conversation_id, route.query.conv === payload.createdMessage.conversation_id)
+            soundStore.addSound({soundType: 'message', soundCaller: 'receive_msg'})
+        }else{
+            soundStore.addSound({soundType: 'message', soundCaller: 'receive_msg'})
+        }
+    }
+
     const notifyWithPreload = async (
         type: 'publish_Photo' | 'publish_many_Photo' | 'react_Photo' | 'react_Post' | 'react_Comment' | 'publish_Post' | 'comment_Photo' | 'comment_Post' | 'comment_Comment'
+        | 'receive_Msg'
         ,uid: string, entity_id?: string, additional_text?: string
     ) => {
         const user = await friendStore.getOneUser(uid, false);
@@ -147,7 +159,8 @@ export const useWsMdStore = defineStore('wsMd', () => {
         reload_posts,
         publish_comment,
         reload_sessions,
-        session_close
+        session_close,
+        receive_msg,
     }
 });
 

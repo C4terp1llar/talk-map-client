@@ -15,7 +15,7 @@ const route = useRoute();
 const cmStore = useCmStore();
 
 const page = ref<number>(1);
-const LIMIT = 200;
+const LIMIT = 500;
 
 onUnmounted(() => {
   page.value = 1;
@@ -63,6 +63,9 @@ watch(
 );
 
 const uploadData = async (convId: string) => {
+  if (cmStore.hasMoreMessages){
+    page.value += 1;
+  }
   await cmStore.getMessages(convId, page.value, LIMIT)
 }
 
@@ -77,7 +80,7 @@ const uploadDialogInfo = async (convId: string) => {
     <div class="cm-main-content" v-if="route.query.conv">
       <lazy-placeholder-loader v-if="cmStore.getDialogPend || cmStore.messagesPend"/>
 
-      <cm-message-list v-if="cmStore.messages && (!cmStore.getDialogPend && !cmStore.messagesPend) && !route.query.info" :messages="cmStore.messages"/>
+      <cm-message-list v-if="cmStore.messages && (!cmStore.getDialogPend && !cmStore.messagesPend) && !route.query.info" :has-more="cmStore.hasMoreMessages" :messages="cmStore.messages" @load-more="uploadData(cmStore.selectedDialogId ? cmStore.selectedDialogId : '')"/>
       <cm-conv-info v-if="cmStore.messages && (!cmStore.getDialogPend && !cmStore.messagesPend) && route.query.info"/>
 
       <dialog-not-found class="__not-found" v-if="!cmStore.messages && !cmStore.getDialogPend && !cmStore.messagesPend"/>

@@ -72,6 +72,10 @@ const handleMsg = async () => {
     data.append("recipient", cmStore.selectedDialog.opponent._id);
   }
 
+  if (cmStore.replyMessage) {
+    data.append("replyTo", cmStore.replyMessage._id);
+  }
+
   if (msgFiles.value.length > 0){
     if (props.changeData && JSON.stringify(tempMsgChangeAttachments) !== JSON.stringify(msgFiles.value)){
       msgFiles.value.forEach(fileEntry => {
@@ -98,6 +102,9 @@ const handleMsg = async () => {
       tempMsgChangeAttachments = null;
       await cmStore.changeMsgReload();
     }else{
+      if (cmStore.replyMessage){
+        cmStore.replyMessage = null;
+      }
       await successSendMessage()
     }
   }

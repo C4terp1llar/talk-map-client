@@ -357,6 +357,25 @@ textarea::-webkit-scrollbar-track {
   }
 }
 
+//
+
+.blinking__op {
+  animation: blinking_opacity 1s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes blinking_opacity {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
 
 .__not_found-icon{
   filter: drop-shadow(0 0 2px currentColor);

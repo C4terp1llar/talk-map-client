@@ -15,7 +15,8 @@ const emit = defineEmits<{
 
 
 interface Props {
-  m: FullMessage
+  m: FullMessage;
+  mode: 'change' | 'reply'
 }
 
 const props = defineProps<Props>()
@@ -26,31 +27,31 @@ const crSendTime = computed(() => {
 
 const cmStore = useCmStore()
 const declineChange = () => {
-  cmStore.changeMsgData = null
-  cmStore.changeMsgMedia = null
+  if (props.mode === 'reply'){
+    cmStore.replyMessage = null
+  }else{
+    cmStore.changeMsgData = null
+  }
 }
 </script>
 
 <template>
   <div :class="['message-item__wrapper minimalistic_scroll']" :data-message-id="m._id">
 
-    <div class="message-item__change-head">
+    <div :class="['message-item__change-head', mode]">
       <v-icon :size="20">mdi-pen</v-icon>
-      <span>Редактирование</span>
+      <span>
+        <template v-if="mode === 'reply'">
+          В ответ <span :style="{color: m.sender.nickname_color ? m.sender.nickname_color : 'currentColor'}">{{m.sender.nickname}}</span>
+        </template>
+        <template v-else>
+          Редактирование
+        </template>
+      </span>
       <v-btn @click="declineChange" class="ml-auto" variant="tonal" icon density="compact"><v-icon>mdi-close</v-icon></v-btn>
     </div>
 
-    <div
-        class="message-item__content"
-    >
-        <span
-            v-if="m.conversationType === 'GroupConversation' && m.mode === 'external'"
-            :style="{color: m.sender.nickname_color ? m.sender.nickname_color : 'currentColor'}"
-            class="nickname-text"
-        >
-          {{ m.sender.nickname }}
-        </span>
-
+    <div class="message-item__content">
       <div class="msg-text__wrapper ">
           <span class="msg-text message__text-content" v-if="m.content || m.mediaInfo.length">
             <span v-if="m.mediaInfo.length" class="text-green mr-2">{{ m.mediaInfo.length === 1 ? m.mediaInfo[0].name : m.mediaInfo.length + `${m.mediaInfo.length <= 4 ? ' файла' : ' файлов'}` }}</span>
@@ -64,11 +65,9 @@ const declineChange = () => {
           </div>
         </div>
       </div>
-
     </div>
 
   </div>
-
 </template>
 
 <style scoped lang="scss">
@@ -77,7 +76,13 @@ const declineChange = () => {
   gap: 5px;
   align-items: center;
   font-size: 14px;
-  color: darkorange;
+
+  &.reply{
+    color: #66c5ff;
+  }
+  &.change{
+    color: darkorange;
+  }
 }
 
 .message__text-content {

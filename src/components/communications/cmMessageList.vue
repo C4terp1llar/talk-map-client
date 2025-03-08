@@ -8,14 +8,20 @@ import {formatCmDividerDate} from "@/helpers/dateHelper";
 import MessageItemMenu from "@/components/communications/messageItemMenu.vue";
 import {useCmStore} from "@/stores/cmStore";
 import MessageChangeItem from "@/components/communications/messageChangeItem.vue";
+import {useRoute, useRouter} from "vue-router";
 
 interface Props {
   messages?: FullMessage[];
   newConvMode?: boolean;
-  newDialogOpponent?: ShortUserInfo
+  newDialogOpponent?: ShortUserInfo,
+  hasMore?: boolean
 }
 
 const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  (e: 'load-more'): void
+}>()
 
 const cmStore = useCmStore();
 
@@ -104,7 +110,9 @@ const handleCloseMenu = () => {
 
 onUnmounted(() => {
   cmStore.changeMsgData = null;
+  cmStore.replyMessage = null;
 })
+
 </script>
 
 <template>
@@ -121,6 +129,10 @@ onUnmounted(() => {
     </div>
 
     <div :class="['cm-message-list__content styled-scroll__cm', {'show-blur': selectedMessageItem}]" ref="messageListRef" v-if="!newConvMode" @contextmenu.prevent>
+      <div class="d-flex" v-if="hasMore">
+        <v-btn @click="emit('load-more')" variant="tonal" class=" text-none ma-auto" color="green" :disabled="cmStore.messagesPendMore" :loading="cmStore.messagesPendMore">Еще ...</v-btn>
+      </div>
+
       <template v-for="(message, index) in props.messages" :key="message._id">
         <div v-if="shouldShowDateDivider(index)" class="msg__date-divider">
           <div class="date-divider__content">
@@ -135,7 +147,8 @@ onUnmounted(() => {
        <span>Сообщений пока нет</span>
     </div>
 
-    <message-change-item v-if="cmStore.changeMsgData?.message" :m="cmStore.changeMsgData.message"/>
+    <message-change-item mode="change" v-if="cmStore.changeMsgData?.message && !cmStore.replyMessage" :m="cmStore.changeMsgData.message"/>
+    <message-change-item mode="reply" v-if="!cmStore.changeMsgData?.message && cmStore.replyMessage" :m="cmStore.replyMessage"/>
     <div class="cm-message-list__create-msg-wrap">
       <create-message :change-data="cmStore.changeMsgData" :new-dialog-opponent="newDialogOpponent" :new-conv-mode="newConvMode"/>
     </div>

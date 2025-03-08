@@ -44,6 +44,9 @@ const handleDeleteMessage = async () => {
 
 const changePending = ref<boolean>(false);
 const handleChangeMessage = async () => {
+  if (cmStore.replyMessage){
+    cmStore.replyMessage = null
+  }
   let files = null;
   changePending.value = true;
   if (props.message.mediaInfo.length) {
@@ -63,6 +66,14 @@ const handleCopyMessage = async () => {
     emit('close', props.mId)
   }
 };
+
+const handleResponseMessage = async () => {
+  if (cmStore.changeMsgData){
+    cmStore.changeMsgData = null
+  }
+  cmStore.replyMessage = props.message;
+  emit('close', props.mId)
+}
 </script>
 
 <template>
@@ -71,16 +82,16 @@ const handleCopyMessage = async () => {
       Изменить
     </v-btn>
 
-    <v-btn prepend-icon="mdi-redo-variant" class="menu-btn text-none fz-12" density="compact" variant="tonal">
+    <v-btn prepend-icon="mdi-redo-variant" class="menu-btn text-none fz-12" density="compact" variant="tonal" @click="handleResponseMessage" :disabled="delPending || changePending">
       Ответить
+    </v-btn>
+
+    <v-btn prepend-icon="mdi-content-copy" class="menu-btn text-none fz-12" density="compact" variant="tonal" @click="handleCopyMessage" v-if="props.message.content" :disabled="delPending || changePending">
+      Копировать
     </v-btn>
 
     <v-btn v-if="mode === 'internal'" prepend-icon="mdi-delete-outline" class="menu-btn text-none fz-12" density="compact" variant="tonal" @click="handleDeleteMessage" :loading="delPending" :disabled="delPending || changePending">
       Удалить
-    </v-btn>
-
-    <v-btn prepend-icon="mdi-content-copy" class="menu-btn text-none fz-12" density="compact" variant="tonal" @click="handleCopyMessage" v-if="props.message.content">
-      Копировать
     </v-btn>
   </div>
 </template>

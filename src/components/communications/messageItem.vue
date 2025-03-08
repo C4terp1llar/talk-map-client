@@ -40,6 +40,15 @@ const handleSendResponse = (event: Event) => {
   emit('voidResponseMessage', props.m)
 };
 
+const scrollToMessage = () => {
+  if (!props.m.replyMessage) return;
+  const target = document.querySelector(`[data-message-id="${props.m.replyMessage._id}"]`);
+  if (target) {
+    target.scrollIntoView({ block: 'center' });
+    target.classList.add('blinking__op');
+    setTimeout(() => {target.classList.remove('blinking__op')}, 1000)
+  }
+}
 </script>
 
 <template>
@@ -63,7 +72,14 @@ const handleSendResponse = (event: Event) => {
       </v-avatar>
     </div>
 
-    <div :class="['message-item__default', m.mode]" v-else>
+    <!--      хендлер на нажатие пкм или холд при таче    -->
+
+    <div :class="['message-item__default', m.mode]"
+         @contextmenu="handleContextMenu"
+         @touchstart="handleContextMenu"
+         @dblclick="handleSendResponse"
+         v-else
+    >
 
       <div class="message-item__avatar" v-if="m.conversationType === 'GroupConversation' && m.mode === 'external'">
         <v-avatar :size="30">
@@ -79,13 +95,29 @@ const handleSendResponse = (event: Event) => {
         </v-avatar>
       </div>
 
-      <!--      хендлер на нажатие пкм или холд при таче    -->
       <div
           class="message-item__content"
-          @contextmenu="handleContextMenu"
-          @touchstart="handleContextMenu"
-          @dblclick="handleSendResponse"
       >
+
+        <div class="message-item__reply" v-if="m.replyTo && m.replyMessage">
+          <span
+              :style="{color: m.replyMessage.sender.nickname_color ? m.replyMessage.sender.nickname_color : 'currentColor'}"
+              class="nickname-text"
+          >
+            {{ m.replyMessage.sender.nickname }}
+          </span>
+
+          <span class="msg-text message__text-content" v-if="m.content || m.mediaInfo.length">
+            <span v-if="m.replyMessage.mediaCount" class="text-green mr-2">
+              <template v-if="m.replyMessage.mediaCount === 1">{{ m.replyMessage.mediaCount }} файл</template>
+              <template v-if="m.replyMessage.mediaCount <= 4 && m.replyMessage.mediaCount > 1">{{ m.replyMessage.mediaCount }} файла</template>
+              <template v-if="m.replyMessage.mediaCount >= 5">{{ m.replyMessage.mediaCount }} файлов</template>
+            </span>
+            <span v-if="m.replyMessage.content">{{ m.replyMessage.content }}</span>
+          </span>
+
+          <button @click="scrollToMessage"></button>
+        </div>
 
         <span
             v-if="m.conversationType === 'GroupConversation' && m.mode === 'external'"
@@ -117,7 +149,7 @@ const handleSendResponse = (event: Event) => {
 </template>
 
 <style scoped lang="scss">
-.no_blurred__message{
+.no_blurred__message {
   filter: none;
   position: relative;
   z-index: 5;
@@ -168,6 +200,35 @@ const handleSendResponse = (event: Event) => {
       border-radius: 10px;
       border: 1px solid grey;
 
+      .message-item__reply {
+        display: flex;
+        flex-direction: column;
+        padding: 5px;
+        border-radius: 7px;
+        border-left: 5px solid #66c5ff;
+        background-color: rgba(211, 211, 211, 0.25);
+        position: relative;
+        transition: .3s;
+
+        &:hover{
+          opacity: .8;
+        }
+
+        .message__text-content {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          white-space: normal;
+          font-size: 14px;
+        }
+
+        button{
+          position: absolute;
+          inset: 0;
+        }
+      }
+
       .message-item__media-wrap {
         display: flex;
         flex-wrap: wrap;
@@ -184,7 +245,7 @@ const handleSendResponse = (event: Event) => {
         margin-top: auto;
         padding-left: 8px;
 
-        &.__edited{
+        &.__edited {
           padding-left: 5px;
         }
 
