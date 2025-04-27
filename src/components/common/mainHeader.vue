@@ -6,8 +6,7 @@ import AvatarMenu from "@/components/avatarMenu.vue";
 <template>
 <div class="header">
   <div class="header__logo">
-    <img class="logo-lr" src="/logo/logo-lr.png">
-    <img class="logo-sm" src="/logo/logo-sm.png">
+    <img class="logo-lr" src="/logo/logo-f.png" alt="logo">
     <router-link class="header__logo-link" :to="{name: 'home'}"/>
   </div>
   <avatar-menu/>
@@ -31,21 +30,13 @@ import AvatarMenu from "@/components/avatarMenu.vue";
     position: relative;
     display: flex;
     align-items: center;
-    .logo-lr, .logo-sm{
-      object-fit: cover;
-      filter: drop-shadow(0 0 2px currentColor);
-      max-height: 28px;
-    }
+    transition: .3s;
     .logo-lr{
-      @media (max-width: 650px){
-        display: none;
-      }
+      object-fit: cover;
+      max-height: 40px;
     }
-    .logo-sm{
-      display: none;
-      @media (max-width: 650px){
-        display: block;
-      }
+    &:hover{
+      filter: drop-shadow(0 0 1px green);
     }
     .header__logo-link{
       position: absolute;

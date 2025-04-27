@@ -20,7 +20,7 @@ import ThemeSwitcher from "@/components/themeSwitcher.vue";
 <style scoped lang="scss">
 .wrapper {
   width: 100%;
-  height: 100% ;
+  height: 100%;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr;
