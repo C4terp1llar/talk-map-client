@@ -121,6 +121,11 @@ export const useWsStore = defineStore('ws', () => {
         userSocket.value.on('receive_msg', (payload: {createdMessage: FullMessage}) => {
             wsMd.receive_msg(payload)
         })
+
+        userSocket.value.on('read_msg', (payload: string) => {
+            wsMd.read_msg(payload)
+        })
+
     }
 
     const disconnectSocket = () => {

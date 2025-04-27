@@ -232,7 +232,7 @@ PersonalConv{
         display: flex;
         align-items: center;
         justify-content: center;
-        filter: drop-shadow(0 0 3px lightgreen);
+        filter: drop-shadow(0 0 2px lightgreen);
         .cm-personal-conv-item__detail-msg__unread-counter__content{
           color: black;
           font-size: 11px;

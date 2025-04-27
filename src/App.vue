@@ -9,6 +9,7 @@ import GlobalMedia from "@/components/common/globalMedia.vue";
 import {useRoute} from "vue-router";
 import {computed} from "vue";
 import GlobalPost from "@/components/posts/globalPost.vue";
+import HostTest from "@/components/common/hostTest.vue";
 
 const route = useRoute()
 
@@ -23,6 +24,7 @@ const isGPostVisible = computed(() => route.query.p && !route.query.r);
     <global-loader v-if="pending"/>
     <RouterView v-else/>
 
+    <host-test/>
     <notification/>
 
     <v-dialog-transition>

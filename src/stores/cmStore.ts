@@ -560,7 +560,6 @@ export const useCmStore = defineStore('cm', () => {
         }
 
         readQueueTimer.value = setTimeout(async () => {
-            console.log('mark read');
             if (messageIdsReadQueue.value.length > 0) {
                 await markRead();
             }

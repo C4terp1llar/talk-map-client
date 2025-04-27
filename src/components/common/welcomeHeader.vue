@@ -4,8 +4,8 @@
 
 <template>
   <div class="header">
-    <h3 class="ma-0">TalkMap</h3>
-    <v-icon color="green-darken-2" size="large">mdi-map-marker-radius-outline</v-icon>
+    <img class="logo-lr" src="/logo/logo-lr.png">
+    <img class="logo-sm" src="/logo/logo-sm.png">
   </div>
 </template>
 
@@ -19,5 +19,21 @@
   margin: 5px;
   border-radius: 15px;
   box-shadow: 0 1px 20px currentColor;
+  .logo-lr, .logo-sm{
+    object-fit: cover;
+    filter: drop-shadow(0 0 2px currentColor);
+    max-height: 28px;
+  }
+  .logo-lr{
+    @media (max-width: 650px){
+      display: none;
+    }
+  }
+  .logo-sm {
+    display: none;
+    @media (max-width: 650px) {
+      display: block;
+    }
+  }
 }
 </style>

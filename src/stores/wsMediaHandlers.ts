@@ -130,6 +130,21 @@ export const useWsMdStore = defineStore('wsMd', () => {
         }
     }
 
+    const read_msg = async (payload: string) => {
+        if (cmStore.conversations){
+            const conv = cmStore.conversations.find(c => c.lastMessage._id === payload);
+            if (conv){
+                conv.lastMessage.isRead = true;
+            }
+        }
+        if (cmStore.messages){
+            const msg = cmStore.messages.find(m => m._id === payload);
+            if (msg){
+                msg.isRead = true;
+            }
+        }
+    }
+
     const notifyWithPreload = async (
         type: 'publish_Photo' | 'publish_many_Photo' | 'react_Photo' | 'react_Post' | 'react_Comment' | 'publish_Post' | 'comment_Photo' | 'comment_Post' | 'comment_Comment'
         | 'receive_Msg'
@@ -161,6 +176,7 @@ export const useWsMdStore = defineStore('wsMd', () => {
         reload_sessions,
         session_close,
         receive_msg,
+        read_msg
     }
 });
 

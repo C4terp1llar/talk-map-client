@@ -13,7 +13,7 @@ import CmCreateGroupWrap from "@/components/communications/cmCreateGroupWrap.vue
 .cm-sidebar-head__wrapper{
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 </style>

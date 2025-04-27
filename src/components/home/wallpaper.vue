@@ -74,7 +74,9 @@ const props = defineProps<Props>()
         <div class="actions-block">
           <v-btn
               v-if="!props.isPreview"
-              variant="tonal"
+              variant="outlined"
+              density="comfortable"
+              rounded
               class="text-none"
               prepend-icon="mdi-palette-outline"
               @click="router.push({name: 'settings'})"
