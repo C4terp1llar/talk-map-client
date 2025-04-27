@@ -3,9 +3,10 @@ import type {FullMessage} from "@/helpers/interfaces";
 import {getMsgContent} from "../../helpers/cmHelpers";
 import SkeletonLoader from "@/components/common/skeletonLoader.vue";
 import MessageItemMedia from "@/components/communications/messageItemMedia.vue";
-import {computed, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
 import {format} from "date-fns";
 import MessageItemMenu from "@/components/communications/messageItemMenu.vue";
+import {useCmStore} from "@/stores/cmStore";
 
 const emit = defineEmits<{
   (e: "voidMessageMenu", m: FullMessage): void;
@@ -49,6 +50,60 @@ const scrollToMessage = () => {
     setTimeout(() => {target.classList.remove('blinking__op')}, 1000)
   }
 }
+
+const holdTimer = ref<any>(null);
+
+const handleStartTouch = () => {
+  holdTimer.value = setTimeout(() => {
+      emit('voidMessageMenu', props.m)
+  }, 600)
+}
+const handleEndTouch = () => {
+  if (holdTimer.value){
+    clearTimeout(holdTimer.value)
+    holdTimer.value = null;
+  }
+}
+
+const cmStore = useCmStore();
+
+let observer: IntersectionObserver | null = null;
+
+onMounted( () => {
+  const el = document.querySelector(`[data-message-id="${props.m._id}"]`);
+  if (!el) return;
+
+  observer = new IntersectionObserver(async (entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        if (props.m.mode === 'external' && !props.m.isRead && cmStore.conversations) {
+          // флаг сообщения
+          props.m.isRead = true;
+          // -- кол-во непрочитанных
+          const conv = cmStore.conversations.find(c => c._id === props.m.conversation_id);
+          if (conv){
+            conv.unreadMessagesCount-=1;
+          }
+
+          await cmStore.addMessageToReadQueue(props.m._id);
+        }
+      }
+    }
+  }, {
+    threshold: 0.3
+  });
+
+  observer.observe(el);
+});
+
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect();
+    observer = null;
+  }
+});
+
+
 </script>
 
 <template>
@@ -75,9 +130,11 @@ const scrollToMessage = () => {
     <!--      хендлер на нажатие пкм или холд при таче    -->
 
     <div :class="['message-item__default', m.mode]"
-         @contextmenu="handleContextMenu"
-         @touchstart="handleContextMenu"
+         @touchstart="handleStartTouch"
+         @touchend="handleEndTouch"
+         @touchcancel="handleEndTouch"
          @dblclick="handleSendResponse"
+         @contextmenu="handleContextMenu"
          v-else
     >
 

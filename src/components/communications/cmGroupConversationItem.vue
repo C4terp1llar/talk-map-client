@@ -161,13 +161,14 @@ const handleSelectDialog = () => {
       .cm-group-conv-item__detail-msg__unread-counter{
         grid-column: span 1;
         border-radius: 8px;
-        background-color: #cccccc;
+        background-color: palegreen;
         margin-left: 3px;
         min-width: 17px;
         padding: 0 5px;
         display: flex;
         align-items: center;
         justify-content: center;
+        filter: drop-shadow(0 0 3px lightgreen);
         .cm-group-conv-item__detail-msg__unread-counter__content{
           color: black;
           font-size: 11px;

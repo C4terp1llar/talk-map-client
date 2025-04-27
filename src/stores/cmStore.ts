@@ -547,6 +547,43 @@ export const useCmStore = defineStore('cm', () => {
 
     const replyMessage = ref<FullMessage | null>(null);
 
+    const messageIdsReadQueue = ref<string[]>([])
+    const readQueueTimer = ref<number | null>(null)
+
+    const addMessageToReadQueue = async (mId: string) => {
+        if (messageIdsReadQueue.value && !messageIdsReadQueue.value.includes(mId)) {
+            messageIdsReadQueue.value.push(mId);
+        }
+
+        if (readQueueTimer.value) {
+            clearTimeout(readQueueTimer.value);
+        }
+
+        readQueueTimer.value = setTimeout(async () => {
+            console.log('mark read');
+            if (messageIdsReadQueue.value.length > 0) {
+                await markRead();
+            }
+            messageIdsReadQueue.value = [];
+            readQueueTimer.value = null;
+        }, 500);
+    }
+
+    const markRead = async () => {
+        if (!selectedDialogId.value) return;
+
+        try{
+            await apiAuth.post(`/user/conv/${selectedDialogId.value}/msgRead`, {
+                messages: messageIdsReadQueue.value
+            })
+        }catch (e: any) {
+            error.value = `Произошла ошибка при попытке пометить сообщение прочитанным, попробуйте позже`;
+            console.error(e);
+        }
+    }
+
+
+
     return{
         pending,
         error,
@@ -594,6 +631,8 @@ export const useCmStore = defineStore('cm', () => {
         getAttachedFiles,
         changeMsgData,
         changeMsg,
-        replyMessage
+        replyMessage,
+
+        addMessageToReadQueue
     }
 });

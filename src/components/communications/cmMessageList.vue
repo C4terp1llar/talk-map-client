@@ -8,7 +8,6 @@ import {formatCmDividerDate} from "@/helpers/dateHelper";
 import MessageItemMenu from "@/components/communications/messageItemMenu.vue";
 import {useCmStore} from "@/stores/cmStore";
 import MessageChangeItem from "@/components/communications/messageChangeItem.vue";
-import {useRoute, useRouter} from "vue-router";
 
 interface Props {
   messages?: FullMessage[];
@@ -28,14 +27,23 @@ const cmStore = useCmStore();
 const messageListRef = ref<HTMLElement | null>(null);
 const isAtBottom = ref(true);
 
-const scrollToBottom = (smooth = false) => {
+const scrollToMessage = (messageId?: string, smooth = false) => {
   nextTick(() => {
-    if (messageListRef.value) {
-      messageListRef.value.scrollTo({
-        top: messageListRef.value.scrollHeight,
-        behavior: smooth ? "smooth" : "auto",
-      });
+    if (!messageListRef.value) return;
+
+    if (messageId) {
+      const target = messageListRef.value.querySelector(`[data-message-id="${messageId}"]`) as HTMLElement;
+      if (target) {
+        target.scrollIntoView({ block: 'start', behavior: smooth ? 'smooth' : 'auto' });
+        return;
+      }
     }
+
+    // если не нашли сообщение — просто скроллим вниз
+    messageListRef.value.scrollTo({
+      top: messageListRef.value.scrollHeight,
+      behavior: smooth ? "smooth" : "auto",
+    });
   });
 };
 
@@ -50,13 +58,19 @@ onMounted(() => {
 
   const observer = new MutationObserver(() => {
     if (isAtBottom.value) {
-      scrollToBottom(false);
+      scrollToMessage(undefined, false); // скролл в самый низ если мы у низа
     }
   });
 
   observer.observe(messageListRef.value, { childList: true, subtree: true });
 
-  scrollToBottom();
+  const firstUnread = props.messages.find(m => !m.isRead && m.mode !== 'internal'); // <<< тут ищем первое непрочитанное
+
+  if (firstUnread) {
+    scrollToMessage(firstUnread._id);
+  } else {
+    scrollToMessage();
+  }
 
   messageListRef.value.addEventListener("scroll", checkScrollPosition);
 });
